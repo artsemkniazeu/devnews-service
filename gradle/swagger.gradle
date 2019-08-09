@@ -1,0 +1,17 @@
+openApiGenerate {
+    generatorName = "custom-spring"
+    inputSpec = "$rootDir/src/main/resources/swagger/openapi.yaml".toString()
+    outputDir = "$buildDir/generated".toString()
+    apiPackage = "${basePackage}.controllers.api".toString()
+    modelPackage = "${basePackage}.model.rest".toString()
+    modelNamePrefix = "Rest"
+    configOptions = [
+            dateLibrary  : "java11",
+            interfaceOnly: "true",
+            useTags      : "true"
+    ]
+}
+
+
+
+compileJava.dependsOn tasks.openApiGenerate

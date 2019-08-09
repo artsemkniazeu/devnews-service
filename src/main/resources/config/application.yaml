@@ -1,0 +1,81 @@
+---
+app:
+  jwt:
+    base64-secret: "${APP_JWT_BASE64_SECRET:}"
+    access-token-validity: "${APP_JWT_ACCESS_TOKEN_VALIDITY}"
+    refresh-token-validity: "${APP_JWT_REFRESH_TOKEN_VALIDITY}"
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: "${SPRING_DATASOURCE_URL:}"
+    username: "${SPRING_DATASOURCE_USERNAME:}"
+    password: "${SPRING_DATASOURCE_PASSWORD:}"
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  servlet:
+    multipart:
+      max-file-size: -1
+      max-request-size: -1
+  jackson:
+    default-property-inclusion: non_null
+
+server:
+  port: "${PORT:8080}"
+---
+
+---
+spring:
+  profiles: local
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+      file-size-threshold: 1MB
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: onliner
+    password: onliner
+    url: jdbc:postgresql://localhost:5433/onliner_db
+  flyway:
+    baseline-on-migrate: true
+
+---
+
+---
+spring:
+  profiles: test
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  servlet:
+    multipart:
+      max-file-size: 200MB
+      max-request-size: 200MB
+      file-size-threshold: 1MB
+  flyway:
+    baseline-on-migrate: true
+
+---
+
+app:
+  jwt:
+    base64-secret: "dvkfGCq2G00TFJ3j+4UDS+CPwAVLkLziJXlXUvNy2jr0NkIH4QPtfXOLpHK1G++RixsyY5CX6BRh82lZySF4Xg=="
+    access-token-validity: "3600" # 1 hour in seconds
+    refresh-token-validity: "2592000" # 30 days in seconds

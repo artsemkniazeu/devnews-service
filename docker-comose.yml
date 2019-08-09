@@ -1,0 +1,12 @@
+version: "3.7"
+services:
+
+  postgres-db:
+    image: mdillon/postgis:10-alpine
+    container_name: devnews-postgres
+    environment:
+      - POSTGRES_USER=onliner
+      - POSTGRES_PASSWORD=onliner
+      - POSTGRES_DB=onliner_db
+    ports:
+      - "5433:5432"

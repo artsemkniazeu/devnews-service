@@ -1,0 +1,473 @@
+openapi: 3.0.0
+info:
+  title: onliner
+  version: "0.1"
+  description: onliner - API
+tags:
+  - name: Auth
+  - name: User
+  - name: UserResources
+
+servers:
+  - url: /api/v1
+
+paths:
+  # ========================================
+  # ===== Auth API
+  # ========================================
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      operationId: login
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/LoginRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+  /auth/refresh-token:
+    post:
+      tags:
+        - Auth
+      operationId: refreshToken
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/RefreshTokenRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      operationId: signUp
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/SignUpRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ========================================
+  # ===== User API
+  # ========================================
+  /users:
+    get:
+      tags:
+        - User
+      operationId: getUsers
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: username
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: email
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+  "/users/{userId}":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - User
+      operationId: getUser
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    put:
+      tags:
+        - User
+      operationId: updateUser
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/UserModel"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    delete:
+      tags:
+        - User
+      operationId: deleteUser
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /users/{userId}/image:
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - User
+      operationId: uploadImage
+      security:
+        - userAuth: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UrlModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "422":
+          $ref: "#/components/responses/UnprocessableEntity"
+
+components:
+  parameters:
+    PageQueryParameter:
+      name: page
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        default: 1
+    SizeQueryParameter:
+      name: size
+      in: query
+      schema:
+        type: integer
+        minimum: 10
+        maximum: 30
+        default: 10
+
+  responses:
+    BadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Forbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    Conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    UnprocessableEntity:
+      description: Unprocessable Entity
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+    NotAcceptable:
+      description: Not Acceptable
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Problem"
+
+  requestBodies:
+    LoginRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/LoginRequest"
+          examples:
+            put:
+              summary: login request
+              value:
+                email: user@example.com
+                password: pass
+      required: true
+
+    RefreshTokenRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RefreshTokenRequest"
+          examples:
+            put:
+              summary: refresh token request
+              value:
+                email: user@example.com
+                password: pass
+      required: true
+
+    SignUpRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SignUpRequest"
+          examples:
+            put:
+              summary: refresh token request
+              value:
+                firstName: firstname
+                lastName: lastname
+                username: username
+                email: user@example.com
+                country: country
+                state: state
+                password: pass
+      required: true
+
+    UserModel:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/UserModel"
+          examples:
+            put:
+              summary: update user profile
+              value:
+                firstName: string
+                lastName: string
+                country: string
+                state: string
+                email: user@example.com
+                iconUrl: string
+                createdAt: string
+      required: true
+
+  securitySchemes:
+    userAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  schemas:
+    Problem:
+      type: object
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+          minimum: 100
+          maximum: 600
+        detail:
+          type: string
+    UrlModel:
+      type: object
+      properties:
+        url:
+          type: string
+    UserRole:
+      type: string
+      enum:
+        - USER
+        - ADMIN
+
+    LoginRequest:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+    SignUpRequest:
+      type: object
+      properties:
+        firstName:
+          type: string
+        lastName:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        country:
+          type: string
+        state:
+          type: string
+        password:
+          type: string
+
+    UserModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        username:
+          type: string
+          format: string
+        email:
+          type: string
+          format: email
+        phone:
+          type: string
+        imageUrl:
+          type: string
+        profileBgUrl:
+          type: string
+        firstName:
+          type: string
+        lastName:
+          type: string
+        country:
+          type: string
+        city:
+          type: string
+        timezone:
+          type: string
+        birthday:
+          type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
+        createdAt:
+          type: string
+        socials:
+          type: array
+          items:
+            $ref: "#/components/schemas/SocialModel"
+    SocialModel:
+      type: object
+      properties:
+        type:
+          type: string
+        url:
+          type: string
+
+    TokenModel:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        accessIssuedAt:
+          type: integer
+          format: int64
+        accessExpiresIn:
+          type: integer
+          format: int64
+        refreshToken:
+          type: string
+        refreshIssuedAt:
+          type: integer
+          format: int64
+        refreshExpiresIn:
+          type: integer
+          format: int64
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string

@@ -1,0 +1,54 @@
+def projectPackage = "pl/dev/news"
+
+def jacocoExclude =  [
+        "**/OnlinerServiceApplication.class",
+        "${projectPackage}/controllers/api/*.class",
+        "${projectPackage}/model/rest/*.class",
+        "${projectPackage}/openapitools/*.class",
+
+        "${projectPackage}/devnewsservice/constants/*.class",
+        "${projectPackage}/devnewsservice/entity/*.class",
+        "${projectPackage}/devnewsservice/exception/*.class",
+]
+
+jacoco {
+    toolVersion = "0.8.4"
+    reportsDir = file("${buildDir}/reports/jacoco/html")
+}
+
+test {
+    jacoco {
+        append = false
+        destinationFile = file("$buildDir/jacoco/jacocoTest.exec")
+    }
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled = false
+        html.destination = file("${buildDir}/reports/jacoco/html")
+    }
+    afterEvaluate {
+        getClassDirectories().setFrom(classDirectories.files.collect {
+            fileTree(dir: it, exclude: jacocoExclude)
+        })
+    }
+}
+
+jacocoTestCoverageVerification {
+    afterEvaluate {
+        getClassDirectories().setFrom(classDirectories.files.collect {
+            fileTree(dir: it, exclude: jacocoExclude)
+        })
+    }
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.99
+            }
+        }
+    }
+}
+
+check.dependsOn jacocoTestReport
+build.dependsOn jacocoTestCoverageVerification
