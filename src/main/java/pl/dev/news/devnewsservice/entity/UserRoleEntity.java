@@ -2,7 +2,9 @@ package pl.dev.news.devnewsservice.entity;
 
 public enum  UserRoleEntity {
     USER("USER"),
-    ADMIN("ADMIN");
+    ADMIN("ADMIN"),
+    MODERATOR("MODERATOR"),
+    PUBLISHER("PUBLISHER");
 
     private final String value;
 

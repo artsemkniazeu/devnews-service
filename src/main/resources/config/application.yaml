@@ -49,9 +49,9 @@ spring:
       file-size-threshold: 1MB
   datasource:
     driver-class-name: org.postgresql.Driver
-    username: onliner
-    password: onliner
-    url: jdbc:postgresql://localhost:5433/onliner_db
+    username: devnews
+    password: devnews
+    url: jdbc:postgresql://localhost:5433/devnews_db
   flyway:
     baseline-on-migrate: true
 
