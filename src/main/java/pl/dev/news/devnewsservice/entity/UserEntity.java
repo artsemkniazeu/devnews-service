@@ -27,9 +27,9 @@ import static javax.persistence.EnumType.STRING;
 @Setter
 @EqualsAndHashCode(
         callSuper = false,
-        exclude = {"posts", "followingTags", "bookmarks", "followingUsers", "followers", "comments"}
+        exclude = {"posts", "followingTags", "bookmarks", "followingUsers", "followers", "comments", "uploads"}
 )
-@ToString(exclude = {"posts", "followingTags", "bookmarks", "followingUsers", "followers", "comments"})
+@ToString(exclude = {"posts", "followingTags", "bookmarks", "followingUsers", "followers", "comments", "uploads"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -107,5 +107,8 @@ public class UserEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "user")
     private Set<CommentEntity> comments;
+
+    @OneToMany(mappedBy = "post")
+    private Set<UploadEntity> uploads;
 
 }

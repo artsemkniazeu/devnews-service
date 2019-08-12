@@ -8,7 +8,7 @@ import pl.dev.news.model.rest.RestUserModel;
 
 public interface AuthService {
 
-    RestTokenModel login(RestLoginRequest restLoginRequest);
+    RestTokenModel signIn(RestLoginRequest restLoginRequest);
 
     RestTokenModel refreshToken(RestRefreshTokenRequest restRefreshTokenRequest);
 

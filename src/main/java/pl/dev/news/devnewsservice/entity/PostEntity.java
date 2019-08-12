@@ -15,6 +15,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.Set;
@@ -24,9 +25,9 @@ import java.util.UUID;
 @Setter
 @EqualsAndHashCode(
         callSuper = false,
-        exclude = {"publisher", "usersSaved", "tags"}
+        exclude = {"publisher", "usersSaved", "tags", "uploads"}
 )
-@ToString(exclude = {"publisher", "usersSaved", "tags"})
+@ToString(exclude = {"publisher", "usersSaved", "tags", "uploads"})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -38,23 +39,23 @@ public class PostEntity extends AuditableEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "title", nullable = false)
+    @Column(name = "title")
     private String title;
 
-    @Column(name = "text", nullable = false)
+    @Column(name = "text")
     private String text;
 
-    @Column(name = "imageUrl", nullable = false)
+    @Column(name = "imageUrl")
     private String imageUrl;
 
-    @Column(name = "date", nullable = false)
-    private Instant date;
+    @Column(name = "update_date")
+    private Instant updateDate;
 
-    //List<String> authors
-    //List<String> photosAuthor
+    @Column(name = "publish_date")
+    private Instant publishDate;
 
     @ManyToOne
-    @JoinColumn(name = "publisher_id", nullable = false)
+    @JoinColumn(name = "publisher_id")
     private UserEntity publisher;
 
     @ManyToMany(mappedBy = "bookmarks")
@@ -66,5 +67,8 @@ public class PostEntity extends AuditableEntity {
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<TagEntity> tags;
+
+    @OneToMany(mappedBy = "user")
+    private Set<UploadEntity> uploads;
 
 }

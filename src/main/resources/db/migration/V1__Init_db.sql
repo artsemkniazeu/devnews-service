@@ -36,18 +36,19 @@ create table if not exists users
     created_at      timestamp       not null,
     deleted_at      timestamp,
     updated_at      timestamp,
-    bg_url          text,
+    username        text            unique,
+    email           text            not null unique,
+    phone           text            unique,
+    password        text            not null,
+    role            text            not null,
+    first_name      text            not null,
+    last_name       text            not null,
     birthday        timestamp,
     city            text,
     country         text,
-    email           text            not null unique,
-    first_name      text            not null,
-    last_name       text            not null,
     image_url       text,
-    password        text            not null,
-    phone           text            not null unique,
-    role            text            not null,
-    username        text            not null unique
+    bg_url          text
+
 );
 
 --- Comments
@@ -77,7 +78,8 @@ create table if not exists posts
     created_at      timestamp       not null,
     deleted_at      timestamp,
     updated_at      timestamp,
-    date            timestamp       not null,
+    update_date     timestamp,
+    publish_date    timestamp       not null,
     image_url       text            not null,
     text            text            not null,
     title           text            not null,
@@ -86,7 +88,7 @@ create table if not exists posts
 
 create index if not exists posts_publisher_id on posts (publisher_id);
 
----
+--- Post Tags
 
 create table if not exists post_tag
 (
@@ -95,7 +97,7 @@ create table if not exists post_tag
     constraint post_tag_pkey primary key (post_id, tag_id)
 );
 
----
+--- User Bookmarks
 
 create table if not exists user_bookmark
 (
@@ -104,7 +106,7 @@ create table if not exists user_bookmark
     constraint user_bookmark_pkey primary key (user_id, post_id)
 );
 
----
+--- User Followers
 
 create table if not exists user_follower
 (
@@ -113,7 +115,7 @@ create table if not exists user_follower
     constraint user_follower_pkey primary key (user_id, follower_id)
 );
 
----
+--- User Tags
 
 create table if not exists user_tag
 (
@@ -121,3 +123,20 @@ create table if not exists user_tag
     tag_id          uuid            not null references tags,
     constraint user_tag_pkey primary key (user_id, tag_id)
 );
+
+--- Uploads
+
+create table if not exists uploads
+(
+    id              uuid            not null primary key,
+    created_at      timestamp       not null,
+    deleted_at      timestamp,
+    updated_at      timestamp,
+    url             text            not null,
+    user_id         uuid            not null references users (id),
+    post_id         uuid            not null references posts (id)
+);
+
+create index if not exists uploads_user_id on uploads (user_id);
+
+create index if not exists uploads_post_id on uploads (post_id);

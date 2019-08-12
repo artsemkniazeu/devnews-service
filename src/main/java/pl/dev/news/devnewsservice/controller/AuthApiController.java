@@ -1,11 +1,11 @@
-package pl.dev.news.devnewsservice.controllers;
+package pl.dev.news.devnewsservice.controller;
 
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import pl.dev.news.controllers.api.AuthApi;
+import pl.dev.news.controller.api.AuthApi;
 import pl.dev.news.devnewsservice.service.AuthService;
 import pl.dev.news.model.rest.RestLoginRequest;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
@@ -16,7 +16,7 @@ import pl.dev.news.model.rest.RestUserModel;
 import javax.validation.Valid;
 
 import static org.springframework.http.HttpStatus.CREATED;
-import static pl.dev.news.controllers.api.UserApi.getUserPath;
+import static pl.dev.news.controller.api.UserApi.getUserPath;
 import static pl.dev.news.devnewsservice.utils.HeaderUtil.generateLocationHeader;
 
 @RestController
@@ -26,10 +26,10 @@ public class AuthApiController implements AuthApi {
     private final AuthService authService;
 
     @Override
-    public ResponseEntity<RestTokenModel> login(
+    public ResponseEntity<RestTokenModel> signIn(
             @Valid @RequestBody final RestLoginRequest restLoginRequest
     ) {
-        final RestTokenModel tokenModel = authService.login(restLoginRequest);
+        final RestTokenModel tokenModel = authService.signIn(restLoginRequest);
         return new ResponseEntity<>(tokenModel, CREATED);
     }
 

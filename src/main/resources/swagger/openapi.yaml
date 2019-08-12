@@ -20,7 +20,7 @@ paths:
     post:
       tags:
         - Auth
-      operationId: login
+      operationId: signIn
       security: []
       requestBody:
         $ref: "#/components/requestBodies/LoginRequest"
@@ -398,7 +398,8 @@ components:
       enum:
         - USER
         - ADMIN
-
+        - MODERATOR
+        - PUBLISHER
     LoginRequest:
       type: object
       properties:
@@ -414,15 +415,9 @@ components:
           type: string
         lastName:
           type: string
-        username:
-          type: string
         email:
           type: string
           format: email
-        country:
-          type: string
-        state:
-          type: string
         password:
           type: string
 
@@ -440,36 +435,23 @@ components:
           format: email
         phone:
           type: string
+        role:
+          $ref: "#/components/schemas/UserRole"
         imageUrl:
           type: string
-        profileBgUrl:
+        bgUrl:
           type: string
         firstName:
           type: string
         lastName:
           type: string
+        birthday:
+          type: string
         country:
           type: string
         city:
           type: string
-        timezone:
-          type: string
-        birthday:
-          type: string
-        role:
-          $ref: "#/components/schemas/UserRole"
         createdAt:
-          type: string
-        socials:
-          type: array
-          items:
-            $ref: "#/components/schemas/SocialModel"
-    SocialModel:
-      type: object
-      properties:
-        type:
-          type: string
-        url:
           type: string
 
     TokenModel:

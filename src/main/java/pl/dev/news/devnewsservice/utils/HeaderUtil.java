@@ -9,7 +9,6 @@ import org.springframework.web.util.UriComponentsBuilder;
 import static org.springframework.http.HttpHeaders.LINK;
 import static org.springframework.http.HttpHeaders.LOCATION;
 
-
 @UtilityClass
 public final class HeaderUtil {
 
@@ -21,7 +20,6 @@ public final class HeaderUtil {
         headers.add(LOCATION, PathUtils.generate(baseUrl, pathVariables));
         return headers;
     }
-
 
     public HttpHeaders generatePaginationHeaders(final String baseUrl, final Page page, final Object... pathVariables) {
         final String methodPath = PathUtils.generate(baseUrl, pathVariables);

@@ -38,14 +38,13 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public RestTokenModel login(final RestLoginRequest restLoginRequest) {
+    public RestTokenModel signIn(final RestLoginRequest restLoginRequest) {
         final UserEntity existingUserEntity = userRepository
                 .findOneByEmail(restLoginRequest.getEmail())
                 .orElseThrow(() -> new NotFoundException(userWithEmailNotExists));
         if (existingUserEntity.getDeletedAt() != null) {
             throw new ConflictException(userWithEmailDeleted);
         }
-        //noinspection ConstantConditions
         if (!passwordEncoder.matches(restLoginRequest.getPassword(), existingUserEntity.getPassword())) {
             throw new UnauthorizedException(incorrectPassword);
         }
@@ -64,7 +63,7 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RestUserModel signUp(final RestSignUpRequest restSignupRequest) {
-        final UserEntity userEntity = userMapper.toEntityFromRestSignupRequest(restSignupRequest);
+        final UserEntity userEntity = userMapper.toEntity(restSignupRequest);
         userEntity.setRole(USER);
         userEntity.setPassword(passwordEncoder.encode(restSignupRequest.getPassword()));
         final UserEntity savedUser = userRepository.saveAndFlush(userEntity);

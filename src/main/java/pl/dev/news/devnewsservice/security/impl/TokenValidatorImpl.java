@@ -31,14 +31,12 @@ public class TokenValidatorImpl implements TokenValidator {
 
     @Override
     public boolean validateAccessToken(final String accessToken) {
-
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(accessToken);
             return true;
         } catch (JwtException e) {
             log.debug("Invalid access token!");
         }
-
         return false;
     }
 

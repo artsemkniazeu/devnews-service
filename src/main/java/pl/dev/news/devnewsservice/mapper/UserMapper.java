@@ -13,19 +13,38 @@ public interface UserMapper {
 
     UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
 
-    @Mapping(target = "socials", ignore = true)
     RestUserModel toModel(UserEntity userEntity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "role", ignore = true)
+    @Mapping(target = "username", ignore = true)
     @Mapping(target = "phone", ignore = true)
+    @Mapping(target = "role", ignore = true)
     @Mapping(target = "imageUrl", ignore = true)
-    @Mapping(target = "profileBgUrl", ignore = true)
+    @Mapping(target = "bgUrl", ignore = true)
     @Mapping(target = "birthday", ignore = true)
+    @Mapping(target = "country", ignore = true)
     @Mapping(target = "city", ignore = true)
-    @Mapping(target = "timezone", ignore = true)
+    @Mapping(target = "posts", ignore = true)
+    @Mapping(target = "followingTags", ignore = true)
+    @Mapping(target = "bookmarks", ignore = true)
+    @Mapping(target = "followingUsers", ignore = true)
+    @Mapping(target = "followers", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "uploads", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
-    UserEntity toEntityFromRestSignupRequest(RestSignUpRequest restSignupRequest);
+    UserEntity toEntity(RestSignUpRequest restSignupRequest);
+
+    @Mapping(target = "password", ignore = true)
+    @Mapping(target = "posts", ignore = true)
+    @Mapping(target = "followingTags", ignore = true)
+    @Mapping(target = "bookmarks", ignore = true)
+    @Mapping(target = "followingUsers", ignore = true)
+    @Mapping(target = "followers", ignore = true)
+    @Mapping(target = "comments", ignore = true)
+    @Mapping(target = "uploads", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "deletedAt", ignore = true)
+    UserEntity toEntity(RestUserModel restUserModel);
 }

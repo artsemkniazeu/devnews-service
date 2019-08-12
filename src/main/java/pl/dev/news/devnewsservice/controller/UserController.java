@@ -1,15 +1,19 @@
-package pl.dev.news.devnewsservice.controllers;
+package pl.dev.news.devnewsservice.controller;
 
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import pl.dev.news.controllers.api.UserApi;
+import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
+import pl.dev.news.devnewsservice.utils.HeaderUtil;
 import pl.dev.news.model.rest.RestUrlModel;
 import pl.dev.news.model.rest.RestUserModel;
 
@@ -33,19 +37,24 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<RestUserModel> getUser(final UUID userId) {
+    public ResponseEntity<RestUserModel> getUser(@PathVariable("userId") final UUID userId) {
         final RestUserModel model = userService.get(userId);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<List<RestUserModel>> getUsers(
-            @Valid final String name,
-            @Valid final String username,
-            @Valid final String email,
-            @Min(1) @Valid final Integer page,
-            @Min(10) @Max(30) @Valid final Integer size) {
-        return null;
+            @Valid @RequestParam(value = "name", required = false, defaultValue = "")  final String name,
+            @Valid @RequestParam(value = "username", required = false, defaultValue = "") final String username,
+            @Valid @RequestParam(value = "email", required = false, defaultValue = "") final String email,
+            @Min(1) @Valid
+            @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
+            @Min(10) @Max(30) @Valid
+            @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
+    ) {
+        final Page<RestUserModel> users = userService.getUsers(username, name, email, page, size);
+        final HttpHeaders headers = HeaderUtil.generatePaginationHeaders(basePath, users);
+        return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
     }
 
     @Override

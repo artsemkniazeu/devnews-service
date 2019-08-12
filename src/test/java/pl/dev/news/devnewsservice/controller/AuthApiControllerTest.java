@@ -15,9 +15,9 @@ import pl.dev.news.model.rest.RestUserModel;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static pl.dev.news.controllers.api.AuthApi.loginPath;
-import static pl.dev.news.controllers.api.AuthApi.refreshTokenPath;
-import static pl.dev.news.controllers.api.AuthApi.signUpPath;
+import static pl.dev.news.controller.api.AuthApi.refreshTokenPath;
+import static pl.dev.news.controller.api.AuthApi.signInPath;
+import static pl.dev.news.controller.api.AuthApi.signUpPath;
 
 public class AuthApiControllerTest extends AbstractIntegrationTest {
 
@@ -47,7 +47,7 @@ public class AuthApiControllerTest extends AbstractIntegrationTest {
         final UserEntity userEntity = createUser(restSignupRequest);
         final RestLoginRequest restLoginRequest = TestUtils.restLoginRequest(restSignupRequest);
         // when
-        final MvcResult response = mockMvc.perform(post(loginPath)
+        final MvcResult response = mockMvc.perform(post(signInPath)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restLoginRequest)))
                 // then
@@ -69,7 +69,7 @@ public class AuthApiControllerTest extends AbstractIntegrationTest {
         final RestLoginRequest restLoginRequest = TestUtils.restLoginRequest(restSignupRequest);
         deleteUser(userEntity.getId());
         // when
-        mockMvc.perform(post(loginPath)
+        mockMvc.perform(post(signInPath)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restLoginRequest)))
                 // then
@@ -83,7 +83,7 @@ public class AuthApiControllerTest extends AbstractIntegrationTest {
         final RestSignUpRequest restSignupRequest = TestUtils.restSignupRequest();
         final RestLoginRequest restLoginRequest = TestUtils.restLoginRequest(restSignupRequest);
         // when
-        mockMvc.perform(post(loginPath)
+        mockMvc.perform(post(signInPath)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restLoginRequest)))
                 // then
@@ -99,7 +99,7 @@ public class AuthApiControllerTest extends AbstractIntegrationTest {
         final RestLoginRequest restLoginRequest = TestUtils.restLoginRequest(restSignupRequest);
         restLoginRequest.password("incorrect");
         // when
-        mockMvc.perform(post(loginPath)
+        mockMvc.perform(post(signInPath)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restLoginRequest)))
                 // then

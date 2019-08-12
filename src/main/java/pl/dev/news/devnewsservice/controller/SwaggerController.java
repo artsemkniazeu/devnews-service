@@ -1,4 +1,4 @@
-package pl.dev.news.devnewsservice.controllers;
+package pl.dev.news.devnewsservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;

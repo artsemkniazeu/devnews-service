@@ -6,7 +6,7 @@
     <description>PMD ruleset</description>
 
     <exclude-pattern>.*/model/rest/[^./]+\.java</exclude-pattern>
-    <exclude-pattern>.*/controllers/api/[^./]+\.java</exclude-pattern>
+    <exclude-pattern>.*/controller/api/[^./]+\.java</exclude-pattern>
 
     <rule ref="category/java/bestpractices.xml">
         <exclude name="JUnitTestsShouldIncludeAssert"/>

@@ -1,6 +1,8 @@
 package pl.dev.news.devnewsservice.service.impl;
 
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.UserEntity;
@@ -20,6 +22,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
+    private final UserMapper userMapper = UserMapper.INSTANCE;
+
     @Override
     @Transactional
     public void delete(final UUID userId) {
@@ -34,6 +38,19 @@ public class UserServiceImpl implements UserService {
         final UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(userNotFound));
         return UserMapper.INSTANCE.toModel(userEntity);
+    }
+
+    @Override
+    public Page<RestUserModel> getUsers(
+            final String username,
+            final String name,
+            final String email,
+            final Integer page,
+            final Integer size
+    ) {
+        return userRepository
+                .findAll(username, name, email, PageRequest.of(page - 1, size))
+                .map(userMapper::toModel);
     }
 
 }

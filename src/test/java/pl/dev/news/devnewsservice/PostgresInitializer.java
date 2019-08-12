@@ -10,9 +10,9 @@ import org.testcontainers.containers.wait.strategy.Wait;
 public class PostgresInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
     public static final int POSTGRES_PORT = 5432;
-    public static final String POSTGRES_DB = "onliner_db";
-    public static final String POSTGRES_USER = "onliner";
-    public static final String POSTGRES_PASSWORD = "onliner";
+    public static final String POSTGRES_DB = "devnews_db";
+    public static final String POSTGRES_USER = "devnews";
+    public static final String POSTGRES_PASSWORD = "devnews";
 
     public static final GenericContainer POSTGRES =
             new GenericContainer("postgres:10.6-alpine")
