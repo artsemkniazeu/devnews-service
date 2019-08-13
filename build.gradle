@@ -69,6 +69,7 @@ dependencies {
 	implementation "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
 
 	compile "org.openapitools:jackson-databind-nullable:0.2.0"
+	compile "io.springfox:springfox-swagger2:${springfoxSwaggerVersion}"
 	compile "io.springfox:springfox-swagger-ui:${springfoxSwaggerVersion}"
 	compile "org.springframework.boot:spring-boot-configuration-processor"
 	compileOnly 'org.projectlombok:lombok'
