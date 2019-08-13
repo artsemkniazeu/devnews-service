@@ -27,16 +27,8 @@ public class SwaggerController {
     public SwaggerController(final ResourceLoader resourceLoader,
                              final ObjectMapper objectMapper,
                              final Yaml yaml) {
-        final JsonNode configurationUiJson = loadJson(
-                objectMapper,
-                resourceLoader,
-                "swagger/configuration-ui.json"
-        );
-        final JsonNode configurationJson = loadJson(
-                objectMapper,
-                resourceLoader,
-                "swagger/configuration.json"
-        );
+        final JsonNode configurationUiJson = loadJson(objectMapper, "swagger/configuration-ui.json");
+        final JsonNode configurationJson = loadJson(objectMapper, "swagger/configuration.json");
         final Map<?, ?> swaggerYaml = yaml
                 .load(resourceLoader.getResource("classpath:/swagger/openapi.yaml")
                         .getInputStream());
@@ -70,7 +62,6 @@ public class SwaggerController {
 
     private JsonNode loadJson(
             final ObjectMapper objectMapper,
-            final ResourceLoader resourceLoader,
             final String location
     ) throws IOException {
         try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
