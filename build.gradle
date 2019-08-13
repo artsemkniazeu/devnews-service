@@ -35,11 +35,7 @@ apply from: "gradle/jacoco.gradle"
 group = 'pl.dev.news'
 version = '1.0'
 sourceCompatibility = 11
-targetCompatibility = 11
-
-
 assert System.properties["java.specification.version"] == "11"
-
 sourceSets.main.java.srcDirs = ['src/main/java', "$buildDir/generated/src/main/java"]
 
 configurations {
