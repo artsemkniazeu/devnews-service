@@ -4,8 +4,8 @@ import com.github.javafaker.Faker;
 import lombok.experimental.UtilityClass;
 import org.springframework.context.annotation.Profile;
 import org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils;
-import pl.dev.news.model.rest.RestLoginRequest;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
+import pl.dev.news.model.rest.RestSignInRequest;
 import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestUserModel;
 import pl.dev.news.model.rest.RestUserRole;
@@ -24,8 +24,8 @@ public class TestUtils {
                 .password(RandomStringUtils.random(10, true, true));
     }
 
-    public RestLoginRequest restLoginRequest(final RestSignUpRequest restSignupRequest) {
-        return new RestLoginRequest()
+    public RestSignInRequest restSignInRequest(final RestSignUpRequest restSignupRequest) {
+        return new RestSignInRequest()
                 .email(restSignupRequest.getEmail())
                 .password(restSignupRequest.getPassword());
     }

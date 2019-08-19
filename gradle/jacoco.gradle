@@ -52,5 +52,7 @@ jacocoTestCoverageVerification {
     }
 }
 
-check.dependsOn jacocoTestReport
+jacocoTestReport.mustRunAfter test
+jacocoTestCoverageVerification.dependsOn jacocoTestReport
 build.dependsOn jacocoTestCoverageVerification
+

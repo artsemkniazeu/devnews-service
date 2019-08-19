@@ -2,7 +2,7 @@ package pl.dev.news.devnewsservice;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.junit.After;
+import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -14,17 +14,15 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
-import pl.dev.news.devnewsservice.repository.UserRepository;
+import pl.dev.news.devnewsservice.repository.QueryDslUserRepository;
 import pl.dev.news.devnewsservice.security.impl.TokenProviderImpl;
 import pl.dev.news.devnewsservice.security.impl.TokenValidatorImpl;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestSignUpRequest;
-import pl.dev.news.model.rest.RestUserModel;
 
 import java.util.UUID;
 
@@ -38,6 +36,8 @@ import static pl.dev.news.devnewsservice.exception.ExceptionsConstants.userNotFo
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public abstract class AbstractIntegrationTest {
+
+    protected final UserMapper userMapper = UserMapper.INSTANCE;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
@@ -58,51 +58,33 @@ public abstract class AbstractIntegrationTest {
     protected TokenValidatorImpl tokenValidator;
 
     @Autowired
-    protected UserRepository userRepository;
+    protected QueryDslUserRepository userRepository;
 
-    @After
+    @Before
     public final void clearDatabase() {
         jdbcTemplate.execute("delete from users");
     }
 
     // User logic
 
-    @Transactional
     protected UserEntity createUser(
-            final RestUserModel restUserModel,
+            final UserEntity userEntity,
             final UserRoleEntity userRoleEntity
     ) {
-        final UserEntity userEntity = UserMapper.INSTANCE.toEntity(restUserModel);
         userEntity.setRole(userRoleEntity);
-        userEntity.setPassword(passwordEncoder.encode(RandomStringUtils.random(10, true, true)));
+        userEntity.setPassword(passwordEncoder.encode(userEntity.getPassword()));
         return userRepository.saveAndFlush(userEntity);
     }
 
-    @Transactional
     protected UserEntity createUser(
             final RestSignUpRequest restSignUpRequest,
             final UserRoleEntity userRoleEntity
     ) {
-        final UserEntity userEntity = UserMapper.INSTANCE.toEntity(restSignUpRequest);
-        userEntity.setRole(userRoleEntity);
-        userEntity.setPassword(passwordEncoder.encode(restSignUpRequest.getPassword()));
-        return userRepository.saveAndFlush(userEntity);
-    }
-
-    protected UserEntity createUser(final RestUserModel restUserModel) {
-        return createUser(restUserModel, UserRoleEntity.USER);
-    }
-
-    protected UserEntity createUser(final RestSignUpRequest restSignUpRequest) {
-        return createUser(restSignUpRequest, UserRoleEntity.USER);
+        return createUser(userMapper.toEntity(restSignUpRequest), userRoleEntity);
     }
 
     protected UserEntity createUser(final UserRoleEntity userRoleEntity) {
-        return createUser(TestUtils.restUserModel(), userRoleEntity);
-    }
-
-    protected UserEntity createUser() {
-        return createUser(TestUtils.restUserModel());
+        return createUser(userMapper.toEntity(TestUtils.restSignupRequest()), userRoleEntity);
     }
 
     @Transactional(readOnly = true)

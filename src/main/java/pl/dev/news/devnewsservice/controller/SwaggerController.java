@@ -22,6 +22,7 @@ public class SwaggerController {
     private final String uiConfiguration;
     private final String configuration;
     private final String json;
+    private final Map<?, ?> yaml;
 
     @SneakyThrows
     public SwaggerController(final ResourceLoader resourceLoader,
@@ -29,12 +30,12 @@ public class SwaggerController {
                              final Yaml yaml) {
         final JsonNode configurationUiJson = loadJson(objectMapper, "swagger/configuration-ui.json");
         final JsonNode configurationJson = loadJson(objectMapper, "swagger/configuration.json");
-        final Map<?, ?> swaggerYaml = yaml
+        this.yaml = yaml
                 .load(resourceLoader.getResource("classpath:/swagger/openapi.yaml")
                         .getInputStream());
         this.uiConfiguration = objectMapper.writeValueAsString(configurationUiJson);
         this.configuration = objectMapper.writeValueAsString(configurationJson);
-        this.json = objectMapper.writeValueAsString(swaggerYaml);
+        this.json = objectMapper.writeValueAsString(this.yaml);
     }
 
     @GetMapping("/")
@@ -58,6 +59,12 @@ public class SwaggerController {
     @GetMapping("/swagger.json")
     public String swaggerJson() {
         return json;
+    }
+
+    @ResponseBody
+    @GetMapping("/swagger.yaml")
+    public Map swaggerYaml() {
+        return yaml;
     }
 
     private JsonNode loadJson(

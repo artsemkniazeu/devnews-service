@@ -11,6 +11,7 @@ import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 import pl.dev.news.devnewsservice.security.TokenProvider;
 import pl.dev.news.model.rest.RestTokenModel;
+import pl.dev.news.model.rest.RestTokenResponse;
 
 import javax.annotation.PostConstruct;
 import java.security.Key;
@@ -43,48 +44,60 @@ public class TokenProviderImpl implements TokenProvider {
     }
 
     @Override
-    public RestTokenModel createTokenModel(final UserEntity userEntity) {
+    public RestTokenResponse createTokenModel(final UserEntity userEntity) {
 
-        final long currentTimeMillils = System.currentTimeMillis();
-        final Date issuedAt = new Date(currentTimeMillils);
+        final long currentTimeMillis = System.currentTimeMillis();
+        final Date issuedAt = new Date(currentTimeMillis);
 
-        final Date accessExpiresIn = new Date(currentTimeMillils + accessTokenValidityMillils);
-        final Date refreshExpiresIn = new Date(currentTimeMillils + refreshTokenValidityMillils);
+        final Date accessExpiresIn = new Date(currentTimeMillis + accessTokenValidityMillils);
+        final Date refreshExpiresIn = new Date(currentTimeMillis + refreshTokenValidityMillils);
 
         final String accessToken = createToken(userEntity, issuedAt, accessExpiresIn, ACCESS_TOKEN);
         final String refreshToken = createToken(userEntity, issuedAt, refreshExpiresIn, REFRESH_TOKEN);
 
-        return new RestTokenModel()
-                .accessToken(accessToken)
-                .accessIssuedAt(issuedAt.getTime())
-                .accessExpiresIn(accessExpiresIn.getTime())
-                .refreshToken(refreshToken)
-                .refreshIssuedAt(issuedAt.getTime())
-                .refreshExpiresIn(refreshExpiresIn.getTime());
+        final RestTokenModel refresh = new RestTokenModel()
+                .issuedAt(issuedAt.getTime())
+                .expiresIn(refreshExpiresIn.getTime())
+                .token(refreshToken);
+
+        final RestTokenModel access = new RestTokenModel()
+                .issuedAt(issuedAt.getTime())
+                .expiresIn(accessExpiresIn.getTime())
+                .token(accessToken);
+
+        return new RestTokenResponse()
+                .access(access)
+                .refresh(refresh);
     }
 
     @Override
-    public RestTokenModel refreshToken(final String refreshToken) {
+    public RestTokenResponse refreshToken(final String refreshTokenOld) {
 
         final long currentTimeMillis = System.currentTimeMillis();
-        final Date accessIssuedAt = new Date(currentTimeMillis);
-        final Date refreshIssuedAt = Jwts.parser().setSigningKey(key)
-                .parseClaimsJws(refreshToken).getBody().getIssuedAt();
+        final Date issuedAt = new Date(currentTimeMillis);
 
         final Date accessExpiresIn = new Date(currentTimeMillis + accessTokenValidityMillils);
-        final Date refreshExpiresIn = Jwts.parser().setSigningKey(key)
-                .parseClaimsJws(refreshToken).getBody().getExpiration();
+        final Date refreshExpiresIn = new Date(currentTimeMillis + refreshTokenValidityMillils);
 
-        final String accessToken = createToken(getUserIdByToken(refreshToken), getUserRoleByToken(refreshToken),
-                accessIssuedAt, accessExpiresIn, ACCESS_TOKEN);
+        final UUID userId = getUserIdByToken(refreshTokenOld);
+        final UserRoleEntity role = getUserRoleByToken(refreshTokenOld);
 
-        return new RestTokenModel()
-                .accessToken(accessToken)
-                .accessIssuedAt(accessIssuedAt.getTime())
-                .accessExpiresIn(accessExpiresIn.getTime())
-                .refreshToken(refreshToken)
-                .refreshIssuedAt(refreshIssuedAt.getTime())
-                .refreshExpiresIn(refreshExpiresIn.getTime());
+        final String accessToken = createToken(userId, role, issuedAt, accessExpiresIn, ACCESS_TOKEN);
+        final String refreshToken = createToken(userId, role, issuedAt, refreshExpiresIn, REFRESH_TOKEN);
+
+        final RestTokenModel refresh = new RestTokenModel()
+                .issuedAt(issuedAt.getTime())
+                .expiresIn(refreshExpiresIn.getTime())
+                .token(refreshToken);
+
+        final RestTokenModel access = new RestTokenModel()
+                .issuedAt(issuedAt.getTime())
+                .expiresIn(accessExpiresIn.getTime())
+                .token(accessToken);
+
+        return new RestTokenResponse()
+                .access(access)
+                .refresh(refresh);
     }
 
     @Override

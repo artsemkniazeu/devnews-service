@@ -10,7 +10,7 @@ import static org.springframework.http.HttpHeaders.LINK;
 import static org.springframework.http.HttpHeaders.LOCATION;
 
 @UtilityClass
-public final class HeaderUtil {
+public final class HeaderUtils {
 
     private static final String xTotalCount = "X-Total-Count";
 

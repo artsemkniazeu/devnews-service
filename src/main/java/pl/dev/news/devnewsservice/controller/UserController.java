@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
-import pl.dev.news.devnewsservice.utils.HeaderUtil;
+import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestUrlModel;
 import pl.dev.news.model.rest.RestUserModel;
 
@@ -44,16 +44,16 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<List<RestUserModel>> getUsers(
-            @Valid @RequestParam(value = "name", required = false, defaultValue = "")  final String name,
-            @Valid @RequestParam(value = "username", required = false, defaultValue = "") final String username,
-            @Valid @RequestParam(value = "email", required = false, defaultValue = "") final String email,
+            @Valid @RequestParam(value = "name", required = false)  final String name,
+            @Valid @RequestParam(value = "username", required = false) final String username,
+            @Valid @RequestParam(value = "email", required = false) final String email,
             @Min(1) @Valid
             @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
         final Page<RestUserModel> users = userService.getUsers(username, name, email, page, size);
-        final HttpHeaders headers = HeaderUtil.generatePaginationHeaders(basePath, users);
+        final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(basePath, users);
         return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
     }
 

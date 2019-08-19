@@ -6,7 +6,6 @@ checkstyle {
     reportsDir = file("$project.buildDir/reports/checkstyle")
     dependencies {
         assert project.hasProperty("checkstyleVersion")
-
         checkstyle "com.puppycrawl.tools:checkstyle:${checkstyleVersion}"
         checkstyle "com.github.sevntu-checkstyle:sevntu-checks:${sevntuChecksVersion}"
     }

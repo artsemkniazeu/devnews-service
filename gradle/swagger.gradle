@@ -12,6 +12,13 @@ openApiGenerate {
     ]
 }
 
+sourceSets {
+    main {
+        java {
+            srcDir swaggerSourceDir
+        }
+    }
+}
 
 
 compileJava.dependsOn tasks.openApiGenerate

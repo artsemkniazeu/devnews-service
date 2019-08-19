@@ -16,21 +16,21 @@ paths:
   # ========================================
   # ===== Auth API
   # ========================================
-  /auth/login:
+  /auth/sign-in:
     post:
       tags:
         - Auth
       operationId: signIn
       security: []
       requestBody:
-        $ref: "#/components/requestBodies/LoginRequest"
+        $ref: "#/components/requestBodies/SignInRequest"
       responses:
         "201":
           description: Created
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TokenModel"
+                $ref: "#/components/schemas/TokenResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -39,6 +39,26 @@ paths:
           $ref: "#/components/responses/Conflict"
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
+
+  /auth/sign-up:
+    post:
+      tags:
+        - Auth
+      operationId: signUp
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/SignUpRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /auth/refresh-token:
     post:
@@ -54,32 +74,11 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/TokenModel"
+                $ref: "#/components/schemas/TokenResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-
-  /auth/signup:
-    post:
-      tags:
-        - Auth
-      operationId: signUp
-      security: []
-      requestBody:
-        $ref: "#/components/requestBodies/SignUpRequest"
-      responses:
-        "201":
-          description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserModel"
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "401":
-          $ref: "#/components/responses/Unauthorized"
-
 
 
   # ========================================
@@ -251,30 +250,12 @@ components:
   # ========================================
 
   requestBodies:
-    LoginRequest:
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/LoginRequest"
-          examples:
-            put:
-              summary: login request
-              value:
-                email: user@example.com
-                password: pass
-      required: true
 
-    RefreshTokenRequest:
+    SignInRequest:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/RefreshTokenRequest"
-          examples:
-            put:
-              summary: refresh token request
-              value:
-                email: user@example.com
-                password: pass
+            $ref: "#/components/schemas/SignInRequest"
       required: true
 
     SignUpRequest:
@@ -282,17 +263,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SignUpRequest"
-          examples:
-            put:
-              summary: refresh token request
-              value:
-                firstName: firstname
-                lastName: lastname
-                username: username
-                email: user@example.com
-                country: country
-                state: state
-                password: pass
+      required: true
+
+    RefreshTokenRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/RefreshTokenRequest"
       required: true
 
     UserModel:
@@ -300,17 +277,6 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/UserModel"
-          examples:
-            put:
-              summary: update user profile
-              value:
-                firstName: string
-                lastName: string
-                country: string
-                state: string
-                email: user@example.com
-                iconUrl: string
-                createdAt: string
       required: true
 
   # ========================================
@@ -371,7 +337,6 @@ components:
       in: header
       name: Authorization
 
-
   schemas:
     Problem:
       type: object
@@ -388,11 +353,42 @@ components:
           maximum: 600
         detail:
           type: string
+
+    TokenModel:
+      type: object
+      properties:
+        token:
+          type: string
+        issuedAt:
+          type: integer
+          format: int64
+        expiresIn:
+          type: integer
+          format: int64
+
+    TokenResponse:
+      type: object
+      properties:
+        access:
+          $ref: '#/components/schemas/TokenModel'
+        refresh:
+          $ref: '#/components/schemas/TokenModel'
+
+
+    RefreshTokenRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+
     UrlModel:
       type: object
       properties:
         url:
           type: string
+
     UserRole:
       type: string
       enum:
@@ -400,7 +396,8 @@ components:
         - ADMIN
         - MODERATOR
         - PUBLISHER
-    LoginRequest:
+
+    SignInRequest:
       type: object
       properties:
         email:
@@ -408,6 +405,7 @@ components:
           format: email
         password:
           type: string
+
     SignUpRequest:
       type: object
       properties:
@@ -454,31 +452,6 @@ components:
         createdAt:
           type: string
 
-    TokenModel:
-      type: object
-      properties:
-        accessToken:
-          type: string
-        accessIssuedAt:
-          type: integer
-          format: int64
-        accessExpiresIn:
-          type: integer
-          format: int64
-        refreshToken:
-          type: string
-        refreshIssuedAt:
-          type: integer
-          format: int64
-        refreshExpiresIn:
-          type: integer
-          format: int64
-    RefreshTokenRequest:
-      type: object
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
-          type: string
+
 
 

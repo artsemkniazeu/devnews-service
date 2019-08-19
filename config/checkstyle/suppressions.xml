@@ -6,4 +6,5 @@
 <suppressions>
     <suppress checks="." files="[\\/]model[\\/]rest[\\/][^./\\]+\.java$"/>
     <suppress checks="." files="[\\/]controller[\\/]api[\\/][^./\\]+\.java$"/>
+    <suppress checks="." files="[\\/][A-z\\/]*generateQuerydsl[\\/][A-z\\/]*[^./\\]+\.java"/>
 </suppressions>

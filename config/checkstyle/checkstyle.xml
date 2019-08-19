@@ -117,7 +117,6 @@
         <module name="MissingSwitchDefault" />
         <module name="FallThrough" />
         <module name="NoFinalizer" />
-        <module name="OverloadMethodsDeclarationOrder" />
         <module name="VariableDeclarationUsageDistance" />
 
         <!-- Miscellaneous other checks. -->

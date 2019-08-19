@@ -1,0 +1,42 @@
+
+
+clean.doFirst {
+    delete(querydslSourceDir)
+}
+
+configurations {
+    generateQuerydsl
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir querydslSourceDir
+        }
+    }
+    generateQuerydsl {
+        afterEvaluate {
+            java {
+                srcDirs sourceSets.main.java.srcDirs
+            }
+        }
+    }
+}
+
+
+dependencies {
+    generateQuerydslAnnotationProcessor "com.querydsl:querydsl-apt"
+    generateQuerydslAnnotationProcessor "javax.persistence:javax.persistence-api"
+    generateQuerydslAnnotationProcessor "javax.annotation:javax.annotation-api"
+}
+
+compileGenerateQuerydslJava {
+    classpath = sourceSets.main.compileClasspath
+    destinationDir = querydslSourceDir
+    options.compilerArgs += [
+            "-proc:only", "-processor", "com.querydsl.apt.jpa.JPAAnnotationProcessor"
+    ]
+}
+
+compileJava.dependsOn compileGenerateQuerydslJava
+compileGenerateQuerydslJava.dependsOn tasks.openApiGenerate
