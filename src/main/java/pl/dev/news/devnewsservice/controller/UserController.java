@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
-import pl.dev.news.model.rest.RestUrlModel;
+import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
 
 import javax.validation.Valid;
@@ -39,7 +39,8 @@ public class UserController implements UserApi {
     @Override
     public ResponseEntity<RestUserModel> getUser(@PathVariable("userId") final UUID userId) {
         final RestUserModel model = userService.get(userId);
-        return new ResponseEntity<>(model, HttpStatus.OK);
+        final HttpHeaders headers = HeaderUtils.generateLocationHeader(getUserPath, userId);
+        return new ResponseEntity<>(model, headers, HttpStatus.OK);
     }
 
     @Override
@@ -62,14 +63,16 @@ public class UserController implements UserApi {
             final UUID userId,
             @Valid final RestUserModel restUserModel
     ) {
-        return null;
+        final RestUserModel user = userService.update(userId, restUserModel);
+        return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<RestUrlModel> uploadImage(
+    public ResponseEntity<RestUploadModel> uploadImage(
             final UUID userId,
             @Valid final MultipartFile file
     ) {
-        return null;
+        final RestUploadModel restUploadModel = userService.uploadImage(userId, file);
+        return new ResponseEntity<>(restUploadModel, HttpStatus.OK);
     }
 }

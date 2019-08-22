@@ -6,7 +6,7 @@ import pl.dev.news.devnewsservice.repository.custom.CustomQueryDslRspository;
 
 import java.util.UUID;
 
-public interface QueryDslUserRepository extends CustomQueryDslRspository<UserEntity, QUserEntity, UUID> {
+public interface UserRepository extends CustomQueryDslRspository<UserEntity, QUserEntity, UUID> {
 
 
 }

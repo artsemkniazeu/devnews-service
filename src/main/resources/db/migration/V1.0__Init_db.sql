@@ -88,6 +88,16 @@ create table if not exists posts
 
 create index if not exists posts_publisher_id on posts (publisher_id);
 
+
+--- Post Categories
+
+create table if not exists post_category
+(
+    post_id         uuid            not null references posts (id),
+    category_id     uuid            not null references categories (id),
+    constraint post_category_pkey primary key (post_id, category_id)
+);
+
 --- Post Tags
 
 create table if not exists post_tag

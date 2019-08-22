@@ -11,7 +11,7 @@ import pl.dev.news.devnewsservice.exception.ConflictException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.exception.UnauthorizedException;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
-import pl.dev.news.devnewsservice.repository.QueryDslUserRepository;
+import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.security.TokenProvider;
 import pl.dev.news.devnewsservice.security.TokenValidator;
 import pl.dev.news.devnewsservice.service.AuthService;
@@ -30,7 +30,7 @@ import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
-    private final QueryDslUserRepository userRepository;
+    private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
     private final TokenValidator tokenValidator;
     private final PasswordEncoder passwordEncoder;

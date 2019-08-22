@@ -22,7 +22,7 @@ import static pl.dev.news.controller.api.UserApi.getUserPath;
 
 @RestController
 @AllArgsConstructor
-public class AuthApiController implements AuthApi {
+public class AuthController implements AuthApi {
 
     private final AuthService authService;
 

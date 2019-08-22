@@ -26,9 +26,7 @@ import java.util.UUID;
 public interface CustomQueryDslRspository<
         T extends AuditableEntity, P extends EntityPathBase<T>, I extends Serializable> extends JpaRepository<T, I>,
         QuerydslPredicateExecutor<T>, QuerydslBinderCustomizer<P> {
-
-
-
+    
     @Override
     default void customize(final QuerydslBindings bindings, final P root){
 

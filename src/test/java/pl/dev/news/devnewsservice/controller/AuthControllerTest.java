@@ -22,7 +22,7 @@ import static pl.dev.news.controller.api.AuthApi.signInPath;
 import static pl.dev.news.controller.api.AuthApi.signUpPath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
-public class AuthApiControllerTest extends AbstractIntegrationTest {
+public class AuthControllerTest extends AbstractIntegrationTest {
 
     @Test
     public void testSignUp() throws Exception {

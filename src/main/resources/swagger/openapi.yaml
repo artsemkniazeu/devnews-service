@@ -7,6 +7,10 @@ info:
 tags:
   - name: Auth
   - name: User
+  - name: Category
+  - name: Tag
+  - name: Comment
+  - name: Post
 
 servers:
   - url: /api/v1
@@ -158,7 +162,7 @@ paths:
       security:
         - userAuth: []
       requestBody:
-        $ref: "#/components/requestBodies/UserModel"
+        $ref: "#/components/requestBodies/UserRequest"
       responses:
         "200":
           description: OK
@@ -212,7 +216,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UrlModel"
+                $ref: "#/components/schemas/UploadModel"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -220,6 +224,458 @@ paths:
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
+  # ========================================
+  # ===== Category API
+  # ========================================
+  /categories:
+    get:
+      tags:
+        - Category
+      operationId: getCategories
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CategoryModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags:
+        - Category
+      operationId: createCategory
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/CategoryRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/categories/{categoryId}":
+    parameters:
+      - name: categoryId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Category
+      operationId: getCategory
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Category
+      operationId: updateCategory
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/CategoryRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      tags:
+        - Category
+      operationId: deleteCategory
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ========================================
+  # ===== Tag API
+  # ========================================
+  /tags:
+    get:
+      tags:
+        - Tag
+      operationId: getTags
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: name
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TagModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags:
+        - Tag
+      operationId: createTag
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/TagRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/tags/{tagId}":
+    parameters:
+      - name: tagId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Tag
+      operationId: getTag
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Tag
+      operationId: updateTag
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/TagRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TagModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      tags:
+        - Tag
+      operationId: deleteTag
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ========================================
+  # ===== Comment API
+  # ========================================
+  /comments:
+    get:
+      tags:
+        - Comment
+      operationId: getComments
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: userId
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CommentModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags:
+        - Comment
+      operationId: createComment
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/CommentRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/comments/{commentId}":
+    parameters:
+      - name: commentId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Comment
+      operationId: getComment
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Comment
+      operationId: updateComment
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/CommentRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      tags:
+        - Comment
+      operationId: deleteComment
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ========================================
+  # ===== Comment API
+  # ========================================
+  /posts:
+    get:
+      tags:
+        - Post
+      operationId: getPosts
+      security:
+        - userAuth: []
+      parameters:
+        - in: query
+          name: publisher_id
+          required: false
+          schema:
+            type: string
+            format: uuid
+        - in: query
+          name: title
+          required: false
+          schema:
+            type: string
+        - in: query
+          name: text
+          required: false
+          schema:
+            type: string
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags:
+        - Post
+      operationId: createPost
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/PostRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/posts/{postId}":
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Post
+      operationId: getPost
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Post
+      operationId: updatePost
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/PostRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PostModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      tags:
+        - Post
+      operationId: deletePost
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
 
 components:
@@ -272,13 +728,40 @@ components:
             $ref: "#/components/schemas/RefreshTokenRequest"
       required: true
 
-    UserModel:
+    UserRequest:
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/UserModel"
       required: true
 
+    CategoryRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/CategoryModel"
+      required: true
+
+    TagRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TagModel"
+      required: true
+
+    CommentRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/TagModel"
+      required: true
+
+    PostRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PostModel"
+      required: true
   # ========================================
   # ===== Responses
   # ========================================
@@ -286,46 +769,24 @@ components:
   responses:
     BadRequest:
       description: Bad Request
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
+
     Unauthorized:
       description: Unauthorized
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
+
     Forbidden:
       description: Forbidden
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
+
     NotFound:
       description: Not Found
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
+
     Conflict:
       description: Conflict
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
+
     UnprocessableEntity:
       description: Unprocessable Entity
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
+
     NotAcceptable:
       description: Not Acceptable
-      content:
-        application/json:
-          schema:
-            $ref: "#/components/schemas/Problem"
 
   # ========================================
   # ===== SecuritySchemes
@@ -338,21 +799,6 @@ components:
       name: Authorization
 
   schemas:
-    Problem:
-      type: object
-      properties:
-        type:
-          type: string
-          format: uri
-        title:
-          type: string
-        status:
-          type: integer
-          format: int32
-          minimum: 100
-          maximum: 600
-        detail:
-          type: string
 
     TokenModel:
       type: object
@@ -452,6 +898,97 @@ components:
         createdAt:
           type: string
 
+    CategoryModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        value:
+          type: string
+        parent_id:
+          type: string
+          format: uuid
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryModel'
 
+    TagModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        value:
+          type: string
+        category_id:
+          type: string
+          format: uuid
 
+    CommentModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        text:
+          type: string
+        likes:
+          type: integer
+          format: int64
+        parent_id:
+          type: string
+          format: uuid
+        children:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentModel'
+        user:
+          $ref: '#/components/schemas/UserModel'
+
+    PostModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        title:
+          type: string
+        text:
+          type: string
+        imageUrl:
+          type: string
+        updateDate:
+          type: string
+        publishDate:
+          type: string
+        publisher_id:
+          type: string
+          format: uuid
+        publisher:
+          $ref: '#/components/schemas/UserModel'
+        tags:
+          type: array
+          items:
+            $ref: '#/components/schemas/TagModel'
+
+    UploadModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        url:
+          type: string
+        user_id:
+          type: string
+          format: uuid
+        post_id:
+          type: string
+          format: uuid
 

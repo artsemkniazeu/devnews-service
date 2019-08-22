@@ -18,11 +18,12 @@ import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
-import pl.dev.news.devnewsservice.repository.QueryDslUserRepository;
+import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.security.impl.TokenProviderImpl;
 import pl.dev.news.devnewsservice.security.impl.TokenValidatorImpl;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestSignUpRequest;
+import pl.dev.news.model.rest.RestUserModel;
 
 import java.util.UUID;
 
@@ -58,11 +59,21 @@ public abstract class AbstractIntegrationTest {
     protected TokenValidatorImpl tokenValidator;
 
     @Autowired
-    protected QueryDslUserRepository userRepository;
+    protected UserRepository userRepository;
 
     @Before
     public final void clearDatabase() {
+        jdbcTemplate.execute("delete from categories");
+        jdbcTemplate.execute("delete from tags");
         jdbcTemplate.execute("delete from users");
+        jdbcTemplate.execute("delete from comments");
+        jdbcTemplate.execute("delete from posts");
+        jdbcTemplate.execute("delete from post_category");
+        jdbcTemplate.execute("delete from post_tag");
+        jdbcTemplate.execute("delete from user_bookmark");
+        jdbcTemplate.execute("delete from user_follower");
+        jdbcTemplate.execute("delete from user_tag");
+        jdbcTemplate.execute("delete from uploads");
     }
 
     // User logic
@@ -83,8 +94,17 @@ public abstract class AbstractIntegrationTest {
         return createUser(userMapper.toEntity(restSignUpRequest), userRoleEntity);
     }
 
+    protected UserEntity createUser(
+            final RestUserModel restUserModel,
+            final UserRoleEntity userRoleEntity
+    ) {
+        final UserEntity userEntity = userMapper.toEntity(TestUtils.restSignupRequest());
+        final UserEntity updated = userMapper.update(userEntity, restUserModel);
+        return createUser(updated, userRoleEntity);
+    }
+
     protected UserEntity createUser(final UserRoleEntity userRoleEntity) {
-        return createUser(userMapper.toEntity(TestUtils.restSignupRequest()), userRoleEntity);
+        return createUser(TestUtils.restUserModel(), userRoleEntity);
     }
 
     @Transactional(readOnly = true)

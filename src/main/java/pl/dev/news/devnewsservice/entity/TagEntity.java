@@ -47,6 +47,9 @@ public class TagEntity extends AuditableEntity {
     @JoinColumn(name = "category_id", nullable = false)
     private CategoryEntity category;
 
+    @Column(name = "category_id", updatable = false, insertable = false)
+    private UUID categoryId;
+
     @ManyToMany(mappedBy = "followingTags")
     private Set<UserEntity> followers;
 

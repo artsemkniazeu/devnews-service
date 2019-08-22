@@ -68,6 +68,13 @@ public class PostEntity extends AuditableEntity {
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<TagEntity> tags;
 
+    @ManyToMany
+    @JoinTable(
+            name = "post_category",
+            joinColumns = @JoinColumn(name = "post_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
+    private Set<CategoryEntity> categories;
+
     @OneToMany(mappedBy = "user")
     private Set<UploadEntity> uploads;
 

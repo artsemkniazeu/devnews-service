@@ -34,7 +34,7 @@ public class TokenValidatorImpl implements TokenValidator {
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(accessToken);
             return true;
-        } catch (JwtException e) {
+        } catch (final JwtException e) {
             log.debug("Invalid access token!");
         }
         return false;
@@ -46,7 +46,7 @@ public class TokenValidatorImpl implements TokenValidator {
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(refreshToken);
             return true;
-        } catch (JwtException e) {
+        } catch (final JwtException e) {
             log.debug("Invalid refresh token!");
         }
 

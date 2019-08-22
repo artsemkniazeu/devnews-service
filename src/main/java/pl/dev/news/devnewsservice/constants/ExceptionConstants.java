@@ -6,6 +6,7 @@ import lombok.experimental.UtilityClass;
 public class ExceptionConstants {
     // NotFoundException
     public static String userWithEmailNotExists = "User with same email does not exist";
+    public static String tagWithIdNotExists = "Tag with requested id does not exist";
 
     // ConflictException
     public static String userWithEmailDeleted = "Account with the same email was deleted!";

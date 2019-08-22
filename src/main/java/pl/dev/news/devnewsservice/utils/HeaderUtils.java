@@ -1,6 +1,5 @@
 package pl.dev.news.devnewsservice.utils;
 
-import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -14,7 +13,6 @@ public final class HeaderUtils {
 
     private static final String xTotalCount = "X-Total-Count";
 
-    @SneakyThrows
     public static HttpHeaders generateLocationHeader(final String baseUrl, final Object... pathVariables) {
         final HttpHeaders headers = new HttpHeaders();
         headers.add(LOCATION, PathUtils.generate(baseUrl, pathVariables));
