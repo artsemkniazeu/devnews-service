@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -21,11 +22,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(
-        callSuper = false,
-        exclude = {"tags", "parent", "children"}
-)
-@ToString(exclude = {"tags", "parent", "children"})
+@EqualsAndHashCode(callSuper = false, exclude = {
+        "parent", "children", "posts"
+})
+@ToString(exclude = {
+        "parent", "children", "posts"
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -37,20 +39,23 @@ public class CategoryEntity extends AuditableEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", columnDefinition = "citext")
     private String name;
 
-    @Column(name = "value", nullable = false)
+    @Column(name = "value")
     private String value;
 
-    @OneToMany(mappedBy = "category")
-    private Set<TagEntity> tags;
-
     @ManyToOne
-    @JoinColumn(name = "parent_id", nullable = false)
+    @JoinColumn(name = "parent_id")
     private CategoryEntity parent;
 
-    @OneToMany(mappedBy = "parent")
+    @Column(name = "parent_id", insertable = false, updatable = false)
+    private UUID parentId;
+
+    @OneToMany(mappedBy = "parent", cascade = {
+            CascadeType.PERSIST,
+            CascadeType.DETACH
+    })
     private Set<CategoryEntity> children;
 
     @ManyToMany(mappedBy = "categories")

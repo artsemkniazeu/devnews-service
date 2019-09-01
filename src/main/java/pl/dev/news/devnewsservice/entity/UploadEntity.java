@@ -18,11 +18,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(
-        callSuper = false,
-        exclude = {"user", "post"}
-)
-@ToString(exclude = {"user", "post"})
+@EqualsAndHashCode(callSuper = false, exclude = {
+        "user", "post"
+})
+@ToString(exclude = {
+        "user", "post"
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -41,8 +42,14 @@ public class UploadEntity extends AuditableEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private UUID userId;
+
     @ManyToOne
     @JoinColumn(name = "post_id")
     private PostEntity post;
+
+    @Column(name = "post_id", insertable = false, updatable = false)
+    private UUID postId;
 
 }

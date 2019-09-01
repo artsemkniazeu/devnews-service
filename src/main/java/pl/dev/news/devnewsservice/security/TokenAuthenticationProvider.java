@@ -4,8 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
-import pl.dev.news.devnewsservice.entity.UserEntity;
 
 @Slf4j
 @Component
@@ -20,8 +20,8 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         final TokenAuthentication tokenAuthentication = (TokenAuthentication) authentication;
         final String accessToken = tokenAuthentication.getName();
         if (tokenValidator.validateAccessToken(accessToken)) {
-            final UserEntity userEntity = new UserEntity(tokenProvider.buildUserEntityByToken(accessToken));
-            tokenAuthentication.setUserDetails(userEntity);
+            final UserDetails userDetails = new UserDetailsImpl(tokenProvider.buildUserEntityByToken(accessToken));
+            tokenAuthentication.setUserDetails(userDetails);
             tokenAuthentication.setAuthenticated(true);
         } else {
             tokenAuthentication.setAuthenticated(false);

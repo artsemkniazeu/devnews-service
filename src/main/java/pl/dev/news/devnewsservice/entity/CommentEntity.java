@@ -20,11 +20,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(
-        callSuper = false,
-        exclude = {"user", "parent", "children"}
-)
-@ToString(exclude = {"user", "parent", "children"})
+@EqualsAndHashCode(callSuper = false, exclude = {
+        "user", "parent", "children"
+})
+@ToString(exclude = {
+        "user", "parent", "children"
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -45,6 +46,9 @@ public class CommentEntity extends AuditableEntity {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
+
+    @Column(name = "user_id", insertable = false, updatable = false)
+    private UUID userId;
 
     @ManyToOne
     @JoinColumn(name = "parent_id", nullable = false)

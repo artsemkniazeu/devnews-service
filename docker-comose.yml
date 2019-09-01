@@ -10,3 +10,10 @@ services:
       - POSTGRES_DB=devnews_db
     ports:
       - "5433:5432"
+
+  maildev:
+    image: djfarrelly/maildev:latest
+    container_name: devnews-maildev
+    ports:
+      - "1025:25"
+      - "1080:80"

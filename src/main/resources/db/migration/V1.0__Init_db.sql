@@ -1,3 +1,6 @@
+create extension if not exists citext;
+
+
 -- Categories
 
 create table if not exists categories
@@ -6,9 +9,9 @@ create table if not exists categories
     created_at      timestamp       not null,
     deleted_at      timestamp,
     updated_at      timestamp,
-    name            text            not null unique,
+    name            citext          not null unique,
     value           text            not null unique,
-    parent_id       uuid            not null references categories (id)
+    parent_id       uuid            references categories (id)
 );
 
 create index if not exists categories_parent_id on categories (parent_id);
@@ -21,12 +24,9 @@ create table if not exists tags
     created_at      timestamp       not null,
     deleted_at      timestamp,
     updated_at      timestamp,
-    name            text            not null unique,
-    value           text            not null unique,
-    category_id     uuid            not null references categories (id)
+    name            citext          not null unique,
+    value           text            not null unique
 );
-
-create index if not exists tags_category_id on tags (category_id);
 
 --- Users
 
@@ -36,13 +36,13 @@ create table if not exists users
     created_at      timestamp       not null,
     deleted_at      timestamp,
     updated_at      timestamp,
-    username        text            unique,
+    username        citext          unique,
     email           text            not null unique,
     phone           text            unique,
     password        text            not null,
     role            text            not null,
-    first_name      text            not null,
-    last_name       text            not null,
+    first_name      citext          not null,
+    last_name       citext          not null,
     birthday        timestamp,
     city            text,
     country         text,
@@ -69,6 +69,22 @@ create index if not exists comments_parent_id on comments (parent_id);
 
 create index if not exists comments_user_id on comments (user_id);
 
+-- Groups
+
+create table if not exists groups
+(
+    id              uuid            not null primary key,
+    created_at      timestamp       not null,
+    deleted_at      timestamp,
+    updated_at      timestamp,
+    name            text            not null,
+    value           text            not null,
+    about           text,
+    nsfw            bool            default false,
+    owner_id        uuid            not null references users (id)
+);
+
+create index if not exists groups_owner_id on groups (owner_id);
 
 --- Posts
 
@@ -83,11 +99,31 @@ create table if not exists posts
     image_url       text            not null,
     text            text            not null,
     title           text            not null,
-    publisher_id    uuid            not null references users (id)
+    publisher_id    uuid            not null references users (id),
+    group_id        uuid            not null references groups (id)
 );
 
 create index if not exists posts_publisher_id on posts (publisher_id);
 
+create index if not exists posts_group_id on posts (group_id);
+
+
+--- Uploads
+
+create table if not exists uploads
+(
+    id              uuid            not null primary key,
+    created_at      timestamp       not null,
+    deleted_at      timestamp,
+    updated_at      timestamp,
+    url             text            not null,
+    user_id         uuid            not null references users (id),
+    post_id         uuid            not null references posts (id)
+);
+
+create index if not exists uploads_user_id on uploads (user_id);
+
+create index if not exists uploads_post_id on uploads (post_id);
 
 --- Post Categories
 
@@ -134,19 +170,11 @@ create table if not exists user_tag
     constraint user_tag_pkey primary key (user_id, tag_id)
 );
 
---- Uploads
+--- Group User
 
-create table if not exists uploads
+create table if not exists group_user
 (
-    id              uuid            not null primary key,
-    created_at      timestamp       not null,
-    deleted_at      timestamp,
-    updated_at      timestamp,
-    url             text            not null,
-    user_id         uuid            not null references users (id),
-    post_id         uuid            not null references posts (id)
+    group_id         uuid            not null references groups,
+    user_id          uuid            not null references users,
+    constraint group_user_pkey primary key (group_id, user_id)
 );
-
-create index if not exists uploads_user_id on uploads (user_id);
-
-create index if not exists uploads_post_id on uploads (post_id);

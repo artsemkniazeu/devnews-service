@@ -1,10 +1,11 @@
 package pl.dev.news.devnewsservice.service.impl;
 
-import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.QTagEntity;
 import pl.dev.news.devnewsservice.entity.TagEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
@@ -16,7 +17,7 @@ import pl.dev.news.model.rest.RestTagModel;
 
 import java.util.UUID;
 
-import static pl.dev.news.devnewsservice.constants.ExceptionConstants.tagWithIdNotExists;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.tagWithIdNotFound;
 
 @Service
 @RequiredArgsConstructor
@@ -26,46 +27,52 @@ public class TagServiceImpl implements TagService {
 
     private final TagMapper tagMapper = TagMapper.INSTANCE;
 
+    private final QTagEntity qTagEntity = QTagEntity.tagEntity;
+
     @Override
-    public RestTagModel createTag(final RestTagModel restTagModel) {
+    @Transactional
+    public RestTagModel create(final RestTagModel restTagModel) {
         final TagEntity mapped = tagMapper.toEntity(restTagModel);
         final TagEntity saved = tagRepository.saveAndFlush(mapped);
         return tagMapper.toModel(saved);
     }
 
     @Override
-    public void deleteTag(final UUID tagId) {
-        final TagEntity entity = tagRepository.findOne(
-                tagRepository.soft(QTagEntity.tagEntity.id.eq(tagId))
-        ).orElseThrow(() -> new NotFoundException(tagWithIdNotExists));
-        tagRepository.softDelete(entity.getId());
+    @Transactional
+    public void delete(final UUID tagId) {
+        if (!tagRepository.softExistsById(tagId)) {
+            throw new NotFoundException(tagWithIdNotFound);
+        }
+        tagRepository.softDelete(tagId);
     }
 
     @Override
-    public RestTagModel retrieveTag(final UUID tagId) {
-        final TagEntity entity = tagRepository.findOne(
-                tagRepository.soft(QTagEntity.tagEntity.id.eq(tagId))
-        ).orElseThrow(() -> new NotFoundException(tagWithIdNotExists));
+    @Transactional
+    public RestTagModel retrieve(final UUID tagId) {
+        final TagEntity entity = tagRepository.softFindById(tagId)
+                .orElseThrow(() -> new NotFoundException(tagWithIdNotFound));
         return tagMapper.toModel(entity);
     }
 
     @Override
-    public Page retrieveAll(final String name, final Integer page, final Integer size) {
-        final BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(QueryUtils.likeIfNotNull(name, QTagEntity.tagEntity.name));
+    @Transactional
+    public Page<RestTagModel> retrieveAll(final String name, final Integer page, final Integer size) {
+        final Predicate predicate = new QueryUtils()
+                .like(name, qTagEntity.name)
+                .build();
         return tagRepository.findAll(
-                booleanBuilder,
-                PageRequest.of(page - 1, size))
-                .map(tagMapper::toModel);
+                predicate,
+                PageRequest.of(page - 1, size)
+        ).map(tagMapper::toModel);
     }
 
     @Override
-    public RestTagModel updateTag(final UUID tagId, final RestTagModel restTagModel) {
-        final TagEntity entity = tagRepository.findOne(
-                tagRepository.soft(QTagEntity.tagEntity.id.eq(tagId))
-        ).orElseThrow(() -> new NotFoundException(tagWithIdNotExists));
-        final TagEntity updated = tagMapper.update(entity, restTagModel);
-        final TagEntity saved = tagRepository.saveAndFlush(updated);
+    @Transactional
+    public RestTagModel update(final UUID tagId, final RestTagModel restTagModel) {
+        final TagEntity entity = tagRepository.softFindById(tagId)
+                .orElseThrow(() -> new NotFoundException(tagWithIdNotFound));
+        tagMapper.update(entity, restTagModel);
+        final TagEntity saved = tagRepository.saveAndFlush(entity);
         return tagMapper.toModel(saved);
     }
 }

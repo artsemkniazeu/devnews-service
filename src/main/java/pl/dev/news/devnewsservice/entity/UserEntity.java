@@ -6,47 +6,37 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Set;
-import java.util.UUID;
 
 import static javax.persistence.EnumType.STRING;
 
 @Getter
 @Setter
-@EqualsAndHashCode(
-        callSuper = false,
-        exclude = {"posts", "followingTags", "bookmarks", "followingUsers", "followers", "comments", "uploads"}
-)
-@ToString(exclude = {"posts", "followingTags", "bookmarks", "followingUsers", "followers", "comments", "uploads"})
+@EqualsAndHashCode(callSuper = true, exclude = {
+        "posts", "groups", "comments", "uploads", "followingGroups",
+        "followingTags", "bookmarks", "followingUsers", "followers"
+})
+@ToString(exclude = {
+        "posts", "groups", "comments", "uploads", "followingGroups",
+        "followingTags", "bookmarks", "followingUsers", "followers"
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserEntity extends AuditableEntity implements UserDetails {
+public class UserEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
-
-    @Column(name = "username")
+    @Column(name = "username", columnDefinition = "citext")
     private String username;
 
     @Column(name = "email")
@@ -68,10 +58,10 @@ public class UserEntity extends AuditableEntity implements UserDetails {
     @Column(name = "bg_url")
     private String bgUrl;
 
-    @Column(name = "first_name")
+    @Column(name = "first_name", columnDefinition = "citext")
     private String firstName;
 
-    @Column(name = "last_name")
+    @Column(name = "last_name", columnDefinition = "citext")
     private String lastName;
 
     @Column(name = "birthday")
@@ -85,6 +75,18 @@ public class UserEntity extends AuditableEntity implements UserDetails {
 
     @OneToMany(mappedBy = "publisher")
     private Set<PostEntity> posts;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<GroupEntity> groups;
+
+    @OneToMany(mappedBy = "user")
+    private Set<CommentEntity> comments;
+
+    @OneToMany(mappedBy = "post")
+    private Set<UploadEntity> uploads;
+
+    @ManyToMany(mappedBy = "followers")
+    private Set<GroupEntity> followingGroups;
 
     @ManyToMany
     @JoinTable(
@@ -110,44 +112,6 @@ public class UserEntity extends AuditableEntity implements UserDetails {
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private Set<UserEntity> followers;
 
-    @OneToMany(mappedBy = "user")
-    private Set<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "post")
-    private Set<UploadEntity> uploads;
-
-    // ============ //
-    //  UserDetails //
-    // ============ //
-
-    public UserEntity(final UserEntity userEntity) {
-        this.id = userEntity.getId();
-        this.role = userEntity.getRole();
-    }
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority(role.toString()));
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 
 }

@@ -23,7 +23,7 @@ import pl.dev.news.model.rest.RestTokenResponse;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.incorrectPassword;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.refreshTokenInvalid;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailDeleted;
-import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailNotExists;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailNotFound;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
 @Service
@@ -64,7 +64,7 @@ public class AuthServiceImpl implements AuthService {
     private RestTokenResponse signIn(final String email, final String password) {
         final UserEntity userEntity = userRepository
                 .findOne(QUserEntity.userEntity.email.eq(email))
-                .orElseThrow(() -> new NotFoundException(userWithEmailNotExists));
+                .orElseThrow(() -> new NotFoundException(userWithEmailNotFound));
 
         if (userEntity.getDeletedAt() != null) {
             throw new ConflictException(userWithEmailDeleted);

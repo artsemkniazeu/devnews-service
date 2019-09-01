@@ -926,9 +926,6 @@ components:
           type: string
         value:
           type: string
-        category_id:
-          type: string
-          format: uuid
 
     CommentModel:
       type: object

@@ -1,6 +1,6 @@
 package pl.dev.news.devnewsservice.service.impl;
 
-import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,7 +19,7 @@ import pl.dev.news.model.rest.RestUserModel;
 
 import java.util.UUID;
 
-import static pl.dev.news.devnewsservice.exception.ExceptionsConstants.userNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
 
 @Service
 @AllArgsConstructor
@@ -29,21 +29,22 @@ public class UserServiceImpl implements UserService {
 
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
+    private final QUserEntity qUserEntity = QUserEntity.userEntity;
+
     @Override
     @Transactional
     public void delete(final UUID userId) {
-        final UserEntity userEntity = userRepository.findOne(
-                userRepository.soft(QUserEntity.userEntity.id.eq(userId))
-        ).orElseThrow(() -> new NotFoundException(userNotFound));
-        userRepository.softDelete(userEntity.getId());
+        if (!userRepository.softExistsById(userId)) {
+            throw new NotFoundException(userWithIdNotFound);
+        }
+        userRepository.softDelete(userId);
     }
 
     @Override
     @Transactional
     public RestUserModel get(final UUID userId) {
-        final UserEntity userEntity = userRepository.findOne(
-                userRepository.soft(QUserEntity.userEntity.id.eq(userId))
-        ).orElseThrow(() -> new NotFoundException(userNotFound));
+        final UserEntity userEntity = userRepository.softFindById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound));
         return UserMapper.INSTANCE.toModel(userEntity);
     }
 
@@ -56,25 +57,24 @@ public class UserServiceImpl implements UserService {
             final Integer page,
             final Integer size
     ) {
-
-        final BooleanBuilder booleanBuilder = new BooleanBuilder();
-        booleanBuilder.and(QueryUtils.likeIfNotNull(username, QUserEntity.userEntity.username));
-        booleanBuilder.and(QueryUtils.likeIfNotNull(name, QUserEntity.userEntity.firstName));
-        booleanBuilder.or(QueryUtils.likeIfNotNull(name, QUserEntity.userEntity.lastName));
-        booleanBuilder.and(QueryUtils.likeIfNotNull(email, QUserEntity.userEntity.email));
+        final Predicate predicate = new QueryUtils()
+                .like(username, qUserEntity.username)
+                .like(name, qUserEntity.firstName)
+                .likeOr(name, qUserEntity.lastName)
+                .likeOr(email, qUserEntity.email).build();
         return userRepository.findAll(
-                booleanBuilder,
-                PageRequest.of(page - 1, size))
-                .map(userMapper::toModel);
+                predicate,
+                PageRequest.of(page - 1, size)
+        ).map(userMapper::toModel);
     }
 
     @Override
+    @Transactional
     public RestUserModel update(final UUID userId, final RestUserModel restUserModel) {
-        final UserEntity userEntity = userRepository.findOne(
-                userRepository.soft(QUserEntity.userEntity.id.eq(userId))
-        ).orElseThrow(() -> new NotFoundException(userNotFound));
-        final UserEntity updated = userMapper.update(userEntity, restUserModel);
-        final UserEntity saved = userRepository.saveAndFlush(updated);
+        final UserEntity entity = userRepository.softFindById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound));
+        userMapper.update(entity, restUserModel);
+        final UserEntity saved = userRepository.saveAndFlush(entity);
         return userMapper.toModel(saved);
     }
 

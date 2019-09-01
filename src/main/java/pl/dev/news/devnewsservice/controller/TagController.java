@@ -28,20 +28,20 @@ public class TagController implements TagApi {
 
     @Override
     public ResponseEntity<RestTagModel> createTag(@Valid @RequestBody final RestTagModel restTagModel) {
-        final RestTagModel tagModel = tagService.createTag(restTagModel);
+        final RestTagModel tagModel = tagService.create(restTagModel);
         final HttpHeaders headers = HeaderUtils.generateLocationHeader(getTagPath, tagModel.getId());
-        return new ResponseEntity<>(headers, HttpStatus.CREATED);
+        return new ResponseEntity<>(tagModel, headers, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Void> deleteTag(@PathVariable("tagId") final UUID tagId) {
-        tagService.deleteTag(tagId);
+        tagService.delete(tagId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<RestTagModel> getTag(@PathVariable("tagId") final UUID tagId) {
-        final RestTagModel tagModel = tagService.retrieveTag(tagId);
+        final RestTagModel tagModel = tagService.retrieve(tagId);
         return new ResponseEntity<>(tagModel, HttpStatus.OK);
     }
 
@@ -54,9 +54,9 @@ public class TagController implements TagApi {
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page tags = tagService.retrieveAll(name, page, size);
+        final Page<RestTagModel> tags = tagService.retrieveAll(name, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getTagsPath, tags);
-        return new ResponseEntity<>(headers, HttpStatus.OK);
+        return new ResponseEntity<>(tags.getContent(), headers, HttpStatus.OK);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class TagController implements TagApi {
             @PathVariable("tagId") final UUID tagId,
             @Valid @RequestBody final RestTagModel restTagModel
     ) {
-        final RestTagModel tagModel = tagService.updateTag(tagId, restTagModel);
+        final RestTagModel tagModel = tagService.update(tagId, restTagModel);
         return new ResponseEntity<>(tagModel, HttpStatus.OK);
     }
 

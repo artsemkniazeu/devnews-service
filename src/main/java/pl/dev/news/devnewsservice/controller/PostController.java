@@ -1,6 +1,8 @@
 package pl.dev.news.devnewsservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dev.news.controller.api.PostApi;
+import pl.dev.news.devnewsservice.service.PostService;
+import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestPostModel;
 
 import javax.validation.Valid;
@@ -20,22 +24,25 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class PostController implements PostApi {
 
+    private final PostService postService;
+
     @Override
     public ResponseEntity<RestPostModel> createPost(@Valid @RequestBody final RestPostModel restPostModel) {
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        final RestPostModel model = postService.create(restPostModel);
+        final HttpHeaders headers = HeaderUtils.generateLocationHeader(getPostPath, model.getId());
+        return new ResponseEntity<>(model, headers, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Void> deletePost(@PathVariable("postId") final UUID postId) {
-
+        postService.delete(postId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<RestPostModel> getPost(@PathVariable("postId") final UUID postId) {
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        final RestPostModel model = postService.retrieve(postId);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     @Override
@@ -47,8 +54,9 @@ public class PostController implements PostApi {
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        final Page<RestPostModel> posts = postService.retrieveAll(publisherId, title, text, page, size);
+        final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getPostsPath, posts);
+        return new ResponseEntity<>(posts.getContent(), headers, HttpStatus.OK);
     }
 
     @Override
@@ -56,8 +64,8 @@ public class PostController implements PostApi {
             @PathVariable("postId") final UUID postId,
             @Valid @RequestBody final RestPostModel restPostModel
     ) {
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        final RestPostModel model = postService.update(postId, restPostModel);
+        return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
 

@@ -24,6 +24,7 @@
         <exclude name="AvoidFinalLocalVariable"/>
         <exclude name="UnnecessaryFullyQualifiedName"/>
         <exclude name="ShortVariable"/>
+        <exclude name="ShortMethodName"/>
         <exclude name="LongVariable"/>
         <exclude name="UseUnderscoresInNumericLiterals"/>
         <exclude name="TooManyStaticImports"/>

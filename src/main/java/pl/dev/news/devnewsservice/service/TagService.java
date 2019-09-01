@@ -7,13 +7,13 @@ import java.util.UUID;
 
 public interface TagService {
 
-    RestTagModel createTag(RestTagModel restTagModel);
+    RestTagModel create(RestTagModel restTagModel);
 
-    void deleteTag(UUID tagId);
+    void delete(UUID tagId);
 
-    RestTagModel retrieveTag(UUID tagId);
+    RestTagModel retrieve(UUID tagId);
 
-    Page retrieveAll(String name, Integer page, Integer size);
+    Page<RestTagModel> retrieveAll(String name, Integer page, Integer size);
 
-    RestTagModel updateTag(UUID tagId, RestTagModel restTagModel);
+    RestTagModel update(UUID tagId, RestTagModel restTagModel);
 }

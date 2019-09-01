@@ -1,6 +1,8 @@
 package pl.dev.news.devnewsservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -8,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pl.dev.news.controller.api.CategoryApi;
+import pl.dev.news.devnewsservice.service.CategoryService;
+import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
 
 import javax.validation.Valid;
@@ -20,17 +24,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class CategoryController implements CategoryApi {
 
+    private final CategoryService categoryService;
+
     @Override
     public ResponseEntity<RestCategoryModel> createCategory(
             @Valid @RequestBody final RestCategoryModel restCategoryModel
     ) {
-
-        return new ResponseEntity<>(HttpStatus.CREATED);
+        final RestCategoryModel categoryModel = categoryService.create(restCategoryModel);
+        final HttpHeaders headers = HeaderUtils.generateLocationHeader(getCategoryPath, categoryModel.getId());
+        return new ResponseEntity<>(categoryModel, headers, HttpStatus.CREATED);
     }
 
     @Override
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") final UUID categoryId) {
-
+        categoryService.delete(categoryId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
@@ -42,13 +49,15 @@ public class CategoryController implements CategoryApi {
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        return new ResponseEntity<>(HttpStatus.OK);
+        final Page<RestCategoryModel> categories = categoryService.retrieveAll(name, page, size);
+        final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getCategoriesPath, categories);
+        return new ResponseEntity<>(categories.getContent(), headers, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<RestCategoryModel> getCategory(@PathVariable("categoryId") final UUID categoryId) {
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        final RestCategoryModel categoryModel = categoryService.retrieve(categoryId);
+        return new ResponseEntity<>(categoryModel, HttpStatus.OK);
     }
 
     @Override
@@ -56,8 +65,8 @@ public class CategoryController implements CategoryApi {
             @PathVariable("categoryId") final UUID categoryId,
             @Valid @RequestBody final RestCategoryModel restCategoryModel
     ) {
-
-        return new ResponseEntity<>(HttpStatus.OK);
+        final RestCategoryModel categoryModel = categoryService.update(categoryId, restCategoryModel);
+        return new ResponseEntity<>(categoryModel, HttpStatus.OK);
     }
 
 }

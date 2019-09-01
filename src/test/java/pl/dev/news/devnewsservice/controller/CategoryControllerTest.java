@@ -3,12 +3,14 @@ package pl.dev.news.devnewsservice.controller;
 import org.junit.Assert;
 import org.junit.Test;
 import pl.dev.news.devnewsservice.AbstractIntegrationTest;
-import pl.dev.news.devnewsservice.entity.TagEntity;
+import pl.dev.news.devnewsservice.entity.CategoryEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.utils.PathUtils;
 import pl.dev.news.devnewsservice.utils.TestUtils;
-import pl.dev.news.model.rest.RestTagModel;
+import pl.dev.news.model.rest.RestCategoryModel;
 import pl.dev.news.model.rest.RestTokenResponse;
+
+import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -19,23 +21,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static pl.dev.news.controller.api.TagApi.createTagPath;
-import static pl.dev.news.controller.api.TagApi.deleteTagPath;
-import static pl.dev.news.controller.api.TagApi.getTagPath;
-import static pl.dev.news.controller.api.TagApi.getTagsPath;
+import static pl.dev.news.controller.api.CategoryApi.createCategoryPath;
+import static pl.dev.news.controller.api.CategoryApi.deleteCategoryPath;
+import static pl.dev.news.controller.api.CategoryApi.getCategoriesPath;
+import static pl.dev.news.controller.api.CategoryApi.getCategoryPath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
-public class TagControllerTest extends AbstractIntegrationTest {
+public class CategoryControllerTest extends AbstractIntegrationTest {
 
     @Test
-    public void testCreateTag() throws Exception {
+    public void testCreateCategory() throws Exception {
         // given
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
-        final RestTagModel model = TestUtils.restTagModel();
+        final RestCategoryModel model = TestUtils.restCategoryModel();
         // when
         mockMvc.perform(
-                post(createTagPath)
+                post(createCategoryPath)
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, tokenModel.getAccess().getToken())
                         .content(objectMapper.writeValueAsBytes(model)))
@@ -45,58 +47,59 @@ public class TagControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testDeleteTag() throws Exception {
+    public void testDeleteCategory() throws Exception {
         // given
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
-        final TagEntity entity = createTag();
+        final CategoryEntity entity = createCategory();
         // when
-        mockMvc.perform(delete(deleteTagPath, entity.getId())
+        mockMvc.perform(delete(deleteCategoryPath, entity.getId())
                 .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
                 // then
                 .andExpect(status().isNoContent());
 
-        final TagEntity entityFromDB = getTag(entity.getId());
+        final CategoryEntity entityFromDB = getCategory(entity.getId());
         Assert.assertNotNull(entityFromDB.getDeletedAt());
     }
 
     @Test
-    public void testGetTag() throws Exception {
+    public void testGetCategories() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
-        final TagEntity entity = createTag();
+        final CategoryEntity entity = createCategory();
+        final CategoryEntity children = new ArrayList<>(entity.getChildren()).get(0);
         mockMvc.perform(
-                get(PathUtils.generate(getTagPath, entity.getId()))
-                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
-                        .contentType(APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists());
-    }
-
-    @Test
-    public void testGetTags() throws Exception {
-        final UserEntity user = createUser(USER);
-        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
-        final TagEntity entity = createTag();
-        mockMvc.perform(
-                get(PathUtils.generate(getTagsPath))
-                        .param("name", entity.getName())
+                get(PathUtils.generate(getCategoriesPath))
+                        .param("name", children.getName())
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$",  hasSize(1)))
+                .andExpect(jsonPath("$[?(@.id == '" + children.getId() + "')]").exists());
+    }
+
+    @Test
+    public void testGetCategory() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        final CategoryEntity entity = createCategory();
+        mockMvc.perform(
+                get(PathUtils.generate(getCategoryPath, entity.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists());
     }
 
     @Test
-    public void testUpdateTag() throws Exception {
+    public void testUpdateCategory() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
-        final RestTagModel model = TestUtils.restTagModel();
-        final TagEntity entity = createTag(model);
+        final RestCategoryModel model = TestUtils.restCategoryModel();
+        final CategoryEntity entity = createCategory(model);
         model.setName("changed");
         mockMvc.perform(
-                put(PathUtils.generate(getTagPath, entity.getId()))
+                put(PathUtils.generate(getCategoryPath, entity.getId()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .content(objectMapper.writeValueAsBytes(model))
                         .contentType(APPLICATION_JSON))

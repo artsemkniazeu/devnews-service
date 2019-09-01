@@ -23,11 +23,12 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@EqualsAndHashCode(
-        callSuper = false,
-        exclude = {"publisher", "usersSaved", "tags", "uploads"}
-)
-@ToString(exclude = {"publisher", "usersSaved", "tags", "uploads"})
+@EqualsAndHashCode(callSuper = false, exclude = {
+        "publisher", "usersSaved", "tags", "categories", "uploads", "group"
+})
+@ToString(exclude = {
+        "publisher", "usersSaved", "tags", "categories", "uploads", "group"
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
@@ -58,6 +59,9 @@ public class PostEntity extends AuditableEntity {
     @JoinColumn(name = "publisher_id")
     private UserEntity publisher;
 
+    @Column(name = "publisher_id", insertable = false, updatable = false)
+    private UUID publisherId;
+
     @ManyToMany(mappedBy = "bookmarks")
     private Set<UserEntity> usersSaved;
 
@@ -77,5 +81,9 @@ public class PostEntity extends AuditableEntity {
 
     @OneToMany(mappedBy = "user")
     private Set<UploadEntity> uploads;
+
+    @ManyToOne
+    @JoinColumn(name = "group_id")
+    private GroupEntity group;
 
 }

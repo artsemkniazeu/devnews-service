@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.Optional;
 import java.util.UUID;
 
 @NoRepositoryBean
@@ -32,15 +33,35 @@ public interface CustomQueryDslRspository<
 
     }
 
-    default Predicate soft(final Predicate predicate) {
+    default Class getClazz() {
         final Type genericInterface = CustomQueryDslRspository.class.getGenericInterfaces()[0];
         final TypeVariable variable = (TypeVariable) ((ParameterizedType) genericInterface)
                 .getActualTypeArguments()[0];
-        final Class clazz = TypeFactory.rawClass(TypeUtils.getImplicitBounds(variable)[0]);
+        return TypeFactory.rawClass(TypeUtils.getImplicitBounds(variable)[0]);
+    }
+
+    default Predicate soft(final Predicate predicate) {
+        final Class clazz = getClazz();
         //noinspection unchecked
-        final PathBuilder<?> pathBuilder = new PathBuilder(clazz, "deletedAt");
+        final PathBuilder<AuditableEntity> pathBuilder = new PathBuilder(clazz, "deletedAt");
         final Predicate p = pathBuilder.isNull();
         return ExpressionUtils.allOf(predicate, p);
+    }
+
+    default Optional<T> softFindById(final I id) {
+        final Class clazz = getClazz();
+        //noinspection unchecked
+        final PathBuilder<I> pathBuilder = new PathBuilder(clazz, "id");
+        final Predicate p = pathBuilder.eq(id);
+        return findOne(soft(p));
+    }
+
+    default boolean softExistsById(final I id) {
+        final Class clazz = getClazz();
+        //noinspection unchecked
+        final PathBuilder<I> pathBuilder = new PathBuilder(clazz, "id");
+        final Predicate p = pathBuilder.eq(id);
+        return exists(soft(p));
     }
 
     @Transactional
