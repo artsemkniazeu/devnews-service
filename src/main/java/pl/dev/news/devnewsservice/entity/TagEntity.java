@@ -39,9 +39,6 @@ public class TagEntity extends AuditableEntity {
     @Column(name = "name", columnDefinition = "citext")
     private String name;
 
-    @Column(name = "value")
-    private String value;
-
     @ManyToMany(mappedBy = "followingTags")
     private Set<UserEntity> followers;
 

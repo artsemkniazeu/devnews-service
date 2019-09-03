@@ -25,7 +25,6 @@ create table if not exists tags
     deleted_at      timestamp,
     updated_at      timestamp,
     name            citext          not null unique,
-    value           text            not null unique
 );
 
 --- Users

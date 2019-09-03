@@ -7,10 +7,13 @@ info:
 tags:
   - name: Auth
   - name: User
+  - name: UserResources
   - name: Category
-  - name: Tag
   - name: Comment
+  - name: Group
   - name: Post
+  - name: Tag
+  - name: Upload
 
 servers:
   - url: /api/v1
@@ -96,21 +99,12 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - in: query
-          name: name
-          required: false
+        - name: values
+          in: query
           schema:
-            type: string
-        - in: query
-          name: username
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: email
-          required: false
-          schema:
-            type: string
+            $ref: "#/components/schemas/UserQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -187,7 +181,7 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  /users/{userId}/image:
+  "/users/{userId}/follow":
     parameters:
       - name: userId
         in: path
@@ -198,31 +192,158 @@ paths:
     post:
       tags:
         - User
-      operationId: uploadImage
+      operationId: followUser
       security:
         - userAuth: []
-      requestBody:
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              properties:
-                file:
-                  type: string
-                  format: binary
       responses:
-        "201":
-          description: Created
+        "200":
+          description: OK
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UploadModel"
+                $ref: "#/components/schemas/UserModel"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
-        "422":
-          $ref: "#/components/responses/UnprocessableEntity"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/users/{userId}/unfollow":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags:
+        - User
+      operationId: unfollowUser
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ========================================
+  # ===== User Resources API
+  # ========================================
+
+  "/users/{userId}/resources/bookmarks":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - UserResources
+      operationId: getUserBookmarks
+      security:
+        - userAuth: []
+      parameters:
+        - name: values
+          in: query
+          schema:
+            $ref: "#/components/schemas/PostQueryParameters"
+          style: form
+          explode: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/users/{userId}/resources/followers":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - UserResources
+      operationId: getUserFollowers
+      security:
+        - userAuth: []
+      parameters:
+        - name: values
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserQueryParameters"
+          style: form
+          explode: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/users/{userId}/resources/following":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - UserResources
+      operationId: getUserFollowing
+      security:
+        - userAuth: []
+      parameters:
+        - name: values
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserQueryParameters"
+          style: form
+          explode: true
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 
   # ========================================
   # ===== Category API
@@ -235,11 +356,12 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - in: query
-          name: name
-          required: false
+        - name: values
+          in: query
           schema:
-            type: string
+            $ref: "#/components/schemas/CategoryQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -345,11 +467,12 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - in: query
-          name: name
-          required: false
+        - name: values
+          in: query
           schema:
-            type: string
+            $ref: "#/components/schemas/TagQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -455,12 +578,12 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - in: query
-          name: userId
-          required: false
+        - name: values
+          in: query
           schema:
-            type: string
-            format: uuid
+            $ref: "#/components/schemas/CommentQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -556,7 +679,7 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
   # ========================================
-  # ===== Comment API
+  # ===== Post API
   # ========================================
   /posts:
     get:
@@ -566,22 +689,12 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - in: query
-          name: publisher_id
-          required: false
+        - name: values
+          in: query
           schema:
-            type: string
-            format: uuid
-        - in: query
-          name: title
-          required: false
-          schema:
-            type: string
-        - in: query
-          name: text
-          required: false
-          schema:
-            type: string
+            $ref: "#/components/schemas/PostQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -677,7 +790,42 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-
+  # /users/{userId}/image:
+  #   parameters:
+  #     - name: userId
+  #       in: path
+  #       required: true
+  #       schema:
+  #         type: string
+  #         format: uuid
+  #   post:
+  #     tags:
+  #       - User
+  #     operationId: uploadImage
+  #     security:
+  #       - userAuth: []
+  #     requestBody:
+  #       content:
+  #         multipart/form-data:
+  #           schema:
+  #             type: object
+  #             properties:
+  #               file:
+  #                 type: string
+  #                 format: binary
+  #     responses:
+  #       "201":
+  #         description: Created
+  #         content:
+  #           application/json:
+  #             schema:
+  #               $ref: "#/components/schemas/UploadModel"
+  #       "400":
+  #         $ref: "#/components/responses/BadRequest"
+  #       "401":
+  #         $ref: "#/components/responses/Unauthorized"
+  #       "422":
+  #         $ref: "#/components/responses/UnprocessableEntity"
 components:
 
   # ========================================
@@ -692,6 +840,7 @@ components:
         type: integer
         minimum: 1
         default: 1
+
     SizeQueryParameter:
       name: size
       in: query
@@ -700,6 +849,8 @@ components:
         minimum: 10
         maximum: 30
         default: 10
+
+
 
   # ========================================
   # ===== RequestBodies
@@ -798,7 +949,109 @@ components:
       in: header
       name: Authorization
 
+
   schemas:
+
+    # ========================================
+    # ===== Query Parameters Schemes
+    # ========================================
+
+    UserQueryParameters:
+      type: object
+      properties:
+        name:
+          type: string
+        username:
+          type: string
+        email:
+          type: string
+        category:
+          type: string
+        group:
+          type: string
+
+    CategoryQueryParameters:
+      type: object
+      properties:
+        parentId:
+          type: string
+          format: uuid
+        name:
+          type: string
+        value:
+          type: string
+
+    CommentQueryParameters:
+      type: object
+      properties:
+        parentId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        text:
+          type: string
+
+    GroupQueryParameters:
+      type: object
+      properties:
+        name:
+          type: string
+        value:
+          type: string
+        ownerId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+
+    PostQueryParameters:
+      type: object
+      properties:
+        title:
+          type: string
+        text:
+          type: string
+        tagId:
+          type: string
+          format: uuid
+        categoryId:
+          type: string
+          format: uuid
+        groupId:
+          type: string
+          format: uuid
+        publisherId:
+          type: string
+          format: uuid
+
+    TagQueryParameters:
+      type: object
+      properties:
+        name:
+          type: string
+        followerId:
+          type: string
+          format: uuid
+        postId:
+          type: string
+          format: uuid
+
+    UploadQueryParameters:
+      type: object
+      properties:
+        userId:
+          type: string
+          format: uuid
+        postId:
+          type: string
+          format: uuid
+
+    # ========================================
+    # ===== Model Schemes
+    # ========================================
 
     TokenModel:
       type: object
@@ -827,12 +1080,6 @@ components:
         - refreshToken
       properties:
         refreshToken:
-          type: string
-
-    UrlModel:
-      type: object
-      properties:
-        url:
           type: string
 
     UserRole:
@@ -916,17 +1163,6 @@ components:
           items:
             $ref: '#/components/schemas/CategoryModel'
 
-    TagModel:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        value:
-          type: string
-
     CommentModel:
       type: object
       properties:
@@ -947,6 +1183,24 @@ components:
             $ref: '#/components/schemas/CommentModel'
         user:
           $ref: '#/components/schemas/UserModel'
+
+    GroupModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        value:
+          type: string
+        about:
+          type: string
+        nsfw:
+          type: boolean
+        owner_id:
+          type: string
+          format: uuid
 
     PostModel:
       type: object
@@ -973,6 +1227,17 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/TagModel'
+
+    TagModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        value:
+          type: string
 
     UploadModel:
       type: object

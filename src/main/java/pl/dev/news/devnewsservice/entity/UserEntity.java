@@ -82,7 +82,7 @@ public class UserEntity extends BaseEntity {
     @OneToMany(mappedBy = "user")
     private Set<CommentEntity> comments;
 
-    @OneToMany(mappedBy = "post")
+    @OneToMany(mappedBy = "user")
     private Set<UploadEntity> uploads;
 
     @ManyToMany(mappedBy = "followers")

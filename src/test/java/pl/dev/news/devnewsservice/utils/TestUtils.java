@@ -82,10 +82,8 @@ public class TestUtils {
 
     public RestTagModel restTagModel() {
         final String name = faker.name().title();
-        final String value = name.replace(' ', '_');
         return new RestTagModel()
-                .name(name)
-                .value(value);
+                .name(name);
     }
 
 
