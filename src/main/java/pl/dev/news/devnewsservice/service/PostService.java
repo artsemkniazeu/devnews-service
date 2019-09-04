@@ -2,6 +2,7 @@ package pl.dev.news.devnewsservice.service;
 
 import org.springframework.data.domain.Page;
 import pl.dev.news.model.rest.RestPostModel;
+import pl.dev.news.model.rest.RestPostQueryParameters;
 
 import java.util.UUID;
 
@@ -13,7 +14,7 @@ public interface PostService {
 
     RestPostModel retrieve(UUID postId);
 
-    Page<RestPostModel> retrieveAll(UUID publisherId, String title, String text, Integer page, Integer size);
+    Page<RestPostModel> retrieveAll(RestPostQueryParameters parameters, Integer page, Integer size);
 
     RestPostModel update(UUID postId, RestPostModel restPostModel);
 }

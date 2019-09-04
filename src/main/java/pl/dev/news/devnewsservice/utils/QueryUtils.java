@@ -30,6 +30,16 @@ public class QueryUtils {
         return this;
     }
 
+    public QueryUtils likeOr(final String str, final StringPath... paths) {
+        final BooleanBuilder booleanBuilder = new BooleanBuilder();
+        if (str != null && str.length() > 0) {
+            for (final StringPath path:paths) {
+                booleanBuilder.or(path.like(str));
+            }
+            builder.and(booleanBuilder);
+        }
+        return this;
+    }
 
     public QueryUtils and(final Predicate right) {
         builder.and(right);

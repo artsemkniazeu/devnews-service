@@ -13,6 +13,7 @@ import pl.dev.news.controller.api.TagApi;
 import pl.dev.news.devnewsservice.service.TagService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestTagModel;
+import pl.dev.news.model.rest.RestTagQueryParameters;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -47,14 +48,13 @@ public class TagController implements TagApi {
 
     @Override
     public ResponseEntity<List<RestTagModel>> getTags(
-            @Valid
-            @RequestParam(value = "name", required = false) final String name,
+            @Valid final RestTagQueryParameters parameters,
             @Min(1) @Valid
             @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestTagModel> tags = tagService.retrieveAll(name, page, size);
+        final Page<RestTagModel> tags = tagService.retrieveAll(parameters, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getTagsPath, tags);
         return new ResponseEntity<>(tags.getContent(), headers, HttpStatus.OK);
     }

@@ -13,6 +13,7 @@ import javax.validation.constraints.*;
 {{/useBeanValidation}}
 {{#performBeanValidation}}
 import org.hibernate.validator.constraints.*;
+
 {{/performBeanValidation}}
 {{#jackson}}
 {{#withXml}}
@@ -31,6 +32,7 @@ import org.springframework.hateoas.ResourceSupport;
 
 {{#models}}
 {{#model}}
+import javax.validation.constraints.Email;
 {{#isEnum}}
 {{>enumOuterClass}}
 {{/isEnum}}

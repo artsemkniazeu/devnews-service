@@ -14,6 +14,7 @@ import pl.dev.news.devnewsservice.repository.TagRepository;
 import pl.dev.news.devnewsservice.service.TagService;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestTagModel;
+import pl.dev.news.model.rest.RestTagQueryParameters;
 
 import java.util.UUID;
 
@@ -56,9 +57,12 @@ public class TagServiceImpl implements TagService {
 
     @Override
     @Transactional
-    public Page<RestTagModel> retrieveAll(final String name, final Integer page, final Integer size) {
+    public Page<RestTagModel> retrieveAll(
+            final RestTagQueryParameters parameters,
+            final Integer page, final Integer size
+    ) {
         final Predicate predicate = new QueryUtils()
-                .like(name, qTagEntity.name)
+                .like(parameters.getName(), qTagEntity.name) // TODO add all parameters
                 .build();
         return tagRepository.findAll(
                 predicate,

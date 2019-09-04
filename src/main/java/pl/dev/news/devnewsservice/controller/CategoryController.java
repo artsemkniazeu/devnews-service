@@ -13,6 +13,7 @@ import pl.dev.news.controller.api.CategoryApi;
 import pl.dev.news.devnewsservice.service.CategoryService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestCategoryQueryParameters;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -41,15 +42,15 @@ public class CategoryController implements CategoryApi {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-
+    // TODO parameters
     @Override
     public ResponseEntity<List<RestCategoryModel>> getCategories(
-            @Valid @RequestParam(value = "name", required = false) final String name,
+            @Valid final RestCategoryQueryParameters parameters,
             @Min(1) @Valid @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestCategoryModel> categories = categoryService.retrieveAll(name, page, size);
+        final Page<RestCategoryModel> categories = categoryService.retrieveAll(parameters, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getCategoriesPath, categories);
         return new ResponseEntity<>(categories.getContent(), headers, HttpStatus.OK);
     }

@@ -83,7 +83,7 @@ public class UserControllerTest extends AbstractIntegrationTest {
         final RestUserModel restUserModel = TestUtils.restUserModel();
         final UserEntity expected = createUser(restUserModel, USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
-        restUserModel.setEmail("changed");
+        restUserModel.setEmail("changed@example.com");
         restUserModel.setFirstName("changed");
         mockMvc.perform(
                 put(PathUtils.generate(updateUserPath, expected.getId()))

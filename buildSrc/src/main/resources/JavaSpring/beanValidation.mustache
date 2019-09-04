@@ -1,6 +1,3 @@
-{{#required}}
-  @NotNull
-{{/required}}{{#isContainer}}{{^isPrimitiveType}}{{^isEnum}}
-  @Valid{{/isEnum}}{{/isPrimitiveType}}{{/isContainer}}{{^isContainer}}{{^isPrimitiveType}}
-  @Valid{{/isPrimitiveType}}{{/isContainer}}
-{{>beanValidationCore}}
+  {{#isContainer}}{{^isPrimitiveType}}{{^isEnum}}@Valid{{/isEnum}}{{/isPrimitiveType}}{{/isContainer}}{{^isContainer}}{{^isPrimitiveType}}@Valid{{/isPrimitiveType}}{{/isContainer}}
+  {{#required}}@NotNull{{/required}}
+  {{#trimmed}}@NullOrTrimmed{{/trimmed}}{{#phoneNumber}}@PhoneNumber{{/phoneNumber}}{{#notBlank}}@NullOrNotBlank{{/notBlank}}{{#lowerCase}}@LowerCase{{/lowerCase}}{{#email}}@Email{{/email}}{{#currency}}@Digits(integer = 12, fraction = 2){{/currency}}{{#url}}@URL{{/url}}{{#escapeJson}}@EscapeJson{{/escapeJson}}{{>beanValidationCore}}

@@ -13,6 +13,7 @@ import pl.dev.news.controller.api.PostApi;
 import pl.dev.news.devnewsservice.service.PostService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestPostModel;
+import pl.dev.news.model.rest.RestPostQueryParameters;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -47,14 +48,12 @@ public class PostController implements PostApi {
 
     @Override
     public ResponseEntity<List<RestPostModel>> getPosts(
-            @Valid @RequestParam(value = "publisher_id", required = false) final UUID publisherId,
-            @Valid @RequestParam(value = "title", required = false) final String title,
-            @Valid @RequestParam(value = "text", required = false) final String text,
+            @Valid final RestPostQueryParameters parameters,
             @Min(1)  @Valid @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestPostModel> posts = postService.retrieveAll(publisherId, title, text, page, size);
+        final Page<RestPostModel> posts = postService.retrieveAll(parameters, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getPostsPath, posts);
         return new ResponseEntity<>(posts.getContent(), headers, HttpStatus.OK);
     }

@@ -99,7 +99,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/UserQueryParameters"
@@ -248,7 +248,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/PostQueryParameters"
@@ -285,7 +285,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/UserQueryParameters"
@@ -322,7 +322,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/UserQueryParameters"
@@ -356,7 +356,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/CategoryQueryParameters"
@@ -467,7 +467,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/TagQueryParameters"
@@ -578,7 +578,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/CommentQueryParameters"
@@ -689,7 +689,7 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: values
+        - name: parameters
           in: query
           schema:
             $ref: "#/components/schemas/PostQueryParameters"
@@ -965,6 +965,7 @@ components:
           type: string
         email:
           type: string
+          format: email
         category:
           type: string
         group:

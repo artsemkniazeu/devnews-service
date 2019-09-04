@@ -13,6 +13,7 @@ import pl.dev.news.devnewsservice.repository.PostRepository;
 import pl.dev.news.devnewsservice.service.PostService;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestPostModel;
+import pl.dev.news.model.rest.RestPostQueryParameters;
 
 import java.util.UUID;
 
@@ -52,15 +53,13 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public Page retrieveAll(
-            final UUID publisherId,
-            final String title,
-            final String text,
+            final RestPostQueryParameters parameters,
             final Integer page,
             final Integer size
     ) {
         final Predicate predicate = new QueryUtils()
-                .like(title, qPostEntity.title)
-                .like(text, qPostEntity.text)
+                .like(parameters.getTitle(), qPostEntity.title) // TODO add all parameters
+                .like(parameters.getText(), qPostEntity.text)
                 .build();
         return postRepository.findAll(
                 predicate,

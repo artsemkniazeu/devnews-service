@@ -14,6 +14,7 @@ import pl.dev.news.devnewsservice.repository.CategoryRepository;
 import pl.dev.news.devnewsservice.service.CategoryService;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestCategoryQueryParameters;
 
 import java.util.UUID;
 
@@ -48,9 +49,12 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     @Transactional
-    public Page<RestCategoryModel> retrieveAll(final String name, final Integer page, final Integer size) {
+    public Page<RestCategoryModel> retrieveAll(
+            final RestCategoryQueryParameters parameters,
+            final Integer page, final Integer size
+    ) {
         final Predicate predicate = new QueryUtils()
-                .like(name, qCategoryEntity.name)
+                .like(parameters.getName(), qCategoryEntity.name) // TODO add all parameters
                 .build();
         return categoryRepository.findAll(
                 predicate,

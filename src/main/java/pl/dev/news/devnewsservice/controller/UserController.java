@@ -8,14 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
-import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
+import pl.dev.news.model.rest.RestUserQueryParameters;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -45,34 +45,43 @@ public class UserController implements UserApi {
 
     @Override
     public ResponseEntity<List<RestUserModel>> getUsers(
-            @Valid @RequestParam(value = "name", required = false)  final String name,
-            @Valid @RequestParam(value = "username", required = false) final String username,
-            @Valid @RequestParam(value = "email", required = false) final String email,
+            @Valid final RestUserQueryParameters parameters,
             @Min(1) @Valid
             @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestUserModel> users = userService.getUsers(username, name, email, page, size);
+        final Page<RestUserModel> users = userService.getUsers(parameters, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(basePath, users);
         return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
     }
 
     @Override
     public ResponseEntity<RestUserModel> updateUser(
-            final UUID userId,
-            @Valid final RestUserModel restUserModel
+            @PathVariable("userId") final UUID userId,
+            @Valid @RequestBody final RestUserModel restUserModel
     ) {
         final RestUserModel user = userService.update(userId, restUserModel);
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<RestUploadModel> uploadImage(
-            final UUID userId,
-            @Valid final MultipartFile file
-    ) {
-        final RestUploadModel restUploadModel = userService.uploadImage(userId, file);
-        return new ResponseEntity<>(restUploadModel, HttpStatus.OK);
+    public ResponseEntity<Void> unfollowUser(final UUID userId) {
+        return null;
     }
+
+    @Override
+    public ResponseEntity<RestUserModel> followUser(final UUID userId) {
+        return null;
+    }
+
+
+    //@Override
+    //public ResponseEntity<RestUploadModel> uploadImage(
+    //        final UUID userId,
+    //        @Valid final MultipartFile file
+    //) {
+    //    final RestUploadModel restUploadModel = userService.uploadImage(userId, file);
+    //    return new ResponseEntity<>(restUploadModel, HttpStatus.OK);
+    //}
 }

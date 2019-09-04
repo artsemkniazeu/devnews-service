@@ -16,6 +16,7 @@ import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
+import pl.dev.news.model.rest.RestUserQueryParameters;
 
 import java.util.UUID;
 
@@ -51,17 +52,14 @@ public class UserServiceImpl implements UserService {
     @Override
     @Transactional
     public Page<RestUserModel> getUsers(
-            final String username,
-            final String name,
-            final String email,
+            final RestUserQueryParameters parameters,
             final Integer page,
             final Integer size
     ) {
         final Predicate predicate = new QueryUtils()
-                .like(username, qUserEntity.username)
-                .like(name, qUserEntity.firstName)
-                .likeOr(name, qUserEntity.lastName)
-                .likeOr(email, qUserEntity.email).build();
+                .like(parameters.getUsername(), qUserEntity.username) // TODO add all parameters
+                .likeOr(parameters.getName(), qUserEntity.firstName, qUserEntity.lastName)
+                .like(parameters.getEmail(), qUserEntity.email).build();
         return userRepository.findAll(
                 predicate,
                 PageRequest.of(page - 1, size)
