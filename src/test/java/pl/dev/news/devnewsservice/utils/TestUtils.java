@@ -4,7 +4,13 @@ import com.github.javafaker.Faker;
 import lombok.experimental.UtilityClass;
 import org.springframework.context.annotation.Profile;
 import org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils;
+import pl.dev.news.devnewsservice.entity.CategoryEntity;
+import pl.dev.news.devnewsservice.entity.GroupEntity;
+import pl.dev.news.devnewsservice.entity.TagEntity;
+import pl.dev.news.devnewsservice.mapper.CategoryMapper;
+import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
 import pl.dev.news.model.rest.RestSignInRequest;
 import pl.dev.news.model.rest.RestSignUpRequest;
@@ -12,7 +18,9 @@ import pl.dev.news.model.rest.RestTagModel;
 import pl.dev.news.model.rest.RestUserModel;
 import pl.dev.news.model.rest.RestUserRole;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -80,6 +88,13 @@ public class TestUtils {
                 .children(children);
     }
 
+    public List<RestTagModel> restTagModels(final Integer... amount) {
+        return IntStream
+                .range(0, amount(amount))
+                .mapToObj(i -> restTagModel())
+                .collect(Collectors.toList());
+    }
+
     public RestTagModel restTagModel() {
         final String name = faker.name().title();
         return new RestTagModel()
@@ -93,5 +108,37 @@ public class TestUtils {
             x = a[0];
         }
         return x;
+    }
+
+    public static RestPostModel restPostModel(
+            final List<RestTagModel> tags,
+            final List<RestCategoryModel> categories,
+            final UUID groupId
+    ) {
+        return new RestPostModel()
+                .title(faker.name().title())
+                .text(faker.lorem().paragraph())
+                .imageUrl(faker.internet().url())
+                .publishDate(Instant.now().toString())
+                .tags(tags)
+                .categories(categories)
+                .groupId(groupId);
+    }
+
+    public static RestPostModel restPostModel(
+            final List<TagEntity> tagEntities,
+            final Set<CategoryEntity> categoryEntities,
+            final GroupEntity groupEntity
+    ) {
+        final List<RestTagModel> tags = tagEntities.stream()
+                .map(TagMapper.INSTANCE::toModel)
+                .collect(Collectors.toList());
+
+        final List<RestCategoryModel> categories = categoryEntities.stream()
+                .map(CategoryMapper.INSTANCE::toModel)
+                .collect(Collectors.toList());
+
+        return restPostModel(tags, categories, groupEntity.getId());
+
     }
 }

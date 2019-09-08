@@ -14,7 +14,6 @@ public interface CategoryMapper {
 
     CategoryMapper INSTANCE = Mappers.getMapper(CategoryMapper.class);
 
-    @Mapping(target = "id", ignore = true)
     CategoryEntity toEntity(RestCategoryModel model);
 
     RestCategoryModel toModel(CategoryEntity entity);

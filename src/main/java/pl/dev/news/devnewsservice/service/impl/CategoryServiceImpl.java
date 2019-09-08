@@ -42,9 +42,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public void delete(final UUID categoryId) {
         if (!categoryRepository.softExistsById(categoryId)) {
-            throw new NotFoundException(categoryWithIdNotFound);
+            throw new NotFoundException(categoryWithIdNotFound, categoryId);
         }
-        categoryRepository.softDelete(categoryId);
+        categoryRepository.softDeleteById(categoryId);
     }
 
     @Override
@@ -54,7 +54,9 @@ public class CategoryServiceImpl implements CategoryService {
             final Integer page, final Integer size
     ) {
         final Predicate predicate = new QueryUtils()
-                .like(parameters.getName(), qCategoryEntity.name) // TODO add all parameters
+                .andLikeAny(parameters.getName(), qCategoryEntity.name)
+                .andLikeAny(parameters.getValue(), qCategoryEntity.value)
+                .andEq(parameters.getParentId(), qCategoryEntity.parentId)
                 .build();
         return categoryRepository.findAll(
                 predicate,
@@ -66,7 +68,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public RestCategoryModel retrieve(final UUID categoryId) {
         final CategoryEntity entity = categoryRepository.softFindById(categoryId)
-                .orElseThrow(() -> new NotFoundException(categoryWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(categoryWithIdNotFound, categoryId));
         return categoryMapper.toModel(entity);
     }
 
@@ -74,7 +76,7 @@ public class CategoryServiceImpl implements CategoryService {
     @Transactional
     public RestCategoryModel update(final UUID categoryId, final RestCategoryModel model) {
         final CategoryEntity entity = categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException(categoryWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(categoryWithIdNotFound, categoryId));
         categoryMapper.update(entity, model);
         final CategoryEntity saved = categoryRepository.saveAndFlush(entity);
         return categoryMapper.toModel(saved);

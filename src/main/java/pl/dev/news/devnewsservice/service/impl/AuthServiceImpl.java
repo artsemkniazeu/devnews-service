@@ -30,6 +30,7 @@ import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
 
+    private final QUserEntity qUserEntity = QUserEntity.userEntity;
     private final UserRepository userRepository;
     private final TokenProvider tokenProvider;
     private final TokenValidator tokenValidator;
@@ -63,11 +64,11 @@ public class AuthServiceImpl implements AuthService {
 
     private RestTokenResponse signIn(final String email, final String password) {
         final UserEntity userEntity = userRepository
-                .findOne(QUserEntity.userEntity.email.eq(email))
-                .orElseThrow(() -> new NotFoundException(userWithEmailNotFound));
+                .findOne(qUserEntity.email.eq(email))
+                .orElseThrow(() -> new NotFoundException(userWithEmailNotFound, email));
 
         if (userEntity.getDeletedAt() != null) {
-            throw new ConflictException(userWithEmailDeleted);
+            throw new ConflictException(userWithEmailDeleted, email);
         }
         if (!passwordEncoder.matches(password, userEntity.getPassword())) {
             throw new UnauthorizedException(incorrectPassword);

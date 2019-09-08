@@ -285,12 +285,8 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: parameters
-          in: query
-          schema:
-            $ref: "#/components/schemas/UserQueryParameters"
-          style: form
-          explode: true
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
         "200":
           description: OK
@@ -322,12 +318,8 @@ paths:
       security:
         - userAuth: []
       parameters:
-        - name: parameters
-          in: query
-          schema:
-            $ref: "#/components/schemas/UserQueryParameters"
-          style: form
-          explode: true
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
         "200":
           description: OK
@@ -966,10 +958,6 @@ components:
         email:
           type: string
           format: email
-        category:
-          type: string
-        group:
-          type: string
 
     CategoryQueryParameters:
       type: object
@@ -1222,12 +1210,17 @@ components:
         publisher_id:
           type: string
           format: uuid
-        publisher:
-          $ref: '#/components/schemas/UserModel'
         tags:
           type: array
           items:
             $ref: '#/components/schemas/TagModel'
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/CategoryModel'
+        groupId:
+          type: string
+          format: uuid
 
     TagModel:
       type: object
@@ -1249,9 +1242,6 @@ components:
         url:
           type: string
         user_id:
-          type: string
-          format: uuid
-        post_id:
           type: string
           format: uuid
 

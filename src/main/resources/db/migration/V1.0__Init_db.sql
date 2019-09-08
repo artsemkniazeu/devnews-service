@@ -96,10 +96,10 @@ create table if not exists posts
     update_date     timestamp,
     publish_date    timestamp       not null,
     image_url       text            not null,
-    text            text            not null,
-    title           text            not null,
+    text            citext          not null,
+    title           citext          not null,
     publisher_id    uuid            not null references users (id),
-    group_id        uuid            not null references groups (id)
+    group_id        uuid            references groups (id)
 );
 
 create index if not exists posts_publisher_id on posts (publisher_id);

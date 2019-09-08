@@ -13,13 +13,12 @@ public interface TagMapper {
 
     TagMapper INSTANCE = Mappers.getMapper(TagMapper.class);
 
-
-    @Mapping(target = "id", ignore = true)
     TagEntity toEntity(RestTagModel model);
 
     RestTagModel toModel(TagEntity entity);
 
     @Mapping(target = "id", ignore = true)
     void update(@MappingTarget TagEntity entity, RestTagModel restTagModel);
+
 
 }

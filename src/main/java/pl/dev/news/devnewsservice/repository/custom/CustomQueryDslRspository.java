@@ -49,24 +49,30 @@ public interface CustomQueryDslRspository<
     }
 
     default Optional<T> softFindById(final I id) {
+        if (id == null) {
+            return Optional.empty();
+        }
         final Class clazz = getClazz();
         //noinspection unchecked
         final PathBuilder<I> pathBuilder = new PathBuilder(clazz, "id");
-        final Predicate p = pathBuilder.eq(id);
-        return findOne(soft(p));
+        final Predicate predicate = pathBuilder.eq(id);
+        return findOne(soft(predicate));
     }
 
     default boolean softExistsById(final I id) {
+        if (id == null) {
+            return false;
+        }
         final Class clazz = getClazz();
         //noinspection unchecked
         final PathBuilder<I> pathBuilder = new PathBuilder(clazz, "id");
-        final Predicate p = pathBuilder.eq(id);
-        return exists(soft(p));
+        final Predicate predicate = pathBuilder.eq(id);
+        return exists(soft(predicate));
     }
 
     @Transactional
     @Modifying
     @Query("update #{#entityName} e set deleted_at = CURRENT_TIMESTAMP where e.id = ?1")
-    void softDelete(UUID id);
+    void softDeleteById(UUID id);
 
 }

@@ -6,9 +6,14 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -40,10 +45,10 @@ public class PostEntity extends AuditableEntity {
     @Column(name = "id", updatable = false, nullable = false)
     private UUID id;
 
-    @Column(name = "title")
+    @Column(name = "title", columnDefinition = "citext")
     private String title;
 
-    @Column(name = "text")
+    @Column(name = "text", columnDefinition = "citext")
     private String text;
 
     @Column(name = "imageUrl")
@@ -55,7 +60,7 @@ public class PostEntity extends AuditableEntity {
     @Column(name = "publish_date")
     private Instant publishDate;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publisher_id")
     private UserEntity publisher;
 
@@ -65,25 +70,56 @@ public class PostEntity extends AuditableEntity {
     @ManyToMany(mappedBy = "bookmarks")
     private Set<UserEntity> usersSaved;
 
-    @ManyToMany
+    @BatchSize(size = 10)
+    @Fetch(FetchMode.JOIN)
+    @ManyToMany(cascade = {
+            CascadeType.PERSIST,
+            CascadeType.DETACH,
+            CascadeType.REFRESH,
+            CascadeType.MERGE
+    })
     @JoinTable(
             name = "post_tag",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
     private Set<TagEntity> tags;
 
-    @ManyToMany
+    @BatchSize(size = 10)
+    @Fetch(FetchMode.JOIN)
+    @ManyToMany(cascade = {
+            CascadeType.REFRESH,
+            CascadeType.DETACH
+    })
     @JoinTable(
             name = "post_category",
             joinColumns = @JoinColumn(name = "post_id"),
             inverseJoinColumns = @JoinColumn(name = "category_id"))
     private Set<CategoryEntity> categories;
 
-    @OneToMany(mappedBy = "user")
+    @BatchSize(size = 10)
+    @Fetch(FetchMode.JOIN)
+    @OneToMany(mappedBy = "user", cascade = {
+            CascadeType.DETACH,
+            CascadeType.REFRESH
+    })
     private Set<UploadEntity> uploads;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private GroupEntity group;
 
+    @Column(name = "group_id", insertable = false, updatable = false)
+    private UUID groupId;
+
+    public void addTag(final TagEntity tag) {
+        this.tags.add(tag);
+    }
+
+    public void addCategory(final CategoryEntity category) {
+        this.categories.add(category);
+    }
+
+    public void addUpload(final UploadEntity upload) {
+        this.uploads.add(upload);
+    }
 }

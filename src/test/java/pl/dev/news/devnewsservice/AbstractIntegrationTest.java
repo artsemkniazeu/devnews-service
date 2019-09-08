@@ -14,27 +14,36 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.dev.news.devnewsservice.entity.CategoryEntity;
+import pl.dev.news.devnewsservice.entity.GroupEntity;
+import pl.dev.news.devnewsservice.entity.PostEntity;
 import pl.dev.news.devnewsservice.entity.TagEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
+import pl.dev.news.devnewsservice.mapper.PostMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.CategoryRepository;
+import pl.dev.news.devnewsservice.repository.PostRepository;
 import pl.dev.news.devnewsservice.repository.TagRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.security.impl.TokenProviderImpl;
 import pl.dev.news.devnewsservice.security.impl.TokenValidatorImpl;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTagModel;
 import pl.dev.news.model.rest.RestUserModel;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
-import static pl.dev.news.devnewsservice.constants.ExceptionConstants.categoryNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.categoryWithIdNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.postWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.tagWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
 
@@ -75,6 +84,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected TagRepository tagRepository;
+
+    @Autowired
+    protected PostRepository postRepository;
 
     @After
     public final void clearDatabase() {
@@ -126,11 +138,11 @@ public abstract class AbstractIntegrationTest {
 
     protected UserEntity getUser(final UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException(userWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
     }
 
     protected void deleteUser(final UUID userId) {
-        userRepository.softDelete(userId);
+        userRepository.softDeleteById(userId);
     }
 
 
@@ -148,7 +160,7 @@ public abstract class AbstractIntegrationTest {
 
     protected CategoryEntity getCategory(final UUID categoryId) {
         return categoryRepository.findById(categoryId)
-                .orElseThrow(() -> new NotFoundException(categoryNotFound));
+                .orElseThrow(() -> new NotFoundException(categoryWithIdNotFound, categoryId));
     }
 
     // Tag
@@ -162,9 +174,36 @@ public abstract class AbstractIntegrationTest {
         return createTag(TestUtils.restTagModel());
     }
 
+    protected List<TagEntity> createTags(final Integer... amount) {
+        return IntStream.range(0, TestUtils.amount(amount))
+                .mapToObj(i -> createTag())
+                .collect(Collectors.toList());
+    }
+
     protected TagEntity getTag(final UUID tagId) {
         return tagRepository.findById(tagId)
-                .orElseThrow(() -> new NotFoundException(tagWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(tagWithIdNotFound, tagId));
+    }
+
+
+    // Post
+
+    protected PostEntity createPost(final UserEntity user, final RestPostModel model, final GroupEntity group) {
+        final PostEntity entity = PostMapper.INSTANCE.toEntity(model, user, group);
+        final PostEntity persist = postRepository.save(entity);
+        PostMapper.INSTANCE.update(persist, model);
+        return postRepository.saveAndFlush(persist);
+    }
+
+    protected PostEntity createPost(final UserEntity user) {
+        final GroupEntity group = new GroupEntity(); // TODO create group
+        final RestPostModel model = TestUtils.restPostModel(createTags(), createCategory().getChildren(), group);
+        return createPost(user, model, null);
+    }
+
+    protected PostEntity getPost(final UUID postId) {
+        return postRepository.findById(postId)
+                .orElseThrow(() -> new NotFoundException(postWithIdNotFound, postId));
     }
 
 }

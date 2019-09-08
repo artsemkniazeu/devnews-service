@@ -5,11 +5,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import pl.dev.news.devnewsservice.entity.GroupEntity;
 import pl.dev.news.devnewsservice.entity.PostEntity;
 import pl.dev.news.devnewsservice.entity.QPostEntity;
+import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.PostMapper;
+import pl.dev.news.devnewsservice.repository.GroupRepository;
 import pl.dev.news.devnewsservice.repository.PostRepository;
+import pl.dev.news.devnewsservice.security.SecurityResolver;
 import pl.dev.news.devnewsservice.service.PostService;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestPostModel;
@@ -24,42 +29,54 @@ import static pl.dev.news.devnewsservice.constants.ExceptionConstants.postWithId
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
-
+    private final GroupRepository groupRepository;
+    private final SecurityResolver securityResolver;
     private final PostMapper postMapper = PostMapper.INSTANCE;
-
     private final QPostEntity qPostEntity = QPostEntity.postEntity;
 
     @Override
-    public RestPostModel create(final RestPostModel restPostModel) {
-        final PostEntity entity = postMapper.toEntity(restPostModel);
-        final PostEntity saved = postRepository.saveAndFlush(entity);
+    @Transactional
+    public RestPostModel create(final RestPostModel model) {
+        final UserEntity user = securityResolver.getUser();
+        final GroupEntity group = groupRepository.softFindById(model.getGroupId()).orElse(null);
+        final PostEntity entity = postMapper.toEntity(model, user, group);
+        final PostEntity persist = postRepository.save(entity);
+        postMapper.update(persist, model);
+        final PostEntity saved = postRepository.saveAndFlush(persist);
         return postMapper.toModel(saved);
     }
 
     @Override
+    @Transactional
     public void delete(final UUID postId) {
         if (!postRepository.softExistsById(postId)) {
-            throw new NotFoundException(postWithIdNotFound);
+            throw new NotFoundException(postWithIdNotFound, postId);
         }
-        postRepository.softDelete(postId);
+        postRepository.softDeleteById(postId);
     }
 
     @Override
+    @Transactional
     public RestPostModel retrieve(final UUID postId) {
         final PostEntity entity = postRepository.softFindById(postId)
-                .orElseThrow(() -> new NotFoundException(postWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(postWithIdNotFound, postId));
         return postMapper.toModel(entity);
     }
 
     @Override
+    @Transactional
     public Page retrieveAll(
             final RestPostQueryParameters parameters,
             final Integer page,
             final Integer size
     ) {
         final Predicate predicate = new QueryUtils()
-                .like(parameters.getTitle(), qPostEntity.title) // TODO add all parameters
-                .like(parameters.getText(), qPostEntity.text)
+                .andLikeAny(parameters.getTitle(), qPostEntity.title)
+                .andLikeAny(parameters.getText(), qPostEntity.text)
+                .andSetEq(parameters.getTagId(), qPostEntity.tags.any().id)
+                .andSetEq(parameters.getCategoryId(), qPostEntity.categories.any().id)
+                .andEq(parameters.getGroupId(), qPostEntity.group.id)
+                .andEq(parameters.getPublisherId(), qPostEntity.publisherId)
                 .build();
         return postRepository.findAll(
                 predicate,
@@ -68,10 +85,11 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public RestPostModel update(final UUID postId, final RestPostModel restPostModel) {
+    @Transactional
+    public RestPostModel update(final UUID postId, final RestPostModel model) {
         final PostEntity entity = postRepository.softFindById(postId)
-                .orElseThrow(() -> new NotFoundException(postWithIdNotFound));
-        postMapper.update(entity, restPostModel);
+                .orElseThrow(() -> new NotFoundException(postWithIdNotFound, postId));
+        postMapper.update(entity, model);
         final PostEntity saved = postRepository.saveAndFlush(entity);
         return postMapper.toModel(saved);
     }

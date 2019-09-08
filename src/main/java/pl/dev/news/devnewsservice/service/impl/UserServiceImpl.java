@@ -36,16 +36,16 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void delete(final UUID userId) {
         if (!userRepository.softExistsById(userId)) {
-            throw new NotFoundException(userWithIdNotFound);
+            throw new NotFoundException(userWithIdNotFound, userId);
         }
-        userRepository.softDelete(userId);
+        userRepository.softDeleteById(userId);
     }
 
     @Override
     @Transactional
     public RestUserModel get(final UUID userId) {
         final UserEntity userEntity = userRepository.softFindById(userId)
-                .orElseThrow(() -> new NotFoundException(userWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
         return UserMapper.INSTANCE.toModel(userEntity);
     }
 
@@ -57,9 +57,10 @@ public class UserServiceImpl implements UserService {
             final Integer size
     ) {
         final Predicate predicate = new QueryUtils()
-                .like(parameters.getUsername(), qUserEntity.username) // TODO add all parameters
-                .likeOr(parameters.getName(), qUserEntity.firstName, qUserEntity.lastName)
-                .like(parameters.getEmail(), qUserEntity.email).build();
+                .andLikeAny(parameters.getName(), qUserEntity.firstName, qUserEntity.lastName)
+                .andLikeAny(parameters.getUsername(), qUserEntity.username)
+                .andLikeAny(parameters.getEmail(), qUserEntity.email)
+                .build();
         return userRepository.findAll(
                 predicate,
                 PageRequest.of(page - 1, size)
@@ -70,7 +71,7 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public RestUserModel update(final UUID userId, final RestUserModel restUserModel) {
         final UserEntity entity = userRepository.softFindById(userId)
-                .orElseThrow(() -> new NotFoundException(userWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
         userMapper.update(entity, restUserModel);
         final UserEntity saved = userRepository.saveAndFlush(entity);
         return userMapper.toModel(saved);

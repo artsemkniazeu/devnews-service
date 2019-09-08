@@ -42,7 +42,6 @@ public class CategoryController implements CategoryApi {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    // TODO parameters
     @Override
     public ResponseEntity<List<RestCategoryModel>> getCategories(
             @Valid final RestCategoryQueryParameters parameters,

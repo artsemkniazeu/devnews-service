@@ -13,7 +13,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -43,6 +42,6 @@ public class TagEntity extends AuditableEntity {
     private Set<UserEntity> followers;
 
     @ManyToMany(mappedBy = "tags")
-    private List<PostEntity> posts;
+    private Set<PostEntity> posts;
 
 }
