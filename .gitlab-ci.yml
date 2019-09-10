@@ -44,6 +44,7 @@ deploy:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
     - docker logout
+    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews/devnews-service
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
     - docker push registry.heroku.com/devnews/devnews-service
     - apk add --no-cache curl
