@@ -1,8 +1,7 @@
-image: openjdk:11
+image: docker:latest
 
 services:
   - docker:dind
-  - postgres:10.6-alpine
 
 variables:
   DOCKER_DRIVER: overlay
@@ -15,9 +14,10 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 build:
+  image: java:11.0-jdk
   stage: build
   script:
-    - ./gradlew clean build --stacktrace --info
+    - ./gradlew clean build
     - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
 
 deploy:
