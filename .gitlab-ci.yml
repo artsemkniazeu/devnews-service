@@ -16,7 +16,7 @@ before_script:
 build:
   stage: build
   script:
-    - ./gradlew clean build --stacktrace --info --debug
+    - ./gradlew clean build --stacktrace --info
     - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
 
 deploy:
