@@ -29,17 +29,18 @@ package:
   dependencies:
     - build
   script:
-    - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
+    - docker build -t registry.gitlab.com/devnews/devnews-service .
+    - docker push registry.gitlab.com/devnews/devnews-service
 
 deploy:
   stage: deploy
   dependencies:
-    - package
+    - build
   script:
+    - docker pull registry.gitlab.com/devnews/devnews-service
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
-    - docker push registry.heroku.com/drivefocus-services/backend
+    - docker push registry.gitlab.com/devnews/devnews-service
     - apk add --no-cache curl
-    - echo "Docker Image ID is $(cat imageid.txt)"
 
 after_script:
   - echo "End CI"
