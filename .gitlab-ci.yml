@@ -1,3 +1,5 @@
+image: docker:latest
+
 services:
   - docker:dind
 
@@ -7,6 +9,7 @@ variables:
 
 stages:
   - build
+  - package
   - deploy
 
 before_script:
@@ -17,6 +20,10 @@ build:
   stage: build
   script:
     - ./gradlew clean build
+
+package:
+  stage: package
+  script:
     - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
 
 deploy:
