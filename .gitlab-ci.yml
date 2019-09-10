@@ -18,6 +18,9 @@ before_script:
 build:
   image: openjdk:11
   stage: build
+  artifacts:
+    paths:
+    - build/libs/*.jar
   script:
     - ./gradlew clean build
 
