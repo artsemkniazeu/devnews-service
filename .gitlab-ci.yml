@@ -1,4 +1,4 @@
-image: java:11.0-jdk
+image: openjdk:11
 
 services:
   - docker:dind
