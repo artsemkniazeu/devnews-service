@@ -2,6 +2,7 @@ image: openjdk:11
 
 services:
   - docker:dind
+  - postgres:10.6-alpine
 
 variables:
   DOCKER_DRIVER: overlay
