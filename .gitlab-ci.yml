@@ -21,6 +21,8 @@ build:
   artifacts:
     paths:
     - build/libs/*.jar
+  only:
+    - develop
   script:
     - ./gradlew clean build
 
