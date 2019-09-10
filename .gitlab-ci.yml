@@ -13,7 +13,7 @@ before_script:
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 build:
-  image: java:11.0-jdk
+  image: openjdk:11
   stage: build
   script:
     - ./gradlew clean build
