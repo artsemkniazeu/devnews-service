@@ -35,7 +35,7 @@ package:
 deploy:
   stage: deploy
   dependencies:
-    - build
+    - package
   script:
     - docker pull registry.gitlab.com/devnews/devnews-service
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
