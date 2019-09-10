@@ -24,6 +24,7 @@ build:
   only:
     - develop
   script:
+    - git checkout develop
     - ./gradlew clean build
 
 package:
