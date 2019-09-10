@@ -11,6 +11,8 @@ stages:
 docker-build:
   stage: build
   script:
+    - ./gradlew clean
+    - ./gradlew build
     - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
     - docker login -u _ -p $HEROKU_TOKEN registry.heroku.com
     - docker push registry.heroku.com/drivefocus-services/backend
