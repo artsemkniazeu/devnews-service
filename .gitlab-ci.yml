@@ -33,7 +33,6 @@ package:
     - build
   script:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
-    - git checkout develop
     - docker build -t registry.gitlab.com/devnews/devnews-service .
     - docker push registry.gitlab.com/devnews/devnews-service
 
