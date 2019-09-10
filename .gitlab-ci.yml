@@ -36,7 +36,7 @@ deploy:
   dependencies:
     - package
   script:
-    - docker login -u _ -p $HEROKU_TOKEN registry.heroku.com
+    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
     - docker push registry.heroku.com/drivefocus-services/backend
     - apk add --no-cache curl
     - echo "Docker Image ID is $(cat imageid.txt)"
