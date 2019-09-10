@@ -1,20 +1,34 @@
-image: docker:latest
+image: java:8-jdk
 services:
   - docker:dind
 
-variables:
-  DOCKER_DRIVER: overlay
 
 stages:
   - build
+  - deploy
 
-docker-build:
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+cache:
+  paths:
+    - .gradle/wrapper
+    - .gradle/caches
+
+build:
   stage: build
   script:
     - ./gradlew clean
     - ./gradlew build
     - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
+
+deploy:
+  stage: deploy
+  script:
     - docker login -u _ -p $HEROKU_TOKEN registry.heroku.com
     - docker push registry.heroku.com/drivefocus-services/backend
     - apk add --no-cache curl
     - echo "Docker Image ID is $(cat imageid.txt)"
+
+after_script:
+  - echo "End CI"
