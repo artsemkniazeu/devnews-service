@@ -23,11 +23,15 @@ build:
 
 package:
   stage: package
+  dependencies:
+    - build
   script:
     - docker build -f Dockerfile --iidfile imageid.txt -t registry.heroku.com/drivefocus-services/backend .
 
 deploy:
   stage: deploy
+  dependencies:
+    - package
   script:
     - docker login -u _ -p $HEROKU_TOKEN registry.heroku.com
     - docker push registry.heroku.com/drivefocus-services/backend
