@@ -29,6 +29,7 @@ package:
   dependencies:
     - build
   script:
+    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/devnews/devnews-service .
     - docker push registry.gitlab.com/devnews/devnews-service
 
@@ -37,7 +38,9 @@ deploy:
   dependencies:
     - package
   script:
+    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
+    - docker logout
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
     - docker push registry.gitlab.com/devnews/devnews-service
     - apk add --no-cache curl
