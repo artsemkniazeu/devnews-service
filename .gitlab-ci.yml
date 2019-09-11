@@ -9,7 +9,7 @@ variables:
 
 stages:
   - build
-  - package
+#  - package
   - deploy
 
 before_script:
@@ -39,44 +39,46 @@ build:dev:
     - git checkout develop
     - ./gradlew clean build
 
-package:
-  stage: package
-  dependencies:
-    - build
-    - build:dev
-  script:
-    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/devnews/devnews-service .
-    - docker push registry.gitlab.com/devnews/devnews-service
+#package:
+#  stage: package
+#  dependencies:
+#    - build
+#    - build:dev
+#  script:
+#    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
+#    - docker build -t registry.gitlab.com/devnews/devnews-service .
+#    - docker push registry.gitlab.com/devnews/devnews-service
 
-
-deploy:
-  stage: deploy
-  only:
-    - master
-  dependencies:
-    - package
-  script:
-    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
-    - docker pull registry.gitlab.com/devnews/devnews-service
-    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-staging/web
-    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
-    - docker push registry.heroku.com/devnews-staging/web
-    - apk add --no-cache curl
+#deploy:
+#  image: ruby:latest
+#  stage: deploy
+#  only:
+#    - master
+#  dependencies:
+#    - package
+#  script:
+#    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
+#    - docker pull registry.gitlab.com/devnews/devnews-service
+#    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-staging/web
+#    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
+#    - docker push registry.heroku.com/devnews-staging/web
+#    - apk add --no-cache curl
 
 deploy:dev:
+  image: ruby:latest
   stage: deploy
   only:
     - develop
   dependencies:
-    - package
+    - build:dev
   script:
-    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
-    - docker pull registry.gitlab.com/devnews/devnews-service
-    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-dev/web
-    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
-    - docker push registry.heroku.com/devnews-dev/web
-    - apk add --no-cache curl
+#    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
+#    - docker pull registry.gitlab.com/devnews/devnews-service
+#    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-dev/web
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=devnews-dev --api-key=$HEROKU_TOKEN
 
 after_script:
   - echo "End CI"
