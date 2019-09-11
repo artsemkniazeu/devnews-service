@@ -27,7 +27,7 @@ build:
     - git checkout master
     - ./gradlew clean build
 
-build-dev:
+build:dev:
   image: openjdk:11
   stage: build
   only:
@@ -48,14 +48,6 @@ package:
     - docker build -t registry.gitlab.com/devnews/devnews-service .
     - docker push registry.gitlab.com/devnews/devnews-service
 
-package-dev:
-  stage: package
-  dependencies:
-    - build-dev
-  script:
-    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
-    - docker build -t registry.gitlab.com/devnews/devnews-service .
-    - docker push registry.gitlab.com/devnews/devnews-service
 
 deploy:
   stage: deploy
@@ -71,7 +63,7 @@ deploy:
     - docker push registry.heroku.com/devnews-staging/devnews-service
     - apk add --no-cache curl
 
-deploy-dev:
+deploy:dev:
   stage: deploy
   only:
     - develop
