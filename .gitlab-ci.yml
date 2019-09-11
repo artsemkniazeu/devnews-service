@@ -59,9 +59,9 @@ deploy:
   script:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
-    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-staging/devnews-service
+    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-staging/web
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
-    - docker push registry.heroku.com/devnews-staging/devnews-service
+    - docker push registry.heroku.com/devnews-staging/web
     - apk add --no-cache curl
 
 deploy:dev:
@@ -73,9 +73,9 @@ deploy:dev:
   script:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
-    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-dev/devnews-service
+    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-dev/web
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
-    - docker push registry.heroku.com/devnews-dev/devnews-service
+    - docker push registry.heroku.com/devnews-dev/web
     - apk add --no-cache curl
 
 after_script:
