@@ -38,7 +38,7 @@ public class PostControllerTest extends AbstractIntegrationTest {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
         final RestPostModel model = TestUtils
-                .restPostModel(createTags(), createCategory().getChildren(), new GroupEntity());
+                .restPostModel(createTags(), createCategory().getChildren(), createGroup(user));
         // when
         mockMvc.perform(
                 post(createPostPath)
@@ -107,9 +107,10 @@ public class PostControllerTest extends AbstractIntegrationTest {
     public void testUpdatePost() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        final GroupEntity group = createGroup(user);
         final RestPostModel model = TestUtils
-                .restPostModel(createTags(), createCategory().getChildren(), new GroupEntity());
-        final PostEntity entity = createPost(user, model, null);
+                .restPostModel(createTags(), createCategory().getChildren(), group);
+        final PostEntity entity = createPost(user, model, group);
         model.getTags().remove(0);
         model.getTags().addAll(TestUtils.restTagModels());
         model.setTitle("changed");
