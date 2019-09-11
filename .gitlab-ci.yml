@@ -43,6 +43,7 @@ package:
   stage: package
   dependencies:
     - build
+    - build:dev
   script:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker build -t registry.gitlab.com/devnews/devnews-service .
