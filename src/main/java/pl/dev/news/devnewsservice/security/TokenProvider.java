@@ -1,13 +1,13 @@
 package pl.dev.news.devnewsservice.security;
 
 import pl.dev.news.devnewsservice.entity.UserEntity;
-import pl.dev.news.model.rest.RestTokenModel;
+import pl.dev.news.model.rest.RestTokenResponse;
 
 public interface TokenProvider {
 
-    RestTokenModel createTokenModel(UserEntity userEntity);
+    RestTokenResponse createTokenModel(UserEntity userEntity);
 
-    RestTokenModel refreshToken(String refreshToken);
+    RestTokenResponse refreshToken(String refreshToken);
 
     UserEntity buildUserEntityByToken(String token);
 }

@@ -2,7 +2,6 @@ package pl.dev.news.devnewsservice.entity;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.Column;
 import javax.persistence.MappedSuperclass;
@@ -13,7 +12,6 @@ import java.time.Instant;
 @Getter
 @Setter
 @MappedSuperclass
-@Where(clause = "deleted_at is null")
 public abstract class AuditableEntity {
 
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -34,4 +32,5 @@ public abstract class AuditableEntity {
     public void preUpdate() {
         updatedAt = Instant.now();
     }
+
 }

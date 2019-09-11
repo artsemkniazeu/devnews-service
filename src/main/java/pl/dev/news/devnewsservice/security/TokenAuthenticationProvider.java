@@ -21,7 +21,6 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
         final String accessToken = tokenAuthentication.getName();
         if (tokenValidator.validateAccessToken(accessToken)) {
             final UserDetails userDetails = new UserDetailsImpl(tokenProvider.buildUserEntityByToken(accessToken));
-
             tokenAuthentication.setUserDetails(userDetails);
             tokenAuthentication.setAuthenticated(true);
         } else {

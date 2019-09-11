@@ -5,8 +5,15 @@ services:
     image: mdillon/postgis:10-alpine
     container_name: devnews-postgres
     environment:
-      - POSTGRES_USER=onliner
-      - POSTGRES_PASSWORD=onliner
-      - POSTGRES_DB=onliner_db
+      - POSTGRES_USER=devnews
+      - POSTGRES_PASSWORD=devnews
+      - POSTGRES_DB=devnews_db
     ports:
       - "5433:5432"
+
+  maildev:
+    image: djfarrelly/maildev:latest
+    container_name: devnews-maildev
+    ports:
+      - "1025:25"
+      - "1080:80"

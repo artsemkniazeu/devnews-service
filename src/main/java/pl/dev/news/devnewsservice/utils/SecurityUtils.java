@@ -17,7 +17,7 @@ public class SecurityUtils {
     public static UUID getUserId() {
         final UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
                 .getAuthentication().getDetails();
-        return userDetails.getUserId();
+        return userDetails.getId();
     }
 
 }

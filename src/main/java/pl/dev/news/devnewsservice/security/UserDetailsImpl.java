@@ -4,21 +4,20 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import pl.dev.news.devnewsservice.entity.BaseEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.UUID;
 
 @Getter
-public class UserDetailsImpl implements UserDetails {
+public class UserDetailsImpl extends BaseEntity implements UserDetails {
 
-    private final UUID userId;
     private final UserRoleEntity role;
 
     public UserDetailsImpl(final UserEntity userEntity) {
-        this.userId = userEntity.getId();
+        this.id = userEntity.getId();
         this.role = userEntity.getRole();
     }
 

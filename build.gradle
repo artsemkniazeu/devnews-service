@@ -20,6 +20,13 @@ plugins {
 	id 'java'
 }
 
+ext {
+	querydslSourceDir = file("$buildDir/generated/sources/annotationProcessor/java/generateQuerydsl")
+	swaggerSourceDir = file("$buildDir/generated/src/main/java")
+}
+
+
+
 apply plugin: "io.spring.dependency-management"
 apply plugin: "org.openapi.generator"
 apply plugin: 'checkstyle'
@@ -28,6 +35,8 @@ apply plugin: 'jacoco'
 
 apply from: "gradle/swagger.gradle"
 apply from: "gradle/mapstruct.gradle"
+apply from: "gradle/querydsl.gradle"
+
 apply from: "gradle/checkstyle.gradle"
 apply from: "gradle/pmd.gradle"
 apply from: "gradle/jacoco.gradle"
@@ -35,12 +44,9 @@ apply from: "gradle/jacoco.gradle"
 group = 'pl.dev.news'
 version = '1.0'
 sourceCompatibility = 11
-targetCompatibility = 11
-
-
 assert System.properties["java.specification.version"] == "11"
 
-sourceSets.main.java.srcDirs = ['src/main/java', "$buildDir/generated/src/main/java"]
+
 
 configurations {
 	testAnnotationProcessor.extendsFrom annotationProcessor
@@ -51,43 +57,42 @@ repositories {
 	mavenCentral()
 }
 
-allprojects {
-	gradle.projectsEvaluated {
-		tasks.withType(JavaCompile) {
-			options.compilerArgs << "-Xlint:unchecked"
-		}
-	}
-}
-
 dependencies {
 	implementation "io.swagger:swagger-annotations:${swaggerAnnotationsVersion}"
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.flywaydb:flyway-core'
+	implementation "org.springframework.boot:spring-boot-starter-data-jpa"
+	implementation "org.springframework.boot:spring-boot-starter-jdbc"
+	implementation "org.springframework.boot:spring-boot-starter-security"
+	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation "org.flywaydb:flyway-core"
 	implementation "org.yaml:snakeyaml"
-	implementation 'org.springframework.boot:spring-boot-devtools'
+	implementation "org.springframework.boot:spring-boot-devtools"
 	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
 	implementation "org.mapstruct:mapstruct-jdk8:${mapstructVersion}"
 	implementation "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
+	implementation "com.querydsl:querydsl-jpa"
+
+	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
+
 
 	compile "org.openapitools:jackson-databind-nullable:0.2.0"
+	compile "io.springfox:springfox-swagger2:${springfoxSwaggerVersion}"
 	compile "io.springfox:springfox-swagger-ui:${springfoxSwaggerVersion}"
 	compile "org.springframework.boot:spring-boot-configuration-processor"
-	compileOnly 'org.projectlombok:lombok'
+	compileOnly "org.projectlombok:lombok"
 	compileOnly "org.mapstruct:mapstruct:${mapstructVersion}"
 
+	
+	
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
-	runtimeOnly 'org.postgresql:postgresql'
+	runtimeOnly "org.postgresql:postgresql"
 
-	annotationProcessor 'org.projectlombok:lombok'
+	annotationProcessor "org.projectlombok:lombok"
 	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 
 	testImplementation "com.github.javafaker:javafaker:${javaFakerVersion}"
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "org.springframework.security:spring-security-test"
 	testImplementation "org.testcontainers:testcontainers:${testcontainersVersion}"
 	testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
 }

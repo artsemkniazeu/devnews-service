@@ -13,3 +13,4 @@ pmd {
     reportsDir = file("build/reports/pmd")
     consoleOutput = true
 }
+

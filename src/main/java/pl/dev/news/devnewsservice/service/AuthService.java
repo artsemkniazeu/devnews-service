@@ -1,17 +1,16 @@
 package pl.dev.news.devnewsservice.service;
 
-import pl.dev.news.model.rest.RestLoginRequest;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
+import pl.dev.news.model.rest.RestSignInRequest;
 import pl.dev.news.model.rest.RestSignUpRequest;
-import pl.dev.news.model.rest.RestTokenModel;
-import pl.dev.news.model.rest.RestUserModel;
+import pl.dev.news.model.rest.RestTokenResponse;
 
 public interface AuthService {
 
-    RestTokenModel login(RestLoginRequest restLoginRequest);
+    RestTokenResponse signIn(RestSignInRequest restSignInRequest);
 
-    RestTokenModel refreshToken(RestRefreshTokenRequest restRefreshTokenRequest);
+    RestTokenResponse refreshToken(RestRefreshTokenRequest restRefreshTokenRequest);
 
-    RestUserModel signUp(RestSignUpRequest restSignupRequest);
+    RestTokenResponse signUp(RestSignUpRequest restSignupRequest);
 
 }

@@ -1,0 +1,108 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_HOST: "tcp://docker:2375"
+
+stages:
+  - build
+  - deploy
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+
+after_script:
+  - echo "End CI"
+
+# ==============
+#   PRODUCTION
+# ==============
+
+build:production:
+  image: openjdk:11
+  stage: build
+  only:
+    - tags
+    - master
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  script:
+    - git checkout master
+    - ./gradlew clean build
+
+deploy:production:
+  image: ruby:latest
+  stage: deploy
+  only:
+    - master
+    - tags
+  dependencies:
+    - build:production
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=devnews-production --api-key=$HEROKU_TOKEN
+
+# ==============
+#    STAGING
+# ==============
+
+build:staging:
+  image: openjdk:11
+  stage: build
+  only:
+    - master
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  script:
+    - git checkout master
+    - ./gradlew clean build
+
+deploy:staging:
+  image: ruby:latest
+  stage: deploy
+  only:
+    - master
+  dependencies:
+    - build:staging
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=devnews-staging --api-key=$HEROKU_TOKEN
+
+# ==============
+#    DEVELOP
+# ==============
+
+build:dev:
+  image: openjdk:11
+  stage: build
+  only:
+    - develop
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  script:
+    - git checkout develop
+    - ./gradlew clean build
+
+deploy:dev:
+  image: ruby:latest
+  stage: deploy
+  only:
+    - develop
+  dependencies:
+    - build:dev
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app=devnews-dev --api-key=$HEROKU_TOKEN
+

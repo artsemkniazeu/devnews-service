@@ -1,11 +1,13 @@
 def projectPackage = "pl/dev/news"
 
 def jacocoExclude =  [
-        "**/OnlinerServiceApplication.class",
-        "${projectPackage}/controllers/api/*.class",
+        "**/DevnewsServiceApplication.class",
+        "${projectPackage}/controller/api/*.class",
         "${projectPackage}/model/rest/*.class",
         "${projectPackage}/openapitools/*.class",
 
+        "${projectPackage}/devnewsservice/security/*.class",
+        "${projectPackage}/devnewsservice/mapper/*.class",
         "${projectPackage}/devnewsservice/constants/*.class",
         "${projectPackage}/devnewsservice/entity/*.class",
         "${projectPackage}/devnewsservice/exception/*.class",
@@ -44,11 +46,13 @@ jacocoTestCoverageVerification {
     violationRules {
         rule {
             limit {
-                minimum = 0.99
+                minimum = 0.80
             }
         }
     }
 }
 
-check.dependsOn jacocoTestReport
+jacocoTestReport.mustRunAfter test
+jacocoTestCoverageVerification.dependsOn jacocoTestReport
 build.dependsOn jacocoTestCoverageVerification
+

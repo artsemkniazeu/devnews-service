@@ -5,61 +5,67 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import java.util.UUID;
+import java.time.Instant;
+import java.util.Set;
 
 import static javax.persistence.EnumType.STRING;
 
 @Getter
 @Setter
-@EqualsAndHashCode(callSuper = false)
+@EqualsAndHashCode(callSuper = true, exclude = {
+        "posts", "groups", "comments", "uploads", "followingGroups",
+        "followingTags", "bookmarks", "followingUsers", "followers"
+})
+@ToString(exclude = {
+        "posts", "groups", "comments", "uploads", "followingGroups",
+        "followingTags", "bookmarks", "followingUsers", "followers"
+})
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserEntity extends AuditableEntity {
+public class UserEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
-
-    @Column(name = "username", nullable = false, unique = true)
+    @Column(name = "username", columnDefinition = "citext")
     private String username;
 
-    @Column(name = "email", nullable = false, unique = true)
+    @Column(name = "email")
     private String email;
 
-    @Column(name = "password", nullable = false, unique = true)
+    @Column(name = "phone")
+    private String phone;
+
+    @Column(name = "password")
     private String password;
 
-    @Column(name = "phone", nullable = false, unique = true)
-    private String phone;
+    @Enumerated(STRING)
+    @Column(name = "role")
+    private UserRoleEntity role;
 
     @Column(name = "image_url")
     private String imageUrl;
 
-    @Enumerated(STRING)
-    @Column(name = "role", nullable = false)
-    private UserRoleEntity role;
+    @Column(name = "bg_url")
+    private String bgUrl;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(name = "first_name", columnDefinition = "citext")
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(name = "last_name", columnDefinition = "citext")
     private String lastName;
 
-    @Column(name = "profile_bg_url")
-    private String profileBgUrl;
-
     @Column(name = "birthday")
-    private String birthday;
+    private Instant birthday;
 
     @Column(name = "country")
     private String country;
@@ -67,7 +73,45 @@ public class UserEntity extends AuditableEntity {
     @Column(name = "city")
     private String city;
 
-    @Column(name = "timezone")
-    private String timezone;
+    @OneToMany(mappedBy = "publisher")
+    private Set<PostEntity> posts;
+
+    @OneToMany(mappedBy = "owner")
+    private Set<GroupEntity> groups;
+
+    @OneToMany(mappedBy = "user")
+    private Set<CommentEntity> comments;
+
+    @OneToMany(mappedBy = "user")
+    private Set<UploadEntity> uploads;
+
+    @ManyToMany(mappedBy = "followers")
+    private Set<GroupEntity> followingGroups;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_tag",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id"))
+    private Set<TagEntity> followingTags;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_bookmark",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id"))
+    private Set<PostEntity> bookmarks;
+
+    @ManyToMany(mappedBy = "followers")
+    private Set<UserEntity> followingUsers;
+
+    @ManyToMany
+    @JoinTable(
+            name = "user_follower",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "follower_id"))
+    private Set<UserEntity> followers;
+
+
 
 }
