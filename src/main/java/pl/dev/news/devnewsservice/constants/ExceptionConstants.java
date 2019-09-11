@@ -6,6 +6,7 @@ public class ExceptionConstants {
     public static String userWithEmailNotFound = "User with email {} could not be found";
     public static String tagWithIdNotFound = "Tag with id {} could not be found";
     public static String postWithIdNotFound = "Post with id {} could not be found";
+    public static String groupWithIdNotFound = "Group with id {} could not be found";
 
     public static String categoryWithIdNotFound = "Category with id {} not be found";
 

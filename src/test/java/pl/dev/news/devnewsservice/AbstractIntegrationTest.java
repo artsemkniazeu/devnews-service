@@ -21,10 +21,12 @@ import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
+import pl.dev.news.devnewsservice.mapper.GroupMapper;
 import pl.dev.news.devnewsservice.mapper.PostMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.CategoryRepository;
+import pl.dev.news.devnewsservice.repository.GroupRepository;
 import pl.dev.news.devnewsservice.repository.PostRepository;
 import pl.dev.news.devnewsservice.repository.TagRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
@@ -32,6 +34,7 @@ import pl.dev.news.devnewsservice.security.impl.TokenProviderImpl;
 import pl.dev.news.devnewsservice.security.impl.TokenValidatorImpl;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTagModel;
@@ -43,6 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.categoryWithIdNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.postWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.tagWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
@@ -87,6 +91,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected PostRepository postRepository;
+
+    @Autowired
+    protected GroupRepository groupRepository;
 
     @After
     public final void clearDatabase() {
@@ -204,6 +211,24 @@ public abstract class AbstractIntegrationTest {
     protected PostEntity getPost(final UUID postId) {
         return postRepository.findById(postId)
                 .orElseThrow(() -> new NotFoundException(postWithIdNotFound, postId));
+    }
+
+
+    // Group
+
+    protected GroupEntity createGroup(final UserEntity user, final RestGroupModel model) {
+        final GroupEntity entity = GroupMapper.INSTANCE.toEntity(model);
+        entity.setOwner(user);
+        return groupRepository.saveAndFlush(entity);
+    }
+
+    protected GroupEntity createGroup(final UserEntity user) {
+        return createGroup(user, TestUtils.restGroupModel(user.getId()));
+    }
+
+    protected GroupEntity getGroup(final UUID groupId) {
+        return groupRepository.findById(groupId)
+                .orElseThrow(() -> new NotFoundException(groupWithIdNotFound, groupId));
     }
 
 }

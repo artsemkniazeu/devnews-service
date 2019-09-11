@@ -10,6 +10,7 @@ import pl.dev.news.devnewsservice.entity.TagEntity;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
 import pl.dev.news.model.rest.RestSignInRequest;
@@ -101,15 +102,6 @@ public class TestUtils {
                 .name(name);
     }
 
-
-    public int amount(final Integer... a) {
-        int x = 5;
-        if (a.length > 0) {
-            x = a[0];
-        }
-        return x;
-    }
-
     public static RestPostModel restPostModel(
             final List<RestTagModel> tags,
             final List<RestCategoryModel> categories,
@@ -140,5 +132,24 @@ public class TestUtils {
 
         return restPostModel(tags, categories, groupEntity.getId());
 
+    }
+
+    public static RestGroupModel restGroupModel(final UUID ownerId) {
+        final String name = faker.name().title();
+        final String value = name.replace(' ', '_');
+        return new RestGroupModel()
+                .name(name)
+                .value(value)
+                .about(faker.lorem().paragraph())
+                .nsfw(false)
+                .ownerId(ownerId);
+    }
+
+    public int amount(final Integer... a) {
+        int x = 5;
+        if (a.length > 0) {
+            x = a[0];
+        }
+        return x;
     }
 }

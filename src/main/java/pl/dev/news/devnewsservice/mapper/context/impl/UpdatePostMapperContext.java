@@ -1,10 +1,11 @@
-package pl.dev.news.devnewsservice.mapper.context;
+package pl.dev.news.devnewsservice.mapper.context.impl;
 
 import org.mapstruct.AfterMapping;
 import org.mapstruct.MappingTarget;
 import pl.dev.news.devnewsservice.entity.PostEntity;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
+import pl.dev.news.devnewsservice.mapper.context.PostMapperContext;
 import pl.dev.news.model.rest.RestPostModel;
 
 import java.util.HashSet;

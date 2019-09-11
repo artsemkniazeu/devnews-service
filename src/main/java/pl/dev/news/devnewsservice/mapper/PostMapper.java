@@ -9,9 +9,9 @@ import org.mapstruct.factory.Mappers;
 import pl.dev.news.devnewsservice.entity.GroupEntity;
 import pl.dev.news.devnewsservice.entity.PostEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
-import pl.dev.news.devnewsservice.mapper.context.DefaultPostMapperContext;
 import pl.dev.news.devnewsservice.mapper.context.PostMapperContext;
-import pl.dev.news.devnewsservice.mapper.context.UpdatePostMapperContext;
+import pl.dev.news.devnewsservice.mapper.context.impl.DefaultPostMapperContext;
+import pl.dev.news.devnewsservice.mapper.context.impl.UpdatePostMapperContext;
 import pl.dev.news.model.rest.RestPostModel;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {

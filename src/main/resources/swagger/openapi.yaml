@@ -782,6 +782,118 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  # ========================================
+  # ===== Group API
+  # ========================================
+  /groups:
+    get:
+      tags:
+        - Group
+      operationId: getGroups
+      security:
+        - userAuth: []
+      parameters:
+        - name: parameters
+          in: query
+          schema:
+            $ref: "#/components/schemas/GroupQueryParameters"
+          style: form
+          explode: true
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GroupModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    post:
+      tags:
+        - Group
+      operationId: createGroup
+      security: []
+      requestBody:
+        $ref: "#/components/requestBodies/GroupRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/groups/{groupId}":
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - Group
+      operationId: getGroup
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+    put:
+      tags:
+        - Group
+      operationId: updateGroup
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/GroupRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GroupModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+    delete:
+      tags:
+        - Group
+      operationId: deleteGroup
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   # /users/{userId}/image:
   #   parameters:
   #     - name: userId
@@ -905,6 +1017,14 @@ components:
           schema:
             $ref: "#/components/schemas/PostModel"
       required: true
+
+    GroupRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/GroupModel"
+
+
   # ========================================
   # ===== Responses
   # ========================================
