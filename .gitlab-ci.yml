@@ -25,6 +25,7 @@ build:production:
   image: openjdk:11
   stage: build
   only:
+    - tags
     - master
   artifacts:
     paths:
@@ -38,6 +39,7 @@ deploy:production:
   stage: deploy
   only:
     - master
+    - tags
   dependencies:
     - build:production
   script:
