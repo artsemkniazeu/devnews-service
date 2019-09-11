@@ -18,11 +18,23 @@ before_script:
 build:
   image: openjdk:11
   stage: build
+  only:
+    - master
+  artifacts:
+    paths:
+      - build/libs/*.jar
+  script:
+    - git checkout master
+    - ./gradlew clean build
+
+build-dev:
+  image: openjdk:11
+  stage: build
+  only:
+    - develop
   artifacts:
     paths:
     - build/libs/*.jar
-  only:
-    - develop
   script:
     - git checkout develop
     - ./gradlew clean build
@@ -38,15 +50,30 @@ package:
 
 deploy:
   stage: deploy
+  only:
+    - master
   dependencies:
     - package
   script:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
-    - docker logout
-    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews/devnews-service
+    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-staging/devnews-service
     - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
-    - docker push registry.heroku.com/devnews/devnews-service
+    - docker push registry.heroku.com/devnews-staging/devnews-service
+    - apk add --no-cache curl
+
+deploy-dev:
+  stage: deploy
+  only:
+    - develop
+  dependencies:
+    - package
+  script:
+    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
+    - docker pull registry.gitlab.com/devnews/devnews-service
+    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-dev/devnews-service
+    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
+    - docker push registry.heroku.com/devnews-dev/devnews-service
     - apk add --no-cache curl
 
 after_script:
