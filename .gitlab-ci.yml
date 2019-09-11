@@ -39,7 +39,7 @@ build:dev:
     - develop
   artifacts:
     paths:
-      - build/libs/*.jar
+    - build/libs/*.jar
   script:
     - git checkout develop
     - ./gradlew clean build
@@ -64,11 +64,10 @@ deploy:
   script:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
-    - docker tag registry.gitlab.com/devnews-dev/devnews-service registry.heroku.com/devnews-staging/web
-    - dpl --provider=heroku --app=devnews-staging --api-key=$HEROKU_TOKEN
-    - heroku container:login
-    - heroku container:push web -a "devnews-staging"
-    - heroku container:release web -a "devnews-staging"
+    - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-staging/web
+    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
+    - docker push registry.heroku.com/devnews-staging/web
+    - apk add --no-cache curl
 
 deploy:dev:
   stage: deploy
@@ -80,10 +79,9 @@ deploy:dev:
     - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
     - docker pull registry.gitlab.com/devnews/devnews-service
     - docker tag registry.gitlab.com/devnews/devnews-service registry.heroku.com/devnews-dev/web
-    - dpl --provider=heroku --app=devnews-dev --api-key=$HEROKU_TOKEN
-    - heroku container:login
-    - heroku container:push web -a "devnews-dev"
-    - heroku container:release web -a "devnews-dev"
+    - docker login -u artsem.kniazeu@gmail.com -p $HEROKU_TOKEN registry.heroku.com
+    - docker push registry.heroku.com/devnews-dev/web
+    - apk add --no-cache curl
 
 after_script:
   - echo "End CI"
