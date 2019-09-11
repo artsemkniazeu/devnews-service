@@ -48,6 +48,15 @@ package:
     - docker build -t registry.gitlab.com/devnews/devnews-service .
     - docker push registry.gitlab.com/devnews/devnews-service
 
+package-dev:
+  stage: package
+  dependencies:
+    - build-dev
+  script:
+    - docker login -u artsem.kniazeu@gmail.com -p $GITLAB_TOKEN registry.gitlab.com
+    - docker build -t registry.gitlab.com/devnews/devnews-service .
+    - docker push registry.gitlab.com/devnews/devnews-service
+
 deploy:
   stage: deploy
   only:
