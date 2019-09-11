@@ -26,7 +26,6 @@ build:production:
   stage: build
   only:
     - tags
-    - master
   artifacts:
     paths:
       - build/libs/*.jar
@@ -39,7 +38,6 @@ deploy:production:
   stage: deploy
   only:
     - master
-    - tags
   dependencies:
     - build:production
   script:
