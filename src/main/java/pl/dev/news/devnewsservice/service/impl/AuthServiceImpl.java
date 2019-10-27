@@ -43,29 +43,8 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public RestTokenResponse signIn(final RestSignInRequest restSignInRequest) {
-        return signIn(restSignInRequest.getEmail(), restSignInRequest.getPassword());
-    }
-
-    @Override
-    @Transactional
-    public RestTokenResponse refreshToken(final RestRefreshTokenRequest restRefreshTokenRequest) {
-        if (!tokenValidator.validateRefreshToken(restRefreshTokenRequest.getRefreshToken())) {
-            throw new UnauthorizedException(refreshTokenInvalid);
-        }
-        return tokenProvider.refreshToken(restRefreshTokenRequest.getRefreshToken());
-    }
-
-    @Override
-    @Transactional
-    public RestTokenResponse signUp(final RestSignUpRequest restSignupRequest) {
-        final UserEntity userEntity = userMapper.toEntity(restSignupRequest);
-        userEntity.setRole(USER);
-        userEntity.setPassword(passwordEncoder.encode(restSignupRequest.getPassword()));
-        userRepository.saveAndFlush(userEntity);
-        return signIn(restSignupRequest.getEmail(), restSignupRequest.getPassword());
-    }
-
-    private RestTokenResponse signIn(final String email, final String password) {
+        final String email = restSignInRequest.getEmail();
+        final String password = restSignInRequest.getPassword();
         final UserEntity userEntity = userRepository
                 .findOne(qUserEntity.email.eq(email))
                 .orElseThrow(() -> new NotFoundException(userWithEmailNotFound, email));
@@ -83,6 +62,25 @@ public class AuthServiceImpl implements AuthService {
             throw new BadCredentialsException(userWithIdIsLocked, userEntity.getId());
         }
         return tokenProvider.createTokenModel(userEntity);
+    }
+
+    @Override
+    @Transactional
+    public RestTokenResponse refreshToken(final RestRefreshTokenRequest restRefreshTokenRequest) {
+        if (!tokenValidator.validateRefreshToken(restRefreshTokenRequest.getRefreshToken())) {
+            throw new UnauthorizedException(refreshTokenInvalid);
+        }
+        return tokenProvider.refreshToken(restRefreshTokenRequest.getRefreshToken());
+    }
+
+    @Override
+    @Transactional
+    public RestTokenResponse signUp(final RestSignUpRequest restSignupRequest) {
+        final UserEntity userEntity = userMapper.toEntity(restSignupRequest);
+        userEntity.setRole(USER);
+        userEntity.setPassword(passwordEncoder.encode(restSignupRequest.getPassword()));
+        final UserEntity saved = userRepository.saveAndFlush(userEntity);
+        return tokenProvider.createTokenModel(saved);
     }
 
 }
