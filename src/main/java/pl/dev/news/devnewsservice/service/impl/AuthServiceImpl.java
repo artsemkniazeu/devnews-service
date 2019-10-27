@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.QUserEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
+import pl.dev.news.devnewsservice.exception.BadCredentialsException;
 import pl.dev.news.devnewsservice.exception.ConflictException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.exception.UnauthorizedException;
@@ -24,6 +25,8 @@ import static pl.dev.news.devnewsservice.constants.ExceptionConstants.incorrectP
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.refreshTokenInvalid;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailDeleted;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdIsLocked;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdIsNotEnabled;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
 @Service
@@ -72,6 +75,12 @@ public class AuthServiceImpl implements AuthService {
         }
         if (!passwordEncoder.matches(password, userEntity.getPassword())) {
             throw new UnauthorizedException(incorrectPassword);
+        }
+        if (!userEntity.isEnabled()) {
+            throw new BadCredentialsException(userWithIdIsNotEnabled, userEntity.getId());
+        }
+        if (userEntity.isLocked()) {
+            throw new BadCredentialsException(userWithIdIsLocked, userEntity.getId());
         }
         return tokenProvider.createTokenModel(userEntity);
     }

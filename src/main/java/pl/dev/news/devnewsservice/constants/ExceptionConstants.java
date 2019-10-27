@@ -17,6 +17,9 @@ public class ExceptionConstants {
     public static String incorrectPassword = "Incorrect password";
     public static String refreshTokenInvalid = "Invalid refresh token!";
 
+    // BadCredentialsException
+    public static String userWithIdIsLocked = "User with id {} is locked";
+    public static String userWithIdIsNotEnabled = "User with id {} is not enabled";
 
 
 }

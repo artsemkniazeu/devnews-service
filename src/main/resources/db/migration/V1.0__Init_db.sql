@@ -46,8 +46,9 @@ create table if not exists users
     city            text,
     country         text,
     image_url       text,
-    bg_url          text
-
+    bg_url          text,
+    enabled         boolean         not null,
+    locked          boolean         not null
 );
 
 --- Comments

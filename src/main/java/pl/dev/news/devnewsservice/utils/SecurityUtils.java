@@ -2,7 +2,7 @@ package pl.dev.news.devnewsservice.utils;
 
 import lombok.experimental.UtilityClass;
 import org.springframework.security.core.context.SecurityContextHolder;
-import pl.dev.news.devnewsservice.security.UserDetailsImpl;
+import pl.dev.news.devnewsservice.entity.UserEntity;
 
 import java.util.UUID;
 
@@ -11,13 +11,13 @@ public class SecurityUtils {
 
     public static boolean isAuthenticated() {
         return SecurityContextHolder.getContext().getAuthentication().isAuthenticated()
-                && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserDetailsImpl;
+                && SecurityContextHolder.getContext().getAuthentication().getPrincipal() instanceof UserEntity;
     }
 
     public static UUID getUserId() {
-        final UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext()
+        final UserEntity userEntity = (UserEntity) SecurityContextHolder.getContext()
                 .getAuthentication().getDetails();
-        return userDetails.getId();
+        return userEntity.getId();
     }
 
 }

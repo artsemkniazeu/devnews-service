@@ -118,6 +118,7 @@ public abstract class AbstractIntegrationTest {
             final UserEntity user,
             final UserRoleEntity role
     ) {
+        user.setEnabled(true);
         user.setRole(role);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.saveAndFlush(user);

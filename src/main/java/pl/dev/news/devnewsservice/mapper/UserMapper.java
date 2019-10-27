@@ -25,7 +25,6 @@ public interface UserMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "email", ignore = true)
-    @Mapping(target = "phone", ignore = true)
     @Mapping(target = "username", ignore = true)
     UserEntity update(@MappingTarget UserEntity userEntity, RestUserModel restUserModel);
 

@@ -54,7 +54,6 @@ public class AuthController implements AuthApi {
 
     private HttpHeaders generateHeaders(final RestTokenResponse tokenResponse) {
         final UserEntity userEntity = tokenProvider.buildUserEntityByToken(tokenResponse.getAccess().getToken());
-        assert userEntity != null;
         return HeaderUtils.generateLocationHeader(getUserPath, userEntity.getId());
     }
 

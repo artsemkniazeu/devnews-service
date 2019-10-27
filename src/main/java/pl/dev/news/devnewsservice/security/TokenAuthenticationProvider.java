@@ -4,8 +4,17 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import pl.dev.news.devnewsservice.entity.UserEntity;
+import pl.dev.news.devnewsservice.exception.BadCredentialsException;
+import pl.dev.news.devnewsservice.exception.NotFoundException;
+import pl.dev.news.devnewsservice.repository.UserRepository;
+
+import java.util.UUID;
+
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdIsLocked;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdIsNotEnabled;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
 
 @Slf4j
 @Component
@@ -14,14 +23,24 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     private final TokenProvider tokenProvider;
     private final TokenValidator tokenValidator;
+    private final UserRepository userRepository;
+
 
     @Override
     public Authentication authenticate(final Authentication authentication) {
         final TokenAuthentication tokenAuthentication = (TokenAuthentication) authentication;
         final String accessToken = tokenAuthentication.getName();
         if (tokenValidator.validateAccessToken(accessToken)) {
-            final UserDetails userDetails = new UserDetailsImpl(tokenProvider.buildUserEntityByToken(accessToken));
-            tokenAuthentication.setUserDetails(userDetails);
+            final UUID userId = tokenProvider.buildUserEntityByToken(accessToken).getId();
+            final UserEntity user = userRepository.softFindById(userId)
+                    .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
+            if (!user.isEnabled()) {
+                throw new BadCredentialsException(userWithIdIsNotEnabled, userId);
+            }
+            if (user.isLocked()) {
+                throw new BadCredentialsException(userWithIdIsLocked, userId);
+            }
+            tokenAuthentication.setUserDetails(user);
             tokenAuthentication.setAuthenticated(true);
         } else {
             tokenAuthentication.setAuthenticated(false);

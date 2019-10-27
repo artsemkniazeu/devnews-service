@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +19,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import static javax.persistence.EnumType.STRING;
@@ -34,7 +39,7 @@ import static javax.persistence.EnumType.STRING;
 @NoArgsConstructor
 @Entity
 @Table(name = "users")
-public class UserEntity extends BaseEntity {
+public class UserEntity extends BaseEntity implements UserDetails  {
 
     @Column(name = "username", columnDefinition = "citext")
     private String username;
@@ -72,6 +77,12 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "city")
     private String city;
+
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
+
+    @Column(name = "locked", nullable = false)
+    private boolean locked;
 
     @OneToMany(mappedBy = "publisher")
     private Set<PostEntity> posts;
@@ -113,5 +124,26 @@ public class UserEntity extends BaseEntity {
     private Set<UserEntity> followers;
 
 
+    // UserDetails
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return Collections.singletonList(new SimpleGrantedAuthority(role.toString()));
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return !locked;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
 
 }
