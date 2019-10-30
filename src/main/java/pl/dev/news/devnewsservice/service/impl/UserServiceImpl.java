@@ -1,18 +1,25 @@
 package pl.dev.news.devnewsservice.service.impl;
 
 import com.querydsl.core.types.Predicate;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.devnewsservice.entity.QUserEntity;
+import pl.dev.news.devnewsservice.entity.UploadEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
+import pl.dev.news.devnewsservice.exception.BadRequestException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
+import pl.dev.news.devnewsservice.mapper.UploadMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
+import pl.dev.news.devnewsservice.repository.UploadRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
+import pl.dev.news.devnewsservice.service.GoogleFileService;
 import pl.dev.news.devnewsservice.service.UserService;
+import pl.dev.news.devnewsservice.utils.ImageUtils;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
@@ -20,17 +27,28 @@ import pl.dev.news.model.rest.RestUserQueryParameters;
 
 import java.util.UUID;
 
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.invalidImageFormat;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+
+    @Value("${app.google.cloud.storage.image-bucket}")
+    private String videoBucket;
 
     private final UserRepository userRepository;
 
+    private final UploadRepository uploadRepository;
+
+    private final GoogleFileService fileService;
+
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
+    private final UploadMapper uploadMapper = UploadMapper.INSTANCE;
+
     private final QUserEntity qUserEntity = QUserEntity.userEntity;
+
 
     @Override
     @Transactional
@@ -79,7 +97,19 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public RestUploadModel uploadImage(final UUID userId, final MultipartFile file) {
-        return null;
+        if (!ImageUtils.isValid(file)) {
+            throw new BadRequestException(invalidImageFormat);
+        }
+        final UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
+        final String url = fileService.bucketUpload(file, videoBucket);
+        final UploadEntity uploadEntity = new UploadEntity();
+        uploadEntity.setUrl(url);
+        uploadEntity.setUser(entity);
+        entity.setImageUrl(url);
+        userRepository.saveAndFlush(entity);
+        uploadRepository.saveAndFlush(uploadEntity);
+        return uploadMapper.toModel(uploadEntity);
     }
 
 }

@@ -21,5 +21,13 @@ public class ExceptionConstants {
     public static String userWithIdIsLocked = "User with id {} is locked";
     public static String userWithIdIsNotEnabled = "User with id {} is not enabled";
 
+    // BadRequestException
+    public static String invalidImageFormat = "Invalid image format";
+
+    // UnprocessableEntityException
+    public static String fileCorruptOrUnreadable = "Can't read file, file is corrupt and unreadable";
+
+
+
 
 }

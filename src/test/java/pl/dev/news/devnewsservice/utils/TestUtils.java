@@ -3,6 +3,7 @@ package pl.dev.news.devnewsservice.utils;
 import com.github.javafaker.Faker;
 import lombok.experimental.UtilityClass;
 import org.springframework.context.annotation.Profile;
+import org.springframework.mock.web.MockMultipartFile;
 import org.testcontainers.shaded.org.apache.commons.lang.RandomStringUtils;
 import pl.dev.news.devnewsservice.entity.CategoryEntity;
 import pl.dev.news.devnewsservice.entity.GroupEntity;
@@ -19,6 +20,8 @@ import pl.dev.news.model.rest.RestTagModel;
 import pl.dev.news.model.rest.RestUserModel;
 import pl.dev.news.model.rest.RestUserRole;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Instant;
 import java.util.List;
 import java.util.Set;
@@ -143,6 +146,13 @@ public class TestUtils {
                 .about(faker.lorem().paragraph())
                 .nsfw(false)
                 .ownerId(ownerId);
+    }
+
+    public static MockMultipartFile getMultipartFile(final String name, final String contentType) throws IOException {
+        try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
+                .getResourceAsStream("files/" + name)) {
+            return new MockMultipartFile("file", name, contentType, inputStream);
+        }
     }
 
     public int amount(final Integer... a) {

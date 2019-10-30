@@ -13,4 +13,6 @@ public interface UploadMapper {
 
     UploadEntity toEntity(RestUploadModel model);
 
+    RestUploadModel toModel(UploadEntity entity);
+
 }

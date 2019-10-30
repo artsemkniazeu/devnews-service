@@ -3,6 +3,7 @@ package pl.dev.news.devnewsservice.controller;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.mock.web.MockMultipartFile;
 import pl.dev.news.devnewsservice.AbstractIntegrationTest;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.utils.PathUtils;
@@ -11,10 +12,13 @@ import pl.dev.news.model.rest.RestTokenResponse;
 import pl.dev.news.model.rest.RestUserModel;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -22,6 +26,7 @@ import static pl.dev.news.controller.api.UserApi.deleteUserPath;
 import static pl.dev.news.controller.api.UserApi.getUserPath;
 import static pl.dev.news.controller.api.UserApi.getUsersPath;
 import static pl.dev.news.controller.api.UserApi.updateUserPath;
+import static pl.dev.news.controller.api.UserApi.uploadImagePath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
 public class UserControllerTest extends AbstractIntegrationTest {
@@ -94,5 +99,30 @@ public class UserControllerTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[?(@.id == '" + expected.getId() + "')]").exists())
                 .andExpect(jsonPath("$[?(@.email == '" + expected.getEmail() + "')]").exists())
                 .andExpect(jsonPath("$[?(@.firstName == '" + restUserModel.getFirstName() + "')]").exists());
+    }
+
+    @Test
+    public void testUploadImage() throws Exception {
+        // given
+        final RestUserModel restUserModel = TestUtils.restUserModel();
+        final UserEntity expected = createUser(restUserModel, USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "image/jpeg");
+
+        final String url = "https://example.com/image.jpg";
+        when(fileService.bucketUpload(any(), any()))
+                .thenReturn(url);
+        // when
+        mockMvc.perform(
+                multipart(PathUtils.generate(uploadImagePath, expected.getId()))
+                        .file(file)
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
+                // then
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$[?(@.id)]").exists())
+                .andExpect(jsonPath("$[?(@.url == '" + url + "')]").exists());
+
+        final UserEntity userEntityFromDb = getUser(expected.getId());
+        Assert.assertEquals(userEntityFromDb.getImageUrl(), url);
     }
 }

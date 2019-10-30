@@ -10,10 +10,13 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
+import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
 import pl.dev.news.model.rest.RestUserQueryParameters;
 
@@ -66,6 +69,14 @@ public class UserController implements UserApi {
     }
 
     @Override
+    public ResponseEntity<RestUploadModel> uploadImage(
+            @PathVariable("userId") final UUID userId,
+            @Valid @RequestPart("file") final MultipartFile file) {
+        final RestUploadModel restUploadModel = userService.uploadImage(userId, file);
+        return new ResponseEntity<>(restUploadModel, HttpStatus.CREATED);
+    }
+
+    @Override
     public ResponseEntity<Void> unfollowUser(final UUID userId) {
         return null;
     }
@@ -75,13 +86,4 @@ public class UserController implements UserApi {
         return null;
     }
 
-
-    //@Override
-    //public ResponseEntity<RestUploadModel> uploadImage(
-    //        final UUID userId,
-    //        @Valid final MultipartFile file
-    //) {
-    //    final RestUploadModel restUploadModel = userService.uploadImage(userId, file);
-    //    return new ResponseEntity<>(restUploadModel, HttpStatus.OK);
-    //}
 }

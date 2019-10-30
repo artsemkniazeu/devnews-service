@@ -9,6 +9,7 @@ buildscript{
 		testcontainersVersion = "1.10.5"
 		javaFakerVersion = "0.15"
 		commonsFileuploadVersion = "1.4"
+		googleCloudStorageVersion = "1.98.0"
 	}
 	dependencies {
 		classpath "org.openapitools:openapi-generator-gradle-plugin:${openApiVersion}"
@@ -73,6 +74,8 @@ dependencies {
 
 	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
 
+
+	compile "com.google.cloud:google-cloud-storage:${googleCloudStorageVersion}"
 
 	compile "org.openapitools:jackson-databind-nullable:0.2.0"
 	compile "io.springfox:springfox-swagger2:${springfoxSwaggerVersion}"

@@ -2,11 +2,13 @@ package pl.dev.news.devnewsservice;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.storage.Storage;
 import org.junit.After;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -32,6 +34,7 @@ import pl.dev.news.devnewsservice.repository.TagRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.security.impl.TokenProviderImpl;
 import pl.dev.news.devnewsservice.security.impl.TokenValidatorImpl;
+import pl.dev.news.devnewsservice.service.GoogleFileService;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
 import pl.dev.news.model.rest.RestGroupModel;
@@ -94,6 +97,12 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected GroupRepository groupRepository;
+
+    @MockBean
+    protected Storage storage;
+
+    @MockBean
+    protected GoogleFileService fileService;
 
     @After
     public final void clearDatabase() {

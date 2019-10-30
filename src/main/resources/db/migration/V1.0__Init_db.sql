@@ -117,8 +117,8 @@ create table if not exists uploads
     deleted_at      timestamp,
     updated_at      timestamp,
     url             text            not null,
-    user_id         uuid            not null references users (id),
-    post_id         uuid            not null references posts (id)
+    user_id         uuid            references users (id),
+    post_id         uuid            references posts (id)
 );
 
 create index if not exists uploads_user_id on uploads (user_id);
