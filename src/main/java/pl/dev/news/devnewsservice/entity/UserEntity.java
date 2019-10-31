@@ -78,6 +78,12 @@ public class UserEntity extends BaseEntity implements UserDetails  {
     @Column(name = "city")
     private String city;
 
+    @Column(name = "activation_key")
+    private String activationKey;
+
+    @Column(name = "reset_key")
+    private String resetKey;
+
     @Column(name = "enabled", nullable = false)
     private boolean enabled;
 

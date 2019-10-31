@@ -13,12 +13,21 @@ app:
     account-sid: "${APP_TWILIO_ACCOUNT_SID}"
     auth-token: "${APP_TWILIO_AUTH_TOKEN}"
     service-sid: "${APP_TWILIO_SERVICE_SID}"
+  urls:
+    web-url: "${APP_URLS_WEB_URL}"
+    confirm-url: "${APP_URLS_WEB_URL}/activate"
+    reset-url: "${APP_URLS_WEB_URL}/reset"
+  mail:
+    from: "${APP_MAIL_FROM}"
+    replyTo: "${APP_URLS_REPLY_TO}"
+
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
     url: "${SPRING_DATASOURCE_URL:}"
     username: "${SPRING_DATASOURCE_USERNAME:}"
     password: "${SPRING_DATASOURCE_PASSWORD:}"
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -31,11 +40,17 @@ spring:
     multipart:
       max-file-size: -1
       max-request-size: -1
+
   jackson:
     default-property-inclusion: non_null
 
+  mustache:
+    cache: true
+    suffix: ""
+
 server:
   port: "${PORT:8080}"
+
 ---
 
 ---
@@ -62,6 +77,11 @@ spring:
     url: jdbc:postgresql://localhost:5433/devnews_db
   flyway:
     baseline-on-migrate: true
+  mail:
+    host: "localhost"
+    port: "1025"
+    username: "devnews"
+    password: "devnews"
 
 ---
 
@@ -96,3 +116,12 @@ app:
     account-sid: "AC312cd5f34b97488f8d446679f959ce4b"
     auth-token: "cd857cc6816cebb42e1e00d61a0c040f"
     service-sid: "VAfe9e384a1c0bf3d1969de2e56e01b1a2"
+
+  urls:
+    web-url: "http://localhost:4000"
+    confirm-url: "http://localhost:4000/activate"
+    reset-url: "http://localhost:4000/reset"
+
+  mail:
+    from: "no-reply@example.com"
+    replyTo: "info@example.com"

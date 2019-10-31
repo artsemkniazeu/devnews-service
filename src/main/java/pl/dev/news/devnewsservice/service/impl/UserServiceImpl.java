@@ -21,6 +21,8 @@ import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.UploadRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.service.GoogleFileService;
+import pl.dev.news.devnewsservice.service.MailService;
+import pl.dev.news.devnewsservice.service.TransactionTemplate;
 import pl.dev.news.devnewsservice.service.TwilioService;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.ImageUtils;
@@ -48,7 +50,11 @@ public class UserServiceImpl implements UserService {
 
     private final GoogleFileService fileService;
 
+    private final MailService mailService;
+
     private final TwilioService twilioService;
+
+    private final TransactionTemplate transactionTemplate;
 
     private final UserMapper userMapper = UserMapper.INSTANCE;
 

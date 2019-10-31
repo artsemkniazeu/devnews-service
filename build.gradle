@@ -66,6 +66,9 @@ dependencies {
 	implementation "org.springframework.boot:spring-boot-starter-jdbc"
 	implementation "org.springframework.boot:spring-boot-starter-security"
 	implementation "org.springframework.boot:spring-boot-starter-web"
+	implementation("org.springframework.boot:spring-boot-starter-mail")
+	implementation("org.springframework.boot:spring-boot-starter-mustache")
+
 	implementation "org.flywaydb:flyway-core"
 	implementation "org.yaml:snakeyaml"
 	implementation "org.springframework.boot:spring-boot-devtools"
@@ -77,15 +80,12 @@ dependencies {
 	implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
 
 	compile "com.google.cloud:google-cloud-storage:${googleCloudStorageVersion}"
-
 	compile "org.openapitools:jackson-databind-nullable:0.2.0"
 	compile "io.springfox:springfox-swagger2:${springfoxSwaggerVersion}"
 	compile "io.springfox:springfox-swagger-ui:${springfoxSwaggerVersion}"
 	compile "org.springframework.boot:spring-boot-configuration-processor"
 	compileOnly "org.projectlombok:lombok"
 	compileOnly "org.mapstruct:mapstruct:${mapstructVersion}"
-
-	
 	
 	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
 	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"

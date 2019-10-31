@@ -47,6 +47,8 @@ create table if not exists users
     country         text,
     image_url       text,
     bg_url          text,
+    activation_key  text,
+    reset_key       text,
     enabled         boolean         not null,
     locked          boolean         not null
 );

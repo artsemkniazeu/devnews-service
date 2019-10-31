@@ -6,6 +6,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+
 @Getter
 @Setter
 @Component
@@ -16,11 +19,15 @@ public class AppConfiguration {
     private final Jwt jwt;
     private final Google google;
     private final Twilio twilio;
+    private final Urls urls;
+    private final Mail mail;
 
     public AppConfiguration() {
         this.jwt = new Jwt();
         this.google = new Google();
         this.twilio = new Twilio();
+        this.urls = new Urls();
+        this.mail = new Mail();
     }
 
     @Getter
@@ -52,6 +59,28 @@ public class AppConfiguration {
         private String accountSid;
         private String authToken;
         private String serviceSid;
+    }
+
+    @Getter
+    @Setter
+    public class Urls {
+        private String webUrl;
+        private String confirmUrl;
+        private String resetUrl;
+    }
+
+    @Getter
+    @Setter
+    public class Mail {
+
+        @Email
+        @NotBlank
+        private String from;
+
+        @Email
+        @NotBlank
+        private String replyTo;
+
     }
 
 }
