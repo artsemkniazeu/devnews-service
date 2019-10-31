@@ -5,8 +5,8 @@ import com.google.auth.oauth2.ServiceAccountCredentials;
 import com.google.cloud.storage.Storage;
 import com.google.cloud.storage.StorageOptions;
 import io.jsonwebtoken.io.Decoders;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -17,10 +17,10 @@ import java.io.InputStream;
 
 @Slf4j
 @Configuration
+@RequiredArgsConstructor
 public class GoogleStorageConfiguration {
 
-    @Value("${app.google.cloud.storage.key}")
-    private String key;
+    private final AppConfiguration appConfiguration;
 
     @Bean
     @Profile("!test")
@@ -34,6 +34,7 @@ public class GoogleStorageConfiguration {
 
     public ServiceAccountCredentials credentials() {
         ServiceAccountCredentials credentials = null;
+        final String key = appConfiguration.getGoogle().getStorage().getKey();
         try (InputStream inputStream = new ByteArrayInputStream(
                 Decoders.BASE64.decode(key.replace(" ", ""))
         )) {

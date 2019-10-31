@@ -16,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
+import pl.dev.news.model.rest.RestPhoneModel;
+import pl.dev.news.model.rest.RestPhoneResponseModel;
 import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
 import pl.dev.news.model.rest.RestUserQueryParameters;
@@ -59,6 +61,7 @@ public class UserController implements UserApi {
         return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
     }
 
+
     @Override
     public ResponseEntity<RestUserModel> updateUser(
             @PathVariable("userId") final UUID userId,
@@ -74,6 +77,25 @@ public class UserController implements UserApi {
             @Valid @RequestPart("file") final MultipartFile file) {
         final RestUploadModel restUploadModel = userService.uploadImage(userId, file);
         return new ResponseEntity<>(restUploadModel, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<RestPhoneResponseModel> phoneVerify(
+            @PathVariable("userId") final UUID userId,
+            @Valid @RequestBody final RestPhoneModel restPhoneModel
+    ) {
+        final RestPhoneResponseModel restPhoneResponseModel = userService.verifyPhoneNumber(userId, restPhoneModel);
+        return new ResponseEntity<>(restPhoneResponseModel, HttpStatus.OK);
+    }
+
+
+    @Override
+    public ResponseEntity<RestPhoneResponseModel> phoneCheck(
+            @PathVariable("userId") final UUID userId,
+            @Valid @RequestBody final RestPhoneModel restPhoneModel
+    ) {
+        final RestPhoneResponseModel restPhoneResponseModel = userService.checkPhoneNumber(userId, restPhoneModel);
+        return new ResponseEntity<>(restPhoneResponseModel, HttpStatus.OK);
     }
 
     @Override

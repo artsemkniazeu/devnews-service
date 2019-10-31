@@ -48,8 +48,6 @@ public class CustomSpringCodegen extends SpringCodegen {
         if (!isForm || parameter.getSchema().get$ref() == null) {
             populateFormat(result, "not-form-style");
         }
-        //System.out.println(parameter.getSchema().get$ref());
-        //System.out.println(result.isNotFormStyle());
         return result;
     }
 

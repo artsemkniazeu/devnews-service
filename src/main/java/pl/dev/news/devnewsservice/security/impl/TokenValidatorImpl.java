@@ -25,8 +25,7 @@ public class TokenValidatorImpl implements TokenValidator {
 
     @PostConstruct
     public void init() {
-
-        this.key = Keys.hmacShaKeyFor(BASE64.decode(appConfiguration.getBase64Secret()));
+        this.key = Keys.hmacShaKeyFor(BASE64.decode(appConfiguration.getJwt().getBase64Secret()));
     }
 
     @Override

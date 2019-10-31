@@ -38,9 +38,9 @@ public class TokenProviderImpl implements TokenProvider {
 
     @PostConstruct
     public void init() {
-        this.key = Keys.hmacShaKeyFor(BASE64.decode(appConfiguration.getBase64Secret()));
-        accessTokenValidityMillils = appConfiguration.getAccessTokenValidity() * MILLIS_IN_SECOND;
-        refreshTokenValidityMillils = appConfiguration.getRefreshTokenValidity() * MILLIS_IN_SECOND;
+        this.key = Keys.hmacShaKeyFor(BASE64.decode(appConfiguration.getJwt().getBase64Secret()));
+        accessTokenValidityMillils = appConfiguration.getJwt().getAccessTokenValidity() * MILLIS_IN_SECOND;
+        refreshTokenValidityMillils = appConfiguration.getJwt().getRefreshTokenValidity() * MILLIS_IN_SECOND;
     }
 
     @Override

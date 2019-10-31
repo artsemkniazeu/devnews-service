@@ -266,6 +266,66 @@ paths:
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
+  "/users/{userId}/phone/verify":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - User
+      operationId: phoneVerify
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/PhoneVerifyRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhoneResponseModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/users/{userId}/phone/check":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - User
+      operationId: phoneCheck
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/PhoneCheckRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PhoneResponseModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   # ========================================
   # ===== User Resources API
   # ========================================
@@ -1061,6 +1121,18 @@ components:
           schema:
             $ref: "#/components/schemas/GroupModel"
 
+    PhoneVerifyRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PhoneModel"
+
+    PhoneCheckRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/PhoneModel"
+
 
   # ========================================
   # ===== Responses
@@ -1199,6 +1271,14 @@ components:
     # ===== Model Schemes
     # ========================================
 
+    UserRole:
+      type: string
+      enum:
+        - USER
+        - ADMIN
+        - MODERATOR
+        - PUBLISHER
+
     TokenModel:
       type: object
       properties:
@@ -1219,7 +1299,6 @@ components:
         refresh:
           $ref: '#/components/schemas/TokenModel'
 
-
     RefreshTokenRequest:
       type: object
       required:
@@ -1227,14 +1306,6 @@ components:
       properties:
         refreshToken:
           type: string
-
-    UserRole:
-      type: string
-      enum:
-        - USER
-        - ADMIN
-        - MODERATOR
-        - PUBLISHER
 
     SignInRequest:
       type: object
@@ -1272,6 +1343,7 @@ components:
           format: email
         phone:
           type: string
+          format: phone-number
         role:
           $ref: "#/components/schemas/UserRole"
         imageUrl:
@@ -1401,4 +1473,26 @@ components:
         user_id:
           type: string
           format: uuid
+
+    PhoneModel:
+      type: object
+      properties:
+        phone:
+          type: string
+          format: phone-number
+        code:
+          type: string
+
+    PhoneResponseModel:
+      type: object
+      properties:
+        sid:
+          type: string
+        phone:
+          type: string
+        status:
+          type: string
+        dateCreated:
+          type: string
+
 

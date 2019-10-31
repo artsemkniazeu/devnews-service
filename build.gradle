@@ -10,6 +10,8 @@ buildscript{
 		javaFakerVersion = "0.15"
 		commonsFileuploadVersion = "1.4"
 		googleCloudStorageVersion = "1.98.0"
+		twilioVersion = "7.42.0"
+		apacheCommonsVersion = "3.0"
 	}
 	dependencies {
 		classpath "org.openapitools:openapi-generator-gradle-plugin:${openApiVersion}"
@@ -71,9 +73,8 @@ dependencies {
 	implementation "org.mapstruct:mapstruct-jdk8:${mapstructVersion}"
 	implementation "commons-fileupload:commons-fileupload:${commonsFileuploadVersion}"
 	implementation "com.querydsl:querydsl-jpa"
-
-	implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-
+	implementation "com.twilio.sdk:twilio:${twilioVersion}"
+	implementation "org.apache.commons:commons-lang3:${apacheCommonsVersion}"
 
 	compile "com.google.cloud:google-cloud-storage:${googleCloudStorageVersion}"
 
