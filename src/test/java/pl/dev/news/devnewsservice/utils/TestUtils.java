@@ -59,7 +59,7 @@ public class TestUtils {
                 .username(faker.name().username())
                 .email(faker.internet().emailAddress())
                 .role(RestUserRole.USER)
-                .phone(faker.phoneNumber().cellPhone())
+                .phone(faker.numerify("+###########"))
                 .imageUrl(faker.internet().url())
                 .bgUrl(faker.internet().url())
                 .firstName(faker.name().firstName())

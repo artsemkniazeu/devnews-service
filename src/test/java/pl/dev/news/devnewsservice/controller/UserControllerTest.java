@@ -27,6 +27,7 @@ import static pl.dev.news.controller.api.UserApi.getUserPath;
 import static pl.dev.news.controller.api.UserApi.getUsersPath;
 import static pl.dev.news.controller.api.UserApi.updateUserPath;
 import static pl.dev.news.controller.api.UserApi.uploadImagePath;
+import static pl.dev.news.devnewsservice.entity.UserRoleEntity.ADMIN;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
 public class UserControllerTest extends AbstractIntegrationTest {
@@ -42,6 +43,28 @@ public class UserControllerTest extends AbstractIntegrationTest {
                 .andExpect(status().isNoContent());
         final UserEntity userEntityFromDb = getUser(userEntity.getId());
         Assert.assertNotNull(userEntityFromDb.getDeletedAt());
+    }
+
+    @Test
+    public void testDeleteUserForbidden() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                delete(PathUtils.generate(deleteUserPath, "fed443a9-bb8d-4320-848d-9d1c18bd026f"))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    public void testDeleteUserNotFound() throws Exception {
+        final UserEntity userEntity = createUser(ADMIN);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                delete(PathUtils.generate(deleteUserPath, "fed443a9-bb8d-4320-848d-9d1c18bd026f"))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -66,6 +89,18 @@ public class UserControllerTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == '" + expected.getId() + "')]").exists());
     }
+
+    @Test
+    public void testGetUserNotFound() throws Exception {
+        final UserEntity expected = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        mockMvc.perform(
+                get(PathUtils.generate(getUserPath, "fed443a9-bb8d-4320-848d-9d1c18bd026f"))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
 
     @Test
     public void testGetUsers() throws Exception {
@@ -124,5 +159,25 @@ public class UserControllerTest extends AbstractIntegrationTest {
 
         final UserEntity userEntityFromDb = getUser(expected.getId());
         Assert.assertEquals(userEntityFromDb.getImageUrl(), url);
+    }
+
+    @Test
+    public void testUploadImageBadRequest() throws Exception {
+        // given
+        final RestUserModel restUserModel = TestUtils.restUserModel();
+        final UserEntity expected = createUser(restUserModel, USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "video/mp4");
+
+        final String url = "https://example.com/image.jpg";
+        when(fileService.bucketUpload(any(), any()))
+                .thenReturn(url);
+        // when
+        mockMvc.perform(
+                multipart(PathUtils.generate(uploadImagePath, expected.getId()))
+                        .file(file)
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
+                // then
+                .andExpect(status().isBadRequest());
     }
 }
