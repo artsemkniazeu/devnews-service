@@ -58,10 +58,6 @@ paths:
       responses:
         "201":
           description: Created
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/TokenResponse"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":

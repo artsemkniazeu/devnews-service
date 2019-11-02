@@ -5,14 +5,11 @@ import org.junit.Test;
 import org.springframework.test.web.servlet.MvcResult;
 import pl.dev.news.devnewsservice.AbstractIntegrationTest;
 import pl.dev.news.devnewsservice.entity.UserEntity;
-import pl.dev.news.devnewsservice.utils.TestAsserts;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
 import pl.dev.news.model.rest.RestSignInRequest;
 import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTokenResponse;
-
-import java.util.UUID;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,20 +26,13 @@ public class AuthControllerTest extends AbstractIntegrationTest {
         // given
         final RestSignUpRequest restSignUpRequest = TestUtils.restSignupRequest();
         // when
-        final MvcResult response = mockMvc.perform(
+        mockMvc.perform(
                 post(signUpPath)
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restSignUpRequest)))
                 // then
                 .andExpect(status().isCreated())
                 .andReturn();
-
-        final RestTokenResponse model = objectMapper
-                .readValue(response.getResponse().getContentAsString(), RestTokenResponse.class);
-        Assert.assertNotNull(model);
-        final UUID userId = tokenProvider.buildUserEntityByToken(model.getAccess().getToken()).getId();
-        final UserEntity result = userRepository.findById(userId).orElse(null);
-        TestAsserts.assertUserEntityToSignUpRequest(result, restSignUpRequest);
     }
 
     @Test

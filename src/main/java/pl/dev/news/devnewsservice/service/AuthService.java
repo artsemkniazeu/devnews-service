@@ -11,6 +11,6 @@ public interface AuthService {
 
     RestTokenResponse refreshToken(RestRefreshTokenRequest restRefreshTokenRequest);
 
-    RestTokenResponse signUp(RestSignUpRequest restSignupRequest);
+    void signUp(RestSignUpRequest restSignupRequest);
 
 }

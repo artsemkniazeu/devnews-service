@@ -37,11 +37,11 @@ public class AuthController implements AuthApi {
     }
 
     @Override
-    public ResponseEntity<RestTokenResponse> signUp(
+    public ResponseEntity<Void> signUp(
             @Valid @RequestBody final RestSignUpRequest restSignupRequest
     ) {
-        final RestTokenResponse tokenResponse = authService.signUp(restSignupRequest);
-        return new ResponseEntity<>(tokenResponse, generateHeaders(tokenResponse), CREATED);
+        authService.signUp(restSignupRequest);
+        return new ResponseEntity<>(CREATED);
     }
 
     @Override

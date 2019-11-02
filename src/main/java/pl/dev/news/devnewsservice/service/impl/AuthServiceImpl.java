@@ -88,7 +88,7 @@ public class AuthServiceImpl implements AuthService {
 
     @Override
     @Transactional
-    public RestTokenResponse signUp(final RestSignUpRequest restSignupRequest) {
+    public void signUp(final RestSignUpRequest restSignupRequest) {
         final UserEntity userEntity = userMapper.toEntity(restSignupRequest);
         userEntity.setRole(USER);
         userEntity.setPassword(passwordEncoder.encode(restSignupRequest.getPassword()));
@@ -96,7 +96,6 @@ public class AuthServiceImpl implements AuthService {
         transactionTemplate.afterCommit(() -> {
             mailService.sendActivationEmail(saved);
         });
-        return tokenProvider.createTokenModel(saved);
     }
 
 }
