@@ -50,8 +50,11 @@ create table if not exists users
     activation_key  text,
     reset_key       text,
     enabled         boolean         not null,
-    locked          boolean         not null
+    locked          boolean         not null,
+    image_upload_id uuid, -- reference
+    bg_upload_id    uuid  -- reference
 );
+
 
 --- Comments
 
@@ -119,6 +122,9 @@ create table if not exists uploads
     deleted_at      timestamp,
     updated_at      timestamp,
     url             text            not null,
+    bucket          text            not null,
+    filename        text            not null,
+    generation      bigint          not null,
     user_id         uuid            references users (id),
     post_id         uuid            references posts (id)
 );
@@ -180,3 +186,9 @@ create table if not exists group_user
     user_id          uuid            not null references users,
     constraint group_user_pkey primary key (group_id, user_id)
 );
+
+alter table users
+add constraint users_uploads_image_upload_id foreign key (image_upload_id) references uploads (id);
+
+alter table users
+add constraint users_uploads_bg_upload_id foreign key (bg_upload_id) references uploads (id);

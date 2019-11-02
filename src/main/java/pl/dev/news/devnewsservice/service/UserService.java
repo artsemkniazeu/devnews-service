@@ -22,6 +22,8 @@ public interface UserService {
 
     RestUploadModel uploadImage(UUID userId, MultipartFile file);
 
+    RestUploadModel uploadBackground(UUID userId, MultipartFile file);
+
     RestPhoneResponseModel verifyPhoneNumber(UUID userId, RestPhoneModel restPhoneModel);
 
     RestPhoneResponseModel checkPhoneNumber(UUID userId, RestPhoneModel restPhoneModel);

@@ -13,10 +13,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.Instant;
 import java.util.Collection;
@@ -29,11 +31,13 @@ import static javax.persistence.EnumType.STRING;
 @Setter
 @EqualsAndHashCode(callSuper = true, exclude = {
         "posts", "groups", "comments", "uploads", "followingGroups",
-        "followingTags", "bookmarks", "followingUsers", "followers"
+        "followingTags", "bookmarks", "followingUsers", "followers",
+        "image", "bg"
 })
 @ToString(exclude = {
         "posts", "groups", "comments", "uploads", "followingGroups",
-        "followingTags", "bookmarks", "followingUsers", "followers"
+        "followingTags", "bookmarks", "followingUsers", "followers",
+        "image", "bg"
 })
 @AllArgsConstructor
 @NoArgsConstructor
@@ -60,8 +64,16 @@ public class UserEntity extends BaseEntity implements UserDetails  {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_upload_id")
+    private UploadEntity image;
+
     @Column(name = "bg_url")
     private String bgUrl;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bg_upload_id")
+    private UploadEntity bg;
 
     @Column(name = "first_name", columnDefinition = "citext")
     private String firstName;

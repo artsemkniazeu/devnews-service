@@ -1,8 +1,11 @@
 package pl.dev.news.devnewsservice.controller;
 
 
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import pl.dev.news.devnewsservice.AbstractIntegrationTest;
 import pl.dev.news.devnewsservice.entity.UserEntity;
@@ -26,6 +29,7 @@ import static pl.dev.news.controller.api.UserApi.deleteUserPath;
 import static pl.dev.news.controller.api.UserApi.getUserPath;
 import static pl.dev.news.controller.api.UserApi.getUsersPath;
 import static pl.dev.news.controller.api.UserApi.updateUserPath;
+import static pl.dev.news.controller.api.UserApi.uploadBackgroundPath;
 import static pl.dev.news.controller.api.UserApi.uploadImagePath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.ADMIN;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
@@ -145,8 +149,7 @@ public class UserControllerTest extends AbstractIntegrationTest {
         final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "image/jpeg");
 
         final String url = "https://example.com/image.jpg";
-        when(fileService.bucketUpload(any(), any()))
-                .thenReturn(url);
+        mockBucketUpload(url);
         // when
         mockMvc.perform(
                 multipart(PathUtils.generate(uploadImagePath, expected.getId()))
@@ -162,6 +165,30 @@ public class UserControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testUploadBackground() throws Exception {
+        // given
+        final RestUserModel restUserModel = TestUtils.restUserModel();
+        final UserEntity expected = createUser(restUserModel, USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "image/jpeg");
+
+        final String url = "https://example.com/image.jpg";
+        mockBucketUpload(url);
+        // when
+        mockMvc.perform(
+                multipart(PathUtils.generate(uploadBackgroundPath, expected.getId()))
+                        .file(file)
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
+                // then
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$[?(@.id)]").exists())
+                .andExpect(jsonPath("$[?(@.url == '" + url + "')]").exists());
+
+        final UserEntity userEntityFromDb = getUser(expected.getId());
+        Assert.assertEquals(userEntityFromDb.getBgUrl(), url);
+    }
+
+    @Test
     public void testUploadImageBadRequest() throws Exception {
         // given
         final RestUserModel restUserModel = TestUtils.restUserModel();
@@ -170,8 +197,7 @@ public class UserControllerTest extends AbstractIntegrationTest {
         final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "video/mp4");
 
         final String url = "https://example.com/image.jpg";
-        when(fileService.bucketUpload(any(), any()))
-                .thenReturn(url);
+        mockBucketUpload(url);
         // when
         mockMvc.perform(
                 multipart(PathUtils.generate(uploadImagePath, expected.getId()))
@@ -179,5 +205,14 @@ public class UserControllerTest extends AbstractIntegrationTest {
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
                 // then
                 .andExpect(status().isBadRequest());
+    }
+
+    private void mockBucketUpload(final String url) {
+        final Blob blob = Mockito.mock(Blob.class);
+        final BlobId blobId = BlobId.of("", "", 1L);
+        when(blob.getMediaLink()).thenReturn(url);
+        when(blob.getBlobId()).thenReturn(blobId);
+        when(fileService.bucketUpload(any(), any()))
+                .thenReturn(blob);
     }
 }

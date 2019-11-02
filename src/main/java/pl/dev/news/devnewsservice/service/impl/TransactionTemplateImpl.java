@@ -11,6 +11,7 @@ public class TransactionTemplateImpl implements TransactionTemplate {
     @Override
     public void afterCommit(final Runnable action) {
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronizationAdapter() {
+            @Override
             public void afterCommit() {
                 action.run();
             }

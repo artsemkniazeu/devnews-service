@@ -18,12 +18,9 @@ import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.TwilioMapper;
 import pl.dev.news.devnewsservice.mapper.UploadMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
-import pl.dev.news.devnewsservice.repository.UploadRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
-import pl.dev.news.devnewsservice.service.GoogleFileService;
-import pl.dev.news.devnewsservice.service.MailService;
-import pl.dev.news.devnewsservice.service.TransactionTemplate;
 import pl.dev.news.devnewsservice.service.TwilioService;
+import pl.dev.news.devnewsservice.service.UploadService;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.ImageUtils;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
@@ -46,24 +43,17 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
 
-    private final UploadRepository uploadRepository;
-
-    private final GoogleFileService fileService;
-
-    private final MailService mailService;
-
     private final TwilioService twilioService;
 
-    private final TransactionTemplate transactionTemplate;
+    private final UploadService uploadService;
 
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
-    private final UploadMapper uploadMapper = UploadMapper.INSTANCE;
-
     private final TwilioMapper twilioMapper = TwilioMapper.INSTANCE;
 
-    private final QUserEntity qUserEntity = QUserEntity.userEntity;
+    private final UploadMapper uploadMapper = UploadMapper.INSTANCE;
 
+    private final QUserEntity qUserEntity = QUserEntity.userEntity;
 
     @Override
     @Transactional
@@ -111,33 +101,50 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public RestUploadModel uploadImage(final UUID userId, final MultipartFile file) {
-        if (!ImageUtils.isValid(file)) {
-            throw new BadRequestException(invalidImageFormat);
-        }
         final UserEntity entity = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
-        final String url = fileService.bucketUpload(file, appConfiguration.getGoogle().getStorage().getImageBucket());
-        final UploadEntity uploadEntity = new UploadEntity();
-        uploadEntity.setUrl(url);
-        uploadEntity.setUser(entity);
-        entity.setImageUrl(url);
+        final UploadEntity saved = uploadImage(entity, entity.getImage(), file);
+        userMapper.updateImage(entity, saved);
         userRepository.saveAndFlush(entity);
-        uploadRepository.saveAndFlush(uploadEntity);
-        return uploadMapper.toModel(uploadEntity);
+        return uploadMapper.toModel(saved);
     }
 
     @Override
+    @Transactional
+    public RestUploadModel uploadBackground(final UUID userId, final MultipartFile file) {
+        final UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
+        final UploadEntity saved = uploadImage(entity, entity.getBg(), file);
+        userMapper.updateBackground(entity, saved);
+        userRepository.saveAndFlush(entity);
+        return uploadMapper.toModel(saved);
+    }
+
+    @Override
+    @Transactional
     public RestPhoneResponseModel verifyPhoneNumber(final UUID userId, final RestPhoneModel restPhoneModel) {
         final Verification verification = twilioService.sendVerificationSms(restPhoneModel.getPhone());
         return twilioMapper.toModel(verification);
     }
 
     @Override
+    @Transactional
     public RestPhoneResponseModel checkPhoneNumber(final UUID userId, final RestPhoneModel restPhoneModel) {
         final VerificationCheck verificationCheck = twilioService
                 .checkVerificationCode(restPhoneModel.getPhone(), restPhoneModel.getCode());
         return twilioMapper.toModel(verificationCheck);
     }
 
+
+    private UploadEntity uploadImage(final UserEntity entity, final UploadEntity old, final MultipartFile file) {
+        if (!ImageUtils.isValid(file)) {
+            throw new BadRequestException(invalidImageFormat);
+        }
+        if (old != null) {
+            uploadService.delete(old);
+        }
+        return uploadService.upload(entity, file, appConfiguration.getGoogle().getStorage().getImageBucket());
+    }
 }

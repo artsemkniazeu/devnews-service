@@ -57,7 +57,8 @@ import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithId
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @ContextConfiguration(initializers = {
-        PostgresInitializer.class
+        PostgresInitializer.class,
+        MaildevInitializer.class
 })
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -106,19 +107,19 @@ public abstract class AbstractIntegrationTest {
 
     @After
     public final void clearDatabase() {
-        jdbcTemplate.execute("delete from comments");
-        jdbcTemplate.execute("delete from user_follower");
-        jdbcTemplate.execute("delete from post_category");
-        jdbcTemplate.execute("delete from post_tag");
-        jdbcTemplate.execute("delete from user_bookmark");
-        jdbcTemplate.execute("delete from user_tag");
-        jdbcTemplate.execute("delete from group_user");
-        jdbcTemplate.execute("delete from uploads");
-        jdbcTemplate.execute("delete from categories");
-        jdbcTemplate.execute("delete from tags");
-        jdbcTemplate.execute("delete from posts");
-        jdbcTemplate.execute("delete from groups");
-        jdbcTemplate.execute("delete from users");
+        jdbcTemplate.execute("truncate table comments restart identity cascade");
+        jdbcTemplate.execute("truncate table uploads restart identity cascade");
+        jdbcTemplate.execute("truncate table post_category restart identity cascade");
+        jdbcTemplate.execute("truncate table categories restart identity cascade");
+        jdbcTemplate.execute("truncate table post_tag restart identity cascade");
+        jdbcTemplate.execute("truncate table user_bookmark restart identity cascade");
+        jdbcTemplate.execute("truncate table posts restart identity cascade");
+        jdbcTemplate.execute("truncate table user_follower restart identity cascade");
+        jdbcTemplate.execute("truncate table user_tag restart identity cascade");
+        jdbcTemplate.execute("truncate table tags restart identity cascade");
+        jdbcTemplate.execute("truncate table group_user restart identity cascade");
+        jdbcTemplate.execute("truncate table groups restart identity cascade");
+        jdbcTemplate.execute("truncate table users restart identity cascade");
     }
 
     // User

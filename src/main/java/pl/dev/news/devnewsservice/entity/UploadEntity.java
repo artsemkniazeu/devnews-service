@@ -39,6 +39,15 @@ public class UploadEntity extends AuditableEntity {
     @Column(name = "url")
     private String url;
 
+    @Column(name = "bucket")
+    private String bucket;
+
+    @Column(name = "filename")
+    private String filename;
+
+    @Column(name = "generation")
+    private Long generation;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private UserEntity user;

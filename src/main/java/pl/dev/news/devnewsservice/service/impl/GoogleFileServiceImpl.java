@@ -26,11 +26,10 @@ public class GoogleFileServiceImpl implements GoogleFileService {
     private final Storage storage;
 
     @Override
-    public String bucketUpload(final MultipartFile file, final String bucketName) {
+    public BlobInfo bucketUpload(final MultipartFile file, final String bucketName) {
         try {
             final Bucket bucket = storage.get(bucketName);
-            final Blob blob = bucket.create(FileUtil.generateUniqueName(file.getOriginalFilename()), file.getBytes());
-            return blob.getMediaLink();
+            return bucket.create(FileUtil.generateUniqueName(file.getOriginalFilename()), file.getBytes());
         } catch (final IOException e) {
             throw new UnprocessableEntityException(fileCorruptOrUnreadable, e);
         }
@@ -55,6 +54,12 @@ public class GoogleFileServiceImpl implements GoogleFileService {
         }
         final Blob blob = storage.get(blobInfo.getBlobId());
         return blob.getMediaLink();
+    }
+
+    @Override
+    public boolean delete(final String bucket, final String filename) {
+        final BlobId blobId = BlobId.of(bucket, filename);
+        return storage.delete(blobId);
     }
 
     private BlobId createBlobId(final String bucket, final String file) {

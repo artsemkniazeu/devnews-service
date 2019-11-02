@@ -79,6 +79,16 @@ public class UserController implements UserApi {
         return new ResponseEntity<>(restUploadModel, HttpStatus.CREATED);
     }
 
+
+    @Override
+    public ResponseEntity<RestUploadModel> uploadBackground(
+            @PathVariable("userId") final UUID userId,
+            @Valid @RequestPart("file") final MultipartFile file
+    ) {
+        final RestUploadModel restUploadModel = userService.uploadBackground(userId, file);
+        return new ResponseEntity<>(restUploadModel, HttpStatus.CREATED);
+    }
+
     @Override
     public ResponseEntity<RestPhoneResponseModel> phoneVerify(
             @PathVariable("userId") final UUID userId,

@@ -13,6 +13,7 @@ import pl.dev.news.devnewsservice.config.AppConfiguration;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.service.MailService;
 
+import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
@@ -40,7 +41,7 @@ public class MailServiceImpl implements MailService {
                 .toUriString();
 
         final Map<String, Object> context = createContext(entity, buttonUrl);
-        final String content = compileTemplate(EMAIL_ACTIVATION_TEMPLATE ,context);
+        final String content = compileTemplate(EMAIL_ACTIVATION_TEMPLATE, context);
         sendEmail(entity.getEmail(), "Email verification on DevNews", content);
 
     }
@@ -64,8 +65,8 @@ public class MailServiceImpl implements MailService {
 
     @SneakyThrows
     private void sendEmail(final String to, final String subject, final String content) {
-        var mimeMessage = javaMailSender.createMimeMessage();
-        var message = new MimeMessageHelper(mimeMessage, false, StandardCharsets.UTF_8.name());
+        final MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        final MimeMessageHelper message = new MimeMessageHelper(mimeMessage, false, StandardCharsets.UTF_8.name());
         message.setFrom(appConfiguration.getMail().getFrom());
         message.setReplyTo(appConfiguration.getMail().getReplyTo());
         message.setTo(to);
