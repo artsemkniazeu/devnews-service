@@ -47,9 +47,9 @@ create table if not exists users
     country         text,
     image_url       text,
     bg_url          text,
-    activation_key  text,
-    reset_key       text,
-    enabled         boolean         not null,
+    activation_key  uuid,
+    reset_key       uuid,
+    enabled         boolean         not null default false,
     locked          boolean         not null,
     image_upload_id uuid, -- reference
     bg_upload_id    uuid  -- reference

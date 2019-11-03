@@ -8,4 +8,5 @@ public interface MailService {
     @Async
     void sendActivationEmail(UserEntity entity);
 
+    void sendWelcomeEmail(UserEntity entity);
 }
