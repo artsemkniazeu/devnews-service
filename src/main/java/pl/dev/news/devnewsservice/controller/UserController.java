@@ -28,6 +28,8 @@ import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.UUID;
 
+import static org.springframework.http.HttpStatus.NO_CONTENT;
+
 @RestController
 @AllArgsConstructor
 public class UserController implements UserApi {
@@ -38,7 +40,7 @@ public class UserController implements UserApi {
     @PreAuthorize("@securityResolver.isResourceOwner(#userId) || hasAuthority('ADMIN')")
     public ResponseEntity<Void> deleteUser(@PathVariable("userId") final UUID userId) {
         userService.delete(userId);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 
     @Override
@@ -96,6 +98,12 @@ public class UserController implements UserApi {
     ) {
         final RestPhoneResponseModel restPhoneResponseModel = userService.verifyPhoneNumber(userId, restPhoneModel);
         return new ResponseEntity<>(restPhoneResponseModel, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> resendActivationCode(@PathVariable("email") final String email) {
+        userService.resendActivationCode(email);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 
 

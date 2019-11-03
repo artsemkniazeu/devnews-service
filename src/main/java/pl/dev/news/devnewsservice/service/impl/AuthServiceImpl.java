@@ -23,8 +23,11 @@ import pl.dev.news.model.rest.RestSignInRequest;
 import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTokenResponse;
 
+import java.util.UUID;
+
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.incorrectPassword;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.refreshTokenInvalid;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithActivationKeyNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailDeleted;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdIsLocked;
@@ -92,10 +95,22 @@ public class AuthServiceImpl implements AuthService {
         final UserEntity userEntity = userMapper.toEntity(restSignupRequest);
         userEntity.setRole(USER);
         userEntity.setPassword(passwordEncoder.encode(restSignupRequest.getPassword()));
+        userEntity.setActivationKey(UUID.randomUUID());
         final UserEntity saved = userRepository.saveAndFlush(userEntity);
         transactionTemplate.afterCommit(() -> {
             mailService.sendActivationEmail(saved);
         });
+    }
+
+    @Override
+    public void activate(final UUID key) {
+        final UserEntity userEntity = userRepository
+                .findOne(qUserEntity.activationKey.eq(key))
+                .orElseThrow(() -> new NotFoundException(userWithActivationKeyNotFound, key));
+        userEntity.setEnabled(true);
+        userEntity.setActivationKey(null);
+        final UserEntity saved = userRepository.saveAndFlush(userEntity);
+        transactionTemplate.afterCommit(() -> mailService.sendWelcomeEmail(saved));
     }
 
 }

@@ -27,4 +27,6 @@ public interface UserService {
     RestPhoneResponseModel verifyPhoneNumber(UUID userId, RestPhoneModel restPhoneModel);
 
     RestPhoneResponseModel checkPhoneNumber(UUID userId, RestPhoneModel restPhoneModel);
+
+    void resendActivationCode(String email);
 }

@@ -16,12 +16,15 @@ import pl.dev.news.devnewsservice.security.TokenAuthenticationProvider;
 import pl.dev.news.devnewsservice.security.TokenFilter;
 import pl.dev.news.devnewsservice.security.TokenValidator;
 
+import static org.springframework.http.HttpMethod.GET;
 import static org.springframework.http.HttpMethod.OPTIONS;
 import static org.springframework.http.HttpMethod.POST;
+import static pl.dev.news.controller.api.AuthApi.activatePath;
 import static pl.dev.news.controller.api.AuthApi.basePath;
 import static pl.dev.news.controller.api.AuthApi.refreshTokenPath;
 import static pl.dev.news.controller.api.AuthApi.signInPath;
 import static pl.dev.news.controller.api.AuthApi.signUpPath;
+import static pl.dev.news.controller.api.UserApi.resendActivationCodePath;
 
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true, securedEnabled = true)
@@ -62,6 +65,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, signInPath).permitAll()
                 .antMatchers(POST, signUpPath).permitAll()
                 .antMatchers(POST, refreshTokenPath).permitAll()
+                .antMatchers(GET, activatePath).permitAll()
+                .antMatchers(GET, resendActivationCodePath).permitAll()
                 .antMatchers(OPTIONS, "/**").permitAll()
 
                 .antMatchers(basePath + "/**").authenticated();

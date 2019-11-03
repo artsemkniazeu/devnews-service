@@ -19,6 +19,8 @@ import pl.dev.news.devnewsservice.mapper.TwilioMapper;
 import pl.dev.news.devnewsservice.mapper.UploadMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.UserRepository;
+import pl.dev.news.devnewsservice.service.MailService;
+import pl.dev.news.devnewsservice.service.TransactionTemplate;
 import pl.dev.news.devnewsservice.service.TwilioService;
 import pl.dev.news.devnewsservice.service.UploadService;
 import pl.dev.news.devnewsservice.service.UserService;
@@ -33,6 +35,8 @@ import pl.dev.news.model.rest.RestUserQueryParameters;
 import java.util.UUID;
 
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.invalidImageFormat;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userIsAlreadyActivated;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
 
 @Service
@@ -46,6 +50,10 @@ public class UserServiceImpl implements UserService {
     private final TwilioService twilioService;
 
     private final UploadService uploadService;
+
+    private final MailService mailService;
+
+    private final TransactionTemplate transactionTemplate;
 
     private final UserMapper userMapper = UserMapper.INSTANCE;
 
@@ -137,6 +145,16 @@ public class UserServiceImpl implements UserService {
         return twilioMapper.toModel(verificationCheck);
     }
 
+    @Override
+    public void resendActivationCode(final String email) {
+        final UserEntity userEntity = userRepository
+                .findOne(qUserEntity.email.eq(email))
+                .orElseThrow(() -> new NotFoundException(userWithEmailNotFound, email));
+        if (userEntity.isEnabled()) {
+            throw new BadRequestException(userIsAlreadyActivated, email);
+        }
+        transactionTemplate.afterCommit(() -> mailService.sendActivationEmail(userEntity));
+    }
 
     private UploadEntity uploadImage(final UserEntity entity, final UploadEntity old, final MultipartFile file) {
         if (!ImageUtils.isValid(file)) {
