@@ -25,6 +25,7 @@ import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 public class MailServiceImpl implements MailService {
 
     private static final String EMAIL_ACTIVATION_TEMPLATE = "activation-email.html";
+    private static final String EMAIL_WELCOME_TEMPLATE = "welcome-email.html";
 
     private final AppConfiguration appConfiguration;
 
@@ -46,13 +47,24 @@ public class MailServiceImpl implements MailService {
 
     }
 
+    @Override
+    public void sendWelcomeEmail(final UserEntity entity) {
+        final Map<String, Object> context = createContext(entity);
+        final String content = compileTemplate(EMAIL_WELCOME_TEMPLATE, context);
+        sendEmail(entity.getEmail(), "Email verification on DevNews", content);
+    }
+
+    private Map<String, Object> createContext(final UserEntity entity) {
+        return createContext(entity,"");
+    }
+
     private Map<String, Object> createContext(final UserEntity entity, final String buttonUrl) {
         return new ImmutableMap.Builder<String, Object>()
                 .put("webUrl", appConfiguration.getUrls().getWebUrl())
                 .put("buttonUrl", buttonUrl)
                 .put("email", entity.getEmail())
-                .put("firstname", entity.getFirstName())
-                .put("lastname", entity.getLastName())
+                .put("firstName", entity.getFirstName())
+                .put("lastName", entity.getLastName())
                 .build();
     }
 

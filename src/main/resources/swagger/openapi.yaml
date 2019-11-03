@@ -84,6 +84,48 @@ paths:
           $ref: "#/components/responses/Unauthorized"
 
 
+  "/auth/activate":
+    get:
+      tags:
+        - Auth
+      operationId: activate
+      security: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "204":
+          description: No Content
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/auth/resend":
+    get:
+      tags:
+        - Auth
+      operationId: resend
+      security: []
+      parameters:
+        - name: email
+          in: query
+          required: true
+          schema:
+            type: string
+            format: email
+      responses:
+        "204":
+          description: No Content
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   # ========================================
   # ===== User API
   # ========================================

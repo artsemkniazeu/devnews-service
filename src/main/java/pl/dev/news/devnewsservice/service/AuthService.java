@@ -5,6 +5,8 @@ import pl.dev.news.model.rest.RestSignInRequest;
 import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTokenResponse;
 
+import java.util.UUID;
+
 public interface AuthService {
 
     RestTokenResponse signIn(RestSignInRequest restSignInRequest);
@@ -13,4 +15,7 @@ public interface AuthService {
 
     void signUp(RestSignUpRequest restSignupRequest);
 
+    void activate(UUID key);
+
+    void resend(String email);
 }

@@ -24,6 +24,7 @@ import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Set;
+import java.util.UUID;
 
 import static javax.persistence.EnumType.STRING;
 
@@ -91,10 +92,10 @@ public class UserEntity extends BaseEntity implements UserDetails  {
     private String city;
 
     @Column(name = "activation_key")
-    private String activationKey;
+    private UUID activationKey;
 
     @Column(name = "reset_key")
-    private String resetKey;
+    private UUID resetKey;
 
     @Column(name = "enabled", nullable = false)
     private boolean enabled;

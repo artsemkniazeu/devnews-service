@@ -4,6 +4,7 @@ public class ExceptionConstants {
     // NotFoundException
     public static String userWithIdNotFound = "User with id {} could not be found";
     public static String userWithEmailNotFound = "User with email {} could not be found";
+    public static String userWithActivationKeyNotFound = "User with activation key {} could not be found";
     public static String tagWithIdNotFound = "Tag with id {} could not be found";
     public static String postWithIdNotFound = "Post with id {} could not be found";
     public static String groupWithIdNotFound = "Group with id {} could not be found";
@@ -23,6 +24,7 @@ public class ExceptionConstants {
 
     // BadRequestException
     public static String invalidImageFormat = "Invalid image format";
+    public static String userIsAlreadyActivated = "User with email {} is already activated";
 
     // UnprocessableEntityException
     public static String fileCorruptOrUnreadable = "Can't read file, file is corrupt and unreadable";
