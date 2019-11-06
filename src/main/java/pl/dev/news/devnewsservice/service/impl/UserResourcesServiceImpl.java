@@ -8,8 +8,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.QPostEntity;
 import pl.dev.news.devnewsservice.entity.QUserEntity;
-import pl.dev.news.devnewsservice.entity.UserEntity;
-import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.PostMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.PostRepository;
@@ -21,8 +19,6 @@ import pl.dev.news.model.rest.RestPostQueryParameters;
 import pl.dev.news.model.rest.RestUserModel;
 
 import java.util.UUID;
-
-import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
 
 @Service
 @RequiredArgsConstructor
@@ -48,10 +44,8 @@ public class UserResourcesServiceImpl implements UserResourcesService {
             final Integer page,
             final Integer size
     ) {
-        final UserEntity entity = userRepository.softFindById(userId)
-                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
         final Predicate predicate = new QueryUtils()
-                .andEq(qPostEntity.usersSaved.contains(entity))
+                .andSetEq(userId, qPostEntity.usersSaved.any().id)
                 .build();
         return postRepository.findAll(
                 predicate,

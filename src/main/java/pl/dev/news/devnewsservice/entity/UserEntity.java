@@ -157,6 +157,19 @@ public class UserEntity extends BaseEntity implements UserDetails  {
         }
     }
 
+    public void addBookmark(final PostEntity post) {
+        if (this.bookmarks == null) {
+            this.bookmarks = new HashSet<>();
+        }
+        this.bookmarks.add(post);
+    }
+
+    public void removeBookmark(final PostEntity post) {
+        if (this.bookmarks != null) {
+            this.bookmarks.remove(post);
+        }
+    }
+
     // UserDetails
 
     @Override

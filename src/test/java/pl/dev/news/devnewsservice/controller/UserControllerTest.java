@@ -15,6 +15,8 @@ import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestTokenResponse;
 import pl.dev.news.model.rest.RestUserModel;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -147,6 +149,19 @@ public class UserControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testUpdateUserNotFound() throws Exception {
+        final RestUserModel restUserModel = TestUtils.restUserModel();
+        final UserEntity expected = createUser(restUserModel, USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        mockMvc.perform(
+                put(PathUtils.generate(updateUserPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(restUserModel)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testUploadImage() throws Exception {
         // given
         final RestUserModel restUserModel = TestUtils.restUserModel();
@@ -171,6 +186,25 @@ public class UserControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testUploadImageNotFound() throws Exception {
+        // given
+        final RestUserModel restUserModel = TestUtils.restUserModel();
+        final UserEntity expected = createUser(restUserModel, USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "image/jpeg");
+
+        final String url = "https://example.com/image.jpg";
+        mockBucketUpload(url);
+        // when
+        mockMvc.perform(
+                multipart(PathUtils.generate(uploadImagePath, UUID.randomUUID()))
+                        .file(file)
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testUploadBackground() throws Exception {
         // given
         final RestUserModel restUserModel = TestUtils.restUserModel();
@@ -192,6 +226,25 @@ public class UserControllerTest extends AbstractIntegrationTest {
 
         final UserEntity userEntityFromDb = getUser(expected.getId());
         Assert.assertEquals(userEntityFromDb.getBgUrl(), url);
+    }
+
+    @Test
+    public void testUploadBackgroundNotFound() throws Exception {
+        // given
+        final RestUserModel restUserModel = TestUtils.restUserModel();
+        final UserEntity expected = createUser(restUserModel, USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(expected);
+        final MockMultipartFile file = TestUtils.getMultipartFile("avatar.jpg", "image/jpeg");
+
+        final String url = "https://example.com/image.jpg";
+        mockBucketUpload(url);
+        // when
+        mockMvc.perform(
+                multipart(PathUtils.generate(uploadBackgroundPath, UUID.randomUUID()))
+                        .file(file)
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
+                // then
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -245,6 +298,23 @@ public class UserControllerTest extends AbstractIntegrationTest {
         );
     }
 
+    @Test
+    public void testFollowUnFollowUserNotFound() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                post(PathUtils.generate(followUserPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        mockMvc.perform(
+                delete(PathUtils.generate(unfollowUserPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+    }
 
     @Test
     public void testResendActivationCode() throws Exception {
@@ -252,6 +322,21 @@ public class UserControllerTest extends AbstractIntegrationTest {
         mockMvc.perform(
                 get(PathUtils.generate(resendActivationCodePath, user.getEmail())))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testResendActivationCodeNotFound() throws Exception {
+        mockMvc.perform(
+                get(PathUtils.generate(resendActivationCodePath, "notfound@example.com")))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testResendActivationCodeBadRequest() throws Exception {
+        final UserEntity user = createUser(USER, true);
+        mockMvc.perform(
+                get(PathUtils.generate(resendActivationCodePath, user.getEmail())))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -265,6 +350,21 @@ public class UserControllerTest extends AbstractIntegrationTest {
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(model)))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testChangeEmailAddressConflict() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final UserEntity exists = createUser(USER);
+        final RestEmailModel model = TestUtils.restEmailModel();
+        model.setEmail(exists.getEmail());
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                post(PathUtils.generate(changeEmailAddressPath, userEntity.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(model)))
+                .andExpect(status().isConflict());
     }
 
     private void mockBucketUpload(final String url) {

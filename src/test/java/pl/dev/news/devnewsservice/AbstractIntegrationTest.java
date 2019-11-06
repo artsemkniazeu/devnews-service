@@ -46,6 +46,7 @@ import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTagModel;
 import pl.dev.news.model.rest.RestUserModel;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -68,6 +69,8 @@ import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithId
 public abstract class AbstractIntegrationTest {
 
     protected final UserMapper userMapper = UserMapper.INSTANCE;
+
+    protected final PostMapper postMapper = PostMapper.INSTANCE;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
@@ -243,6 +246,13 @@ public abstract class AbstractIntegrationTest {
     protected PostEntity createPost(final UserEntity user) {
         final GroupEntity group = new GroupEntity(); // TODO create group
         final RestPostModel model = TestUtils.restPostModel(createTags(), createCategory().getChildren(), group);
+        return createPost(user, model, null);
+    }
+
+    protected PostEntity createPostEmpty(final UserEntity user) {
+        final GroupEntity group = new GroupEntity(); // TODO create group
+        final RestPostModel model = TestUtils
+                .restPostModel(createTags(0), new HashSet<>(), group);
         return createPost(user, model, null);
     }
 

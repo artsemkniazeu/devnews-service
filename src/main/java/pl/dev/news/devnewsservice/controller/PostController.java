@@ -58,6 +58,19 @@ public class PostController implements PostApi {
         return new ResponseEntity<>(posts.getContent(), headers, HttpStatus.OK);
     }
 
+
+    @Override
+    public ResponseEntity<Void> bookmarkPost(@PathVariable("postId") final UUID postId) {
+        postService.bookmark(postId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> unBookmarkPost(@PathVariable("postId") final UUID postId) {
+        postService.unBookmark(postId);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
     @Override
     public ResponseEntity<RestPostModel> updatePost(
             @PathVariable("postId") final UUID postId,

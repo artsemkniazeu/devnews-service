@@ -9,10 +9,12 @@ import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.utils.PathUtils;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestPostModel;
+import pl.dev.news.model.rest.RestPostQueryParameters;
 import pl.dev.news.model.rest.RestTokenResponse;
 
 import java.util.ArrayList;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -23,10 +25,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static pl.dev.news.controller.api.PostApi.bookmarkPostPath;
 import static pl.dev.news.controller.api.PostApi.createPostPath;
 import static pl.dev.news.controller.api.PostApi.deletePostPath;
 import static pl.dev.news.controller.api.PostApi.getPostPath;
 import static pl.dev.news.controller.api.PostApi.getPostsPath;
+import static pl.dev.news.controller.api.PostApi.unBookmarkPostPath;
 import static pl.dev.news.controller.api.PostApi.updatePostPath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
@@ -163,6 +167,41 @@ public class PostControllerTest extends AbstractIntegrationTest {
                         .content(objectMapper.writeValueAsBytes(model))
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testBookmarkUnBookmarkPost() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final PostEntity postEntity = createPostEmpty(userEntity);
+        final RestPostQueryParameters parameters = new RestPostQueryParameters();
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                post(PathUtils.generate(bookmarkPostPath, postEntity.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assert.assertTrue(
+                userResourcesService
+                        .getBookmarks(userEntity.getId(), parameters, 1, 10)
+                        .getContent()
+                        .stream().map(RestPostModel::getId)
+                        .collect(Collectors.toList())
+                        .contains(postEntity.getId())
+        );
+
+        mockMvc.perform(
+                delete(PathUtils.generate(unBookmarkPostPath, postEntity.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assert.assertTrue(
+                userResourcesService
+                        .getBookmarks(userEntity.getId(), parameters, 1, 10)
+                        .getContent()
+                        .isEmpty()
+        );
     }
 
 }

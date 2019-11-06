@@ -17,4 +17,8 @@ public interface PostService {
     Page<RestPostModel> retrieveAll(RestPostQueryParameters parameters, Integer page, Integer size);
 
     RestPostModel update(UUID postId, RestPostModel restPostModel);
+
+    void bookmark(UUID postId);
+
+    void unBookmark(UUID postId);
 }

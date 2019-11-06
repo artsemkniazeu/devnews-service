@@ -135,7 +135,7 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<RestUserModel> followUser(final UUID userId) {
+    public ResponseEntity<Void> followUser(final UUID userId) {
         userService.follow(userId);
         return new ResponseEntity<>(OK);
     }

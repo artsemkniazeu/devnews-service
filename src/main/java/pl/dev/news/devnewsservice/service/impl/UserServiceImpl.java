@@ -185,11 +185,11 @@ public class UserServiceImpl implements UserService {
         if (userRepository.exists(qUserEntity.email.eq(restEmailModel.getEmail()))) {
             throw new ConflictException(userWithEmailAlreadyExists, restEmailModel.getEmail());
         }
-        final UUID activationkey = UUID.randomUUID();
+        final UUID activationKey = UUID.randomUUID();
         final HashMap<String, String> map = new HashMap<>();
         map.put("email", restEmailModel.getEmail());
-        map.put("key", activationkey.toString());
-        userEntity.setActivationKey(activationkey);
+        map.put("key", activationKey.toString());
+        userEntity.setActivationKey(activationKey);
         final UserEntity saved = userRepository.saveAndFlush(userEntity);
         transactionTemplate.afterCommit(() -> mailService
                 .sendChangeEmailActivationCode(saved, SerializationUtils.serialize(map)));

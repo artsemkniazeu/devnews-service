@@ -235,10 +235,6 @@ paths:
       responses:
         "200":
           description: OK
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UserModel"
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -993,6 +989,50 @@ paths:
       tags:
         - Post
       operationId: deletePost
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/posts/{postId}/bookmark":
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Post
+      operationId: bookmarkPost
+      security:
+        - userAuth: []
+      responses:
+        "200":
+          description: OK
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/posts/{postId}/unbookmark":
+    parameters:
+      - name: postId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags:
+        - Post
+      operationId: unBookmarkPost
       security:
         - userAuth: []
       responses:

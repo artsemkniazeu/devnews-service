@@ -14,6 +14,7 @@ import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.PostMapper;
 import pl.dev.news.devnewsservice.repository.GroupRepository;
 import pl.dev.news.devnewsservice.repository.PostRepository;
+import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.security.SecurityResolver;
 import pl.dev.news.devnewsservice.service.PostService;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
@@ -29,9 +30,15 @@ import static pl.dev.news.devnewsservice.constants.ExceptionConstants.postWithId
 public class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository;
+
     private final GroupRepository groupRepository;
+
+    private final UserRepository userRepository;
+
     private final SecurityResolver securityResolver;
+
     private final PostMapper postMapper = PostMapper.INSTANCE;
+
     private final QPostEntity qPostEntity = QPostEntity.postEntity;
 
     @Override
@@ -92,5 +99,26 @@ public class PostServiceImpl implements PostService {
         postMapper.update(entity, model);
         final PostEntity saved = postRepository.saveAndFlush(entity);
         return postMapper.toModel(saved);
+    }
+
+    @Override
+    @Transactional
+    public void bookmark(final UUID postId) {
+        final UserEntity user = securityResolver.getUser();
+        final PostEntity entity = postRepository.softFindById(postId)
+                .orElseThrow(() -> new NotFoundException(postWithIdNotFound, postId));
+        user.addBookmark(entity);
+        userRepository.saveAndFlush(user);
+
+    }
+
+    @Override
+    @Transactional
+    public void unBookmark(final UUID postId) {
+        final UserEntity user = securityResolver.getUser();
+        final PostEntity entity = postRepository.softFindById(postId)
+                .orElseThrow(() -> new NotFoundException(postWithIdNotFound, postId));
+        user.removeBookmark(entity);
+        userRepository.saveAndFlush(user);
     }
 }
