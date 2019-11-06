@@ -12,8 +12,11 @@ import pl.dev.news.model.rest.RestSignUpRequest;
 import pl.dev.news.model.rest.RestTokenResponse;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.web.util.UriComponentsBuilder.fromPath;
+import static pl.dev.news.controller.api.AuthApi.activatePath;
 import static pl.dev.news.controller.api.AuthApi.refreshTokenPath;
 import static pl.dev.news.controller.api.AuthApi.signInPath;
 import static pl.dev.news.controller.api.AuthApi.signUpPath;
@@ -36,6 +39,22 @@ public class AuthControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testSignUpConflict() throws Exception {
+        // given
+        final RestSignUpRequest restSignUpRequest = TestUtils.restSignupRequest();
+        createUser(restSignUpRequest, USER);
+
+        // when
+        mockMvc.perform(
+                post(signUpPath)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(restSignUpRequest)))
+                // then
+                .andExpect(status().isConflict())
+                .andReturn();
+    }
+
+    @Test
     public void testSignIn() throws Exception {
         // given
         final RestSignUpRequest restSignUpRequest = TestUtils.restSignupRequest();
@@ -54,6 +73,34 @@ public class AuthControllerTest extends AbstractIntegrationTest {
         final UserEntity result = tokenProvider.buildUserEntityByToken(model.getAccess().getToken());
         Assert.assertNotNull(model);
         Assert.assertEquals(userEntity.getId(), result.getId());
+    }
+
+    @Test
+    public void testSignInBadCredentialsDisabled() throws Exception {
+        // given
+        final RestSignUpRequest restSignUpRequest = TestUtils.restSignupRequest();
+        createUser(restSignUpRequest, USER, false, false);
+        final RestSignInRequest restSignInRequest = TestUtils.restSignInRequest(restSignUpRequest);
+        // when
+        mockMvc.perform(post(signInPath)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(restSignInRequest)))
+                // then
+                .andExpect(status().isLocked());
+    }
+
+    @Test
+    public void testSignInBadCredentialsLocked() throws Exception {
+        // given
+        final RestSignUpRequest restSignUpRequest = TestUtils.restSignupRequest();
+        createUser(restSignUpRequest, USER, true, true);
+        final RestSignInRequest restSignInRequest = TestUtils.restSignInRequest(restSignUpRequest);
+        // when
+        mockMvc.perform(post(signInPath)
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(restSignInRequest)))
+                // then
+                .andExpect(status().isLocked());
     }
 
     @Test
@@ -136,6 +183,24 @@ public class AuthControllerTest extends AbstractIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isUnauthorized())
+                .andReturn();
+    }
+
+    @Test
+    public void testActivate() throws Exception {
+        // given
+        final RestSignUpRequest restSignUpRequest = TestUtils.restSignupRequest();
+        final UserEntity userEntity = createUser(restSignUpRequest, USER, false, false);
+        final String path = fromPath(activatePath)
+                .queryParam("key", userEntity.getActivationKey())
+                .toUriString();
+
+        mockMvc.perform(
+                get(path)
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(restSignUpRequest)))
+                // then
+                .andExpect(status().isNoContent())
                 .andReturn();
     }
 

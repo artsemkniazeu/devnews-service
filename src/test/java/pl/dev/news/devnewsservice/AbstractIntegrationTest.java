@@ -142,12 +142,25 @@ public abstract class AbstractIntegrationTest {
     protected UserEntity createUser(
             final UserEntity user,
             final UserRoleEntity role,
-            final boolean enabled
+            final boolean enabled,
+            final boolean locked
     ) {
         user.setEnabled(enabled);
+        user.setLocked(locked);
+        if (!enabled) {
+            user.setActivationKey(UUID.randomUUID());
+        }
         user.setRole(role);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.saveAndFlush(user);
+    }
+
+    protected UserEntity createUser(
+            final UserEntity user,
+            final UserRoleEntity role,
+            final boolean enabled
+    ) {
+        return createUser(user, role, enabled, false);
     }
 
     protected UserEntity createUser(
@@ -155,6 +168,15 @@ public abstract class AbstractIntegrationTest {
             final UserRoleEntity role
     ) {
         return createUser(userMapper.toEntity(signUpRequest), role, true);
+    }
+
+    protected UserEntity createUser(
+            final RestSignUpRequest signUpRequest,
+            final UserRoleEntity role,
+            final boolean enabled,
+            final boolean locked
+    ) {
+        return createUser(userMapper.toEntity(signUpRequest), role, enabled, locked);
     }
 
     protected UserEntity createUser(
