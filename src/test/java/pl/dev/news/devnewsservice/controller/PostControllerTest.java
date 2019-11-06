@@ -68,6 +68,19 @@ public class PostControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testDeletePostNotFound() throws Exception {
+        // given
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
+        // when
+        mockMvc.perform(
+                delete(deletePostPath, UUID.randomUUID())
+                        .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testGetPosts() throws Exception {
         final UserEntity user = createUser(USER);
         final UserEntity publisher = createUser(USER);
@@ -104,6 +117,18 @@ public class PostControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testGetPostNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        mockMvc.perform(
+                get(PathUtils.generate(getPostPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+
+    @Test
     public void testUpdatePost() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
@@ -123,6 +148,21 @@ public class PostControllerTest extends AbstractIntegrationTest {
                 .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists())
                 .andExpect(jsonPath("$[?(@.title == '" + model.getTitle() + "')]").exists())
                 .andExpect(jsonPath("$.tags", hasSize(9)));
+    }
+
+    @Test
+    public void testUpdatePostNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        final GroupEntity group = createGroup(user);
+        final RestPostModel model = TestUtils
+                .restPostModel(createTags(), createCategory().getChildren(), group);
+        mockMvc.perform(
+                put(PathUtils.generate(updatePostPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .content(objectMapper.writeValueAsBytes(model))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
 }

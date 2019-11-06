@@ -10,6 +10,8 @@ import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestTokenResponse;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -63,6 +65,19 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testDeleteGroupNotFound() throws Exception {
+        // given
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
+        // when
+        mockMvc.perform(
+                delete(deleteGroupPath, UUID.randomUUID())
+                        .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testGetPosts() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
@@ -93,6 +108,17 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testGetPostNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        mockMvc.perform(
+                get(PathUtils.generate(getGroupPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testUpdatePost() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
@@ -107,5 +133,18 @@ public class GroupControllerTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists())
                 .andExpect(jsonPath("$[?(@.name == '" + model.getName() + "')]").exists());
+    }
+
+    @Test
+    public void testUpdatePostNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        final RestGroupModel model = TestUtils.restGroupModel(user.getId());
+        mockMvc.perform(
+                put(PathUtils.generate(updateGroupPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .content(objectMapper.writeValueAsBytes(model))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

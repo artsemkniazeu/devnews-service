@@ -10,6 +10,8 @@ import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestTagModel;
 import pl.dev.news.model.rest.RestTokenResponse;
 
+import java.util.UUID;
+
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -61,6 +63,18 @@ public class TagControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testDeleteTagNotFound() throws Exception {
+        // given
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
+        // when
+        mockMvc.perform(delete(deleteTagPath, UUID.randomUUID())
+                .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testGetTag() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
@@ -71,6 +85,17 @@ public class TagControllerTest extends AbstractIntegrationTest {
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists());
+    }
+
+    @Test
+    public void testGetTagNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        mockMvc.perform(
+                get(PathUtils.generate(getTagPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 
     @Test
@@ -103,5 +128,18 @@ public class TagControllerTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists())
                 .andExpect(jsonPath("$[?(@.name == '" + model.getName() + "')]").exists());
+    }
+
+    @Test
+    public void testUpdateTagNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        final RestTagModel model = TestUtils.restTagModel();
+        mockMvc.perform(
+                put(PathUtils.generate(getTagPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .content(objectMapper.writeValueAsBytes(model))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
