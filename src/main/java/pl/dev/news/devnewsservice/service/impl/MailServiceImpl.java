@@ -36,15 +36,13 @@ public class MailServiceImpl implements MailService {
     private final MustacheResourceTemplateLoader templateLoader;
 
     @Override
-    public void sendActivationEmail(final UserEntity entity) {
+    public void sendEmailActivationCode(final UserEntity entity) {
         final String buttonUrl = fromPath(appConfiguration.getUrls().getConfirmUrl())
                 .queryParam("key", entity.getActivationKey())
                 .toUriString();
-
         final Map<String, Object> context = createContext(entity, buttonUrl);
         final String content = compileTemplate(EMAIL_ACTIVATION_TEMPLATE, context);
         sendEmail(entity.getEmail(), "Email verification on DevNews", content);
-
     }
 
     @Override
@@ -54,8 +52,18 @@ public class MailServiceImpl implements MailService {
         sendEmail(entity.getEmail(), "Email verification on DevNews", content);
     }
 
+    @Override
+    public void sendChangeEmailActivationCode(final UserEntity entity, final String key) {
+        final String buttonUrl = fromPath(appConfiguration.getUrls().getEmailConfirmUrl())
+                .queryParam("key", key)
+                .toUriString();
+        final Map<String, Object> context = createContext(entity, buttonUrl);
+        final String content = compileTemplate(EMAIL_ACTIVATION_TEMPLATE, context);
+        sendEmail(entity.getEmail(), "Email verification on DevNews", content);
+    }
+
     private Map<String, Object> createContext(final UserEntity entity) {
-        return createContext(entity,"");
+        return createContext(entity, "");
     }
 
     private Map<String, Object> createContext(final UserEntity entity, final String buttonUrl) {

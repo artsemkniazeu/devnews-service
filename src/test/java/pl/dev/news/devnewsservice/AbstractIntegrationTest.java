@@ -35,6 +35,9 @@ import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.security.impl.TokenProviderImpl;
 import pl.dev.news.devnewsservice.security.impl.TokenValidatorImpl;
 import pl.dev.news.devnewsservice.service.GoogleFileService;
+import pl.dev.news.devnewsservice.service.TwilioService;
+import pl.dev.news.devnewsservice.service.UserResourcesService;
+import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
 import pl.dev.news.model.rest.RestGroupModel;
@@ -99,11 +102,20 @@ public abstract class AbstractIntegrationTest {
     @Autowired
     protected GroupRepository groupRepository;
 
+    @Autowired
+    protected UserService userService;
+
+    @Autowired
+    protected UserResourcesService userResourcesService;
+
     @MockBean
     protected Storage storage;
 
     @MockBean
     protected GoogleFileService fileService;
+
+    @MockBean
+    protected TwilioService twilioService;
 
     @After
     public final void clearDatabase() {
@@ -126,9 +138,10 @@ public abstract class AbstractIntegrationTest {
 
     protected UserEntity createUser(
             final UserEntity user,
-            final UserRoleEntity role
+            final UserRoleEntity role,
+            final boolean enabled
     ) {
-        user.setEnabled(true);
+        user.setEnabled(enabled);
         user.setRole(role);
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepository.saveAndFlush(user);
@@ -138,7 +151,17 @@ public abstract class AbstractIntegrationTest {
             final RestSignUpRequest signUpRequest,
             final UserRoleEntity role
     ) {
-        return createUser(userMapper.toEntity(signUpRequest), role);
+        return createUser(userMapper.toEntity(signUpRequest), role, true);
+    }
+
+    protected UserEntity createUser(
+            final RestUserModel role,
+            final UserRoleEntity entity,
+            final boolean enabled
+    ) {
+        final UserEntity userEntity = userMapper.toEntity(TestUtils.restSignupRequest());
+        final UserEntity updated = userMapper.update(userEntity, role);
+        return createUser(updated, entity, enabled);
     }
 
     protected UserEntity createUser(
@@ -147,11 +170,15 @@ public abstract class AbstractIntegrationTest {
     ) {
         final UserEntity userEntity = userMapper.toEntity(TestUtils.restSignupRequest());
         final UserEntity updated = userMapper.update(userEntity, role);
-        return createUser(updated, entity);
+        return createUser(updated, entity, true);
     }
 
     protected UserEntity createUser(final UserRoleEntity role) {
-        return createUser(TestUtils.restUserModel(), role);
+        return createUser(TestUtils.restUserModel(), role, true);
+    }
+
+    protected UserEntity createUser(final UserRoleEntity role, final boolean enabled) {
+        return createUser(TestUtils.restUserModel(), role, enabled);
     }
 
     protected UserEntity getUser(final UUID userId) {

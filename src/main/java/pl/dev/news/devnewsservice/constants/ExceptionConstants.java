@@ -13,6 +13,7 @@ public class ExceptionConstants {
 
     // ConflictException
     public static String userWithEmailDeleted = "Account with email {} was deleted!";
+    public static String userWithEmailAlreadyExists = "User with email {} is already exists";
 
     // UnauthorizedException
     public static String incorrectPassword = "Incorrect password";
@@ -25,6 +26,7 @@ public class ExceptionConstants {
     // BadRequestException
     public static String invalidImageFormat = "Invalid image format";
     public static String userIsAlreadyActivated = "User with email {} is already activated";
+    public static String verificationCodeNotValidForPhone = "Verification code {} is not valid for phone number {}";
 
     // UnprocessableEntityException
     public static String fileCorruptOrUnreadable = "Can't read file, file is corrupt and unreadable";

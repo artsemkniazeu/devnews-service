@@ -13,6 +13,7 @@ def jacocoExclude =  [
         "${projectPackage}/devnewsservice/exception/*.class",
         "${projectPackage}/devnewsservice/service/impl/GoogleFileServiceImpl.class",
         "${projectPackage}/devnewsservice/service/impl/TwilioServiceImpl.class",
+        "${projectPackage}/devnewsservice/service/impl/MailServiceImpl.class",
 ]
 
 jacoco {

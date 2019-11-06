@@ -50,9 +50,17 @@ public class AuthController implements AuthApi {
 
     @Override
     public ResponseEntity<Void> activate(
-            @NotNull @Valid @RequestParam(value = "key") final UUID key
+            @NotNull @Valid @RequestParam final UUID key
     ) {
         authService.activate(key);
+        return new ResponseEntity<>(NO_CONTENT);
+    }
+
+    @Override
+    public ResponseEntity<Void> emailActivate(
+            @NotNull @Valid @RequestParam final String key
+    ) {
+        authService.emailActivate(key);
         return new ResponseEntity<>(NO_CONTENT);
     }
 

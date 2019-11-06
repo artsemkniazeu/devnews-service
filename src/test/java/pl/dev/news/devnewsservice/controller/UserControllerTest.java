@@ -11,6 +11,7 @@ import pl.dev.news.devnewsservice.AbstractIntegrationTest;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.utils.PathUtils;
 import pl.dev.news.devnewsservice.utils.TestUtils;
+import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestTokenResponse;
 import pl.dev.news.model.rest.RestUserModel;
 
@@ -22,12 +23,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static pl.dev.news.controller.api.UserApi.changeEmailAddressPath;
 import static pl.dev.news.controller.api.UserApi.deleteUserPath;
+import static pl.dev.news.controller.api.UserApi.followUserPath;
 import static pl.dev.news.controller.api.UserApi.getUserPath;
 import static pl.dev.news.controller.api.UserApi.getUsersPath;
+import static pl.dev.news.controller.api.UserApi.resendActivationCodePath;
+import static pl.dev.news.controller.api.UserApi.unfollowUserPath;
 import static pl.dev.news.controller.api.UserApi.updateUserPath;
 import static pl.dev.news.controller.api.UserApi.uploadBackgroundPath;
 import static pl.dev.news.controller.api.UserApi.uploadImagePath;
@@ -205,6 +211,60 @@ public class UserControllerTest extends AbstractIntegrationTest {
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken()))
                 // then
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    public void testFollowUnFollowUser() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final UserEntity follower = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                post(PathUtils.generate(followUserPath, follower.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assert.assertTrue(
+                userResourcesService
+                        .getFollowers(follower.getId(), 1, 10)
+                        .getContent()
+                .contains(userMapper.toModel(userEntity))
+        );
+
+        mockMvc.perform(
+                delete(PathUtils.generate(unfollowUserPath, follower.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        Assert.assertTrue(
+                userResourcesService
+                        .getFollowers(follower.getId(), 1, 10)
+                        .getContent()
+                .isEmpty()
+        );
+    }
+
+
+    @Test
+    public void testResendActivationCode() throws Exception {
+        final UserEntity user = createUser(USER, false);
+        mockMvc.perform(
+                get(PathUtils.generate(resendActivationCodePath, user.getEmail())))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    public void testChangeEmailAddress() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final RestEmailModel model = TestUtils.restEmailModel();
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        mockMvc.perform(
+                post(PathUtils.generate(changeEmailAddressPath, userEntity.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(model)))
+                .andExpect(status().isNoContent());
     }
 
     private void mockBucketUpload(final String url) {

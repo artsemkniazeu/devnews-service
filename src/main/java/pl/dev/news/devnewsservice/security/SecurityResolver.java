@@ -26,7 +26,7 @@ public class SecurityResolver {
     public UserEntity getUser() {
         final UUID userId = SecurityUtils.getUserId();
         return userRepository.softFindById(userId)
-                .orElseThrow(() -> new NotFoundException(userWithIdNotFound));
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
     }
 
 }

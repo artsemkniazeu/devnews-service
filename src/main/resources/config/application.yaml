@@ -16,6 +16,7 @@ app:
   urls:
     web-url: "${APP_URLS_WEB_URL}"
     confirm-url: "${APP_URLS_WEB_URL}/activate"
+    email-confirm-url: "${APP_URLS_WEB_URL}/email/activate"
     reset-url: "${APP_URLS_WEB_URL}/reset"
   mail:
     from: "${APP_MAIL_FROM}"
@@ -120,6 +121,7 @@ app:
   urls:
     web-url: "http://localhost:4000"
     confirm-url: "http://localhost:4000/activate"
+    email-confirm-url: "http://localhost:4000/email/activate"
     reset-url: "http://localhost:4000/reset"
 
   mail:

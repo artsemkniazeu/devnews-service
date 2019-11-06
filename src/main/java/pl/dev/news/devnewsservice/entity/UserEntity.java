@@ -23,6 +23,7 @@ import javax.persistence.Table;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -142,6 +143,19 @@ public class UserEntity extends BaseEntity implements UserDetails  {
             inverseJoinColumns = @JoinColumn(name = "follower_id"))
     private Set<UserEntity> followers;
 
+
+    public void addFolower(final UserEntity user) {
+        if (this.followers == null) {
+            this.followers = new HashSet<>();
+        }
+        this.followers.add(user);
+    }
+
+    public void removeFollower(final UserEntity user) {
+        if (this.followers != null) {
+            this.followers.remove(user);
+        }
+    }
 
     // UserDetails
 

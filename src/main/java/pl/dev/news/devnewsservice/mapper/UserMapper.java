@@ -27,7 +27,7 @@ public interface UserMapper {
     @Mapping(target = "role", ignore = true)
     @Mapping(target = "email", ignore = true)
     @Mapping(target = "phone", ignore = true)
-    @Mapping(target = "username", ignore = true)
+    //@Mapping(target = "username", ignore = true) // TODO username validation
     @Mapping(target = "imageUrl", ignore = true)
     @Mapping(target = "bgUrl", ignore = true)
     @Mapping(target = "password", ignore = true)

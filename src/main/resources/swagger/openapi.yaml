@@ -104,6 +104,26 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  "/auth/email/activate":
+    get:
+      tags:
+        - Auth
+      operationId: emailActivate
+      security: []
+      parameters:
+        - name: key
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: No Content
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
 
   # ========================================
   # ===== User API
@@ -197,27 +217,6 @@ paths:
           description: No Content
         "401":
           $ref: "#/components/responses/Unauthorized"
-
-
-  "/auth/{email}/resend":
-    parameters:
-      - name: email
-        in: path
-        required: true
-        schema:
-          type: string
-    get:
-      tags:
-        - User
-      operationId: resendActivationCode
-      security: []
-      responses:
-        "204":
-          description: No Content
-        "400":
-          $ref: "#/components/responses/BadRequest"
-        "404":
-          $ref: "#/components/responses/NotFound"
 
   "/users/{userId}/follow":
     parameters:
@@ -341,7 +340,7 @@ paths:
         "422":
           $ref: "#/components/responses/UnprocessableEntity"
 
-  "/users/{userId}/phone/verify":
+  "/users/{userId}/phone/send":
     parameters:
       - name: userId
         in: path
@@ -352,7 +351,7 @@ paths:
     post:
       tags:
         - User
-      operationId: phoneVerify
+      operationId: phoneSendVerificationCode
       security:
         - userAuth: []
       requestBody:
@@ -371,7 +370,7 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
-  "/users/{userId}/phone/check":
+  "/users/{userId}/phone/verify":
     parameters:
       - name: userId
         in: path
@@ -382,7 +381,7 @@ paths:
     post:
       tags:
         - User
-      operationId: phoneCheck
+      operationId: phoneVerifyAndUpdate
       security:
         - userAuth: []
       requestBody:
@@ -394,6 +393,52 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/PhoneResponseModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/users/{email}/resend":
+    parameters:
+      - name: email
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - User
+      operationId: resendActivationCode
+      security: []
+      responses:
+        "204":
+          description: No Content
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  "/users/{userId}/email/change":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - User
+      operationId: changeEmailAddress
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/EmailVerifyRequest"
+      responses:
+        "200":
+          description: OK
         "400":
           $ref: "#/components/responses/BadRequest"
         "401":
@@ -426,6 +471,8 @@ paths:
             $ref: "#/components/schemas/PostQueryParameters"
           style: form
           explode: true
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
         "200":
           description: OK
@@ -1208,6 +1255,12 @@ components:
           schema:
             $ref: "#/components/schemas/PhoneModel"
 
+    EmailVerifyRequest:
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/EmailModel"
+
 
   # ========================================
   # ===== Responses
@@ -1427,8 +1480,10 @@ components:
           type: string
         firstName:
           type: string
+          format: not-blank
         lastName:
           type: string
+          format: not-blank
         birthday:
           type: string
         country:
@@ -1557,6 +1612,13 @@ components:
           format: phone-number
         code:
           type: string
+
+    EmailModel:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
 
     PhoneResponseModel:
       type: object

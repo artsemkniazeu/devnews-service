@@ -11,7 +11,9 @@ import pl.dev.news.devnewsservice.entity.TagEntity;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestGroupModel;
+import pl.dev.news.model.rest.RestPhoneModel;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestRefreshTokenRequest;
 import pl.dev.news.model.rest.RestSignInRequest;
@@ -148,6 +150,18 @@ public class TestUtils {
                 .ownerId(ownerId);
     }
 
+    public RestPhoneModel restPhoneModel() {
+        return new RestPhoneModel()
+                .phone(faker.numerify("+###########"))
+                .code(faker.numerify("######"));
+    }
+
+
+    public static RestEmailModel restEmailModel() {
+        return new RestEmailModel()
+                .email(faker.internet().emailAddress());
+    }
+
     public static MockMultipartFile getMultipartFile(final String name, final String contentType) throws IOException {
         try (InputStream inputStream = Thread.currentThread().getContextClassLoader()
                 .getResourceAsStream("files/" + name)) {
@@ -162,4 +176,5 @@ public class TestUtils {
         }
         return x;
     }
+
 }

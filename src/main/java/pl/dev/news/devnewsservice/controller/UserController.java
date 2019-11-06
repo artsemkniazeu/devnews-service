@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.UserApi;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
+import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestPhoneModel;
 import pl.dev.news.model.rest.RestPhoneResponseModel;
 import pl.dev.news.model.rest.RestUploadModel;
@@ -29,6 +30,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.http.HttpStatus.NO_CONTENT;
+import static org.springframework.http.HttpStatus.OK;
 
 @RestController
 @AllArgsConstructor
@@ -92,7 +94,17 @@ public class UserController implements UserApi {
     }
 
     @Override
-    public ResponseEntity<RestPhoneResponseModel> phoneVerify(
+    public ResponseEntity<RestPhoneResponseModel> phoneSendVerificationCode(
+            @PathVariable("userId") final UUID userId,
+            @Valid @RequestBody final RestPhoneModel restPhoneModel
+    ) {
+        final RestPhoneResponseModel restPhoneResponseModel = userService.sendVerificationCode(userId, restPhoneModel);
+        return new ResponseEntity<>(restPhoneResponseModel, HttpStatus.OK);
+    }
+
+
+    @Override
+    public ResponseEntity<RestPhoneResponseModel> phoneVerifyAndUpdate(
             @PathVariable("userId") final UUID userId,
             @Valid @RequestBody final RestPhoneModel restPhoneModel
     ) {
@@ -100,30 +112,32 @@ public class UserController implements UserApi {
         return new ResponseEntity<>(restPhoneResponseModel, HttpStatus.OK);
     }
 
+
     @Override
     public ResponseEntity<Void> resendActivationCode(@PathVariable("email") final String email) {
         userService.resendActivationCode(email);
         return new ResponseEntity<>(NO_CONTENT);
     }
 
-
     @Override
-    public ResponseEntity<RestPhoneResponseModel> phoneCheck(
+    public ResponseEntity<Void> changeEmailAddress(
             @PathVariable("userId") final UUID userId,
-            @Valid @RequestBody final RestPhoneModel restPhoneModel
+            @Valid @RequestBody final RestEmailModel restEmailModel
     ) {
-        final RestPhoneResponseModel restPhoneResponseModel = userService.checkPhoneNumber(userId, restPhoneModel);
-        return new ResponseEntity<>(restPhoneResponseModel, HttpStatus.OK);
+        userService.changeEmailAddress(userId, restEmailModel);
+        return new ResponseEntity<>(NO_CONTENT);
     }
 
     @Override
     public ResponseEntity<Void> unfollowUser(final UUID userId) {
-        return null;
+        userService.unFollow(userId);
+        return new ResponseEntity<>(OK);
     }
 
     @Override
     public ResponseEntity<RestUserModel> followUser(final UUID userId) {
-        return null;
+        userService.follow(userId);
+        return new ResponseEntity<>(OK);
     }
 
 }

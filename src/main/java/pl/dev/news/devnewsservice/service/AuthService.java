@@ -16,4 +16,6 @@ public interface AuthService {
     void signUp(RestSignUpRequest restSignupRequest);
 
     void activate(UUID key);
+
+    void emailActivate(String key);
 }

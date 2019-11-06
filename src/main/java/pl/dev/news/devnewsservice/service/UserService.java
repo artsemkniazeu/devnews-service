@@ -2,6 +2,7 @@ package pl.dev.news.devnewsservice.service;
 
 import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
+import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestPhoneModel;
 import pl.dev.news.model.rest.RestPhoneResponseModel;
 import pl.dev.news.model.rest.RestUploadModel;
@@ -24,9 +25,15 @@ public interface UserService {
 
     RestUploadModel uploadBackground(UUID userId, MultipartFile file);
 
+    RestPhoneResponseModel sendVerificationCode(UUID userId, RestPhoneModel restPhoneModel);
+
     RestPhoneResponseModel verifyPhoneNumber(UUID userId, RestPhoneModel restPhoneModel);
 
-    RestPhoneResponseModel checkPhoneNumber(UUID userId, RestPhoneModel restPhoneModel);
-
     void resendActivationCode(String email);
+
+    void changeEmailAddress(UUID userId, RestEmailModel restEmailModel);
+
+    void follow(UUID userId);
+
+    void unFollow(UUID userId);
 }

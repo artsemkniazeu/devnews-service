@@ -14,11 +14,13 @@ import pl.dev.news.devnewsservice.entity.QUserEntity;
 import pl.dev.news.devnewsservice.entity.UploadEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.exception.BadRequestException;
+import pl.dev.news.devnewsservice.exception.ConflictException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.TwilioMapper;
 import pl.dev.news.devnewsservice.mapper.UploadMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.UserRepository;
+import pl.dev.news.devnewsservice.security.SecurityResolver;
 import pl.dev.news.devnewsservice.service.MailService;
 import pl.dev.news.devnewsservice.service.TransactionTemplate;
 import pl.dev.news.devnewsservice.service.TwilioService;
@@ -26,24 +28,31 @@ import pl.dev.news.devnewsservice.service.UploadService;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.ImageUtils;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
+import pl.dev.news.devnewsservice.utils.SerializationUtils;
+import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestPhoneModel;
 import pl.dev.news.model.rest.RestPhoneResponseModel;
 import pl.dev.news.model.rest.RestUploadModel;
 import pl.dev.news.model.rest.RestUserModel;
 import pl.dev.news.model.rest.RestUserQueryParameters;
 
+import java.util.HashMap;
 import java.util.UUID;
 
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.invalidImageFormat;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userIsAlreadyActivated;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailAlreadyExists;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithEmailNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithIdNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.verificationCodeNotValidForPhone;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
     private final AppConfiguration appConfiguration;
+
+    private final SecurityResolver securityResolver;
 
     private final UserRepository userRepository;
 
@@ -132,28 +141,78 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public RestPhoneResponseModel verifyPhoneNumber(final UUID userId, final RestPhoneModel restPhoneModel) {
+    public RestPhoneResponseModel sendVerificationCode(final UUID userId, final RestPhoneModel restPhoneModel) {
         final Verification verification = twilioService.sendVerificationSms(restPhoneModel.getPhone());
         return twilioMapper.toModel(verification);
     }
 
     @Override
     @Transactional
-    public RestPhoneResponseModel checkPhoneNumber(final UUID userId, final RestPhoneModel restPhoneModel) {
+    public RestPhoneResponseModel verifyPhoneNumber(final UUID userId, final RestPhoneModel restPhoneModel) {
+        final UserEntity entity = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
         final VerificationCheck verificationCheck = twilioService
                 .checkVerificationCode(restPhoneModel.getPhone(), restPhoneModel.getCode());
+        if (!verificationCheck.getValid()) {
+            throw new BadRequestException(
+                    verificationCodeNotValidForPhone,
+                    restPhoneModel.getCode(),
+                    restPhoneModel.getPhone()
+            );
+        }
+        entity.setPhone(restPhoneModel.getPhone());
+        userRepository.saveAndFlush(entity);
         return twilioMapper.toModel(verificationCheck);
     }
 
     @Override
+    @Transactional
     public void resendActivationCode(final String email) {
         final UserEntity userEntity = userRepository
-                .findOne(qUserEntity.email.eq(email))
+                .findOne(userRepository.soft(qUserEntity.email.eq(email)))
                 .orElseThrow(() -> new NotFoundException(userWithEmailNotFound, email));
         if (userEntity.isEnabled()) {
             throw new BadRequestException(userIsAlreadyActivated, email);
         }
-        transactionTemplate.afterCommit(() -> mailService.sendActivationEmail(userEntity));
+        transactionTemplate.afterCommit(() -> mailService.sendEmailActivationCode(userEntity));
+    }
+
+    @Override
+    @Transactional
+    public void changeEmailAddress(final UUID userId, final RestEmailModel restEmailModel) {
+        final UserEntity userEntity = userRepository.softFindById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
+        if (userRepository.exists(qUserEntity.email.eq(restEmailModel.getEmail()))) {
+            throw new ConflictException(userWithEmailAlreadyExists, restEmailModel.getEmail());
+        }
+        final UUID activationkey = UUID.randomUUID();
+        final HashMap<String, String> map = new HashMap<>();
+        map.put("email", restEmailModel.getEmail());
+        map.put("key", activationkey.toString());
+        userEntity.setActivationKey(activationkey);
+        final UserEntity saved = userRepository.saveAndFlush(userEntity);
+        transactionTemplate.afterCommit(() -> mailService
+                .sendChangeEmailActivationCode(saved, SerializationUtils.serialize(map)));
+    }
+
+    @Override
+    @Transactional
+    public void follow(final UUID userId) {
+        final UserEntity follower = securityResolver.getUser();
+        final UserEntity userEntity = userRepository.softFindById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
+        userEntity.addFolower(follower);
+        userRepository.saveAndFlush(userEntity);
+    }
+
+    @Override
+    @Transactional
+    public void unFollow(final UUID userId) {
+        final UserEntity follower = securityResolver.getUser();
+        final UserEntity userEntity = userRepository.softFindById(userId)
+                .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
+        userEntity.removeFollower(follower);
+        userRepository.saveAndFlush(follower);
     }
 
     private UploadEntity uploadImage(final UserEntity entity, final UploadEntity old, final MultipartFile file) {

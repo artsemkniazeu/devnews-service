@@ -21,6 +21,7 @@ import static org.springframework.http.HttpMethod.OPTIONS;
 import static org.springframework.http.HttpMethod.POST;
 import static pl.dev.news.controller.api.AuthApi.activatePath;
 import static pl.dev.news.controller.api.AuthApi.basePath;
+import static pl.dev.news.controller.api.AuthApi.emailActivatePath;
 import static pl.dev.news.controller.api.AuthApi.refreshTokenPath;
 import static pl.dev.news.controller.api.AuthApi.signInPath;
 import static pl.dev.news.controller.api.AuthApi.signUpPath;
@@ -66,6 +67,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers(POST, signUpPath).permitAll()
                 .antMatchers(POST, refreshTokenPath).permitAll()
                 .antMatchers(GET, activatePath).permitAll()
+                .antMatchers(GET, emailActivatePath).permitAll()
                 .antMatchers(GET, resendActivationCodePath).permitAll()
                 .antMatchers(OPTIONS, "/**").permitAll()
 

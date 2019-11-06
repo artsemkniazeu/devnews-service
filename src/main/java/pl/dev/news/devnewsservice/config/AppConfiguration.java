@@ -66,6 +66,7 @@ public class AppConfiguration {
     public class Urls {
         private String webUrl;
         private String confirmUrl;
+        private String emailConfirmUrl;
         private String resetUrl;
     }
 
