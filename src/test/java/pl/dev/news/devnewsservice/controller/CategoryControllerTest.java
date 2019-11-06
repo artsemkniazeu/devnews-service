@@ -11,6 +11,7 @@ import pl.dev.news.model.rest.RestCategoryModel;
 import pl.dev.news.model.rest.RestTokenResponse;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -64,6 +65,18 @@ public class CategoryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testDeleteCategoryNotFound() throws Exception {
+        // given
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
+        // when
+        mockMvc.perform(delete(deleteCategoryPath, UUID.randomUUID())
+                .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
+                // then
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testGetCategories() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
@@ -95,6 +108,17 @@ public class CategoryControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void testGetCategoryNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        mockMvc.perform(
+                get(PathUtils.generate(getCategoryPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     public void testUpdateCategory() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
@@ -109,5 +133,18 @@ public class CategoryControllerTest extends AbstractIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[?(@.id == '" + entity.getId() + "')]").exists())
                 .andExpect(jsonPath("$[?(@.name == '" + model.getName() + "')]").exists());
+    }
+
+    @Test
+    public void testUpdateCategoryNotFound() throws Exception {
+        final UserEntity user = createUser(USER);
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
+        final RestCategoryModel model = TestUtils.restCategoryModel();
+        mockMvc.perform(
+                put(PathUtils.generate(updateCategoryPath, UUID.randomUUID()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .content(objectMapper.writeValueAsBytes(model))
+                        .contentType(APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }
