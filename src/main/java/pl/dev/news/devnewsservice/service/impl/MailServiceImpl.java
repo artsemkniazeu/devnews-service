@@ -66,17 +66,6 @@ public class MailServiceImpl implements MailService {
         return createContext(entity, "");
     }
 
-    @Override
-    public void sendWelcomeEmail(final UserEntity entity) {
-        final Map<String, Object> context = createContext(entity);
-        final String content = compileTemplate(EMAIL_WELCOME_TEMPLATE, context);
-        sendEmail(entity.getEmail(), "Email verification on DevNews", content);
-    }
-
-    private Map<String, Object> createContext(final UserEntity entity) {
-        return createContext(entity,"");
-    }
-
     private Map<String, Object> createContext(final UserEntity entity, final String buttonUrl) {
         return new ImmutableMap.Builder<String, Object>()
                 .put("webUrl", appConfiguration.getUrls().getWebUrl())
