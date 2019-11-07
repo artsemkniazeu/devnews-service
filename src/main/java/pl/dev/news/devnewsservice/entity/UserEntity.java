@@ -83,6 +83,9 @@ public class UserEntity extends BaseEntity implements UserDetails  {
     @Column(name = "last_name", columnDefinition = "citext")
     private String lastName;
 
+    @Column(name = "full_name", columnDefinition = "citext")
+    private String fullName;
+
     @Column(name = "birthday")
     private Instant birthday;
 
