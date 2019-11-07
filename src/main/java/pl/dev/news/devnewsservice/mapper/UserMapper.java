@@ -52,4 +52,13 @@ public interface UserMapper {
         entity.setFullName(model.getFirstName().concat(" ").concat(model.getLastName()));
 
     }
+
+    @AfterMapping
+    default void after(@MappingTarget final UserEntity entity, final RestSignUpRequest model) {
+        if (model == null || entity == null) {
+            return;
+        }
+        entity.setFullName(model.getFirstName().concat(" ").concat(model.getLastName()));
+
+    }
 }

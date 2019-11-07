@@ -17,7 +17,7 @@ import javax.mail.internet.MimeMessage;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 
-import static org.springframework.web.util.UriComponentsBuilder.fromPath;
+import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 @Slf4j
 @Service
@@ -37,7 +37,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void sendEmailActivationCode(final UserEntity entity) {
-        final String buttonUrl = fromPath(appConfiguration.getUrls().getConfirmUrl())
+        final String buttonUrl = fromHttpUrl(appConfiguration.getUrls().getConfirmUrl())
                 .queryParam("key", entity.getActivationKey())
                 .toUriString();
         final Map<String, Object> context = createContext(entity, buttonUrl);
@@ -54,7 +54,7 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void sendChangeEmailActivationCode(final UserEntity entity, final String key) {
-        final String buttonUrl = fromPath(appConfiguration.getUrls().getEmailConfirmUrl())
+        final String buttonUrl = fromHttpUrl(appConfiguration.getUrls().getEmailConfirmUrl())
                 .queryParam("key", key)
                 .toUriString();
         final Map<String, Object> context = createContext(entity, buttonUrl);
