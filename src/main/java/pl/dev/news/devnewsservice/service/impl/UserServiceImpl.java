@@ -208,7 +208,7 @@ public class UserServiceImpl implements UserService {
         final UserEntity follower = securityResolver.getUser();
         final UserEntity userEntity = userRepository.softFindById(userId)
                 .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
-        userEntity.addFolower(follower);
+        userEntity.addFollower(follower);
         userRepository.saveAndFlush(userEntity);
     }
 

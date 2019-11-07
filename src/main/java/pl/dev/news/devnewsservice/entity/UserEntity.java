@@ -147,7 +147,7 @@ public class UserEntity extends BaseEntity implements UserDetails  {
     private Set<UserEntity> followers;
 
 
-    public void addFolower(final UserEntity user) {
+    public void addFollower(final UserEntity user) {
         if (this.followers == null) {
             this.followers = new HashSet<>();
         }
