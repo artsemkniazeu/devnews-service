@@ -28,10 +28,31 @@ public class QueryUtils {
         return this;
     }
 
+    public QueryUtils orLikeAny(final String str, final StringPath... paths) {
+        if (str != null && str.length() > 0) {
+            final BooleanBuilder booleanBuilder = new BooleanBuilder();
+            for (final StringPath path:paths) {
+                booleanBuilder.or(path.contains(str));
+            }
+            builder.or(booleanBuilder);
+        }
+        return this;
+    }
+
     public QueryUtils andEq(final Object obj, final ComparablePath... paths) {
         if (obj != null) {
             for (final ComparablePath path:paths) {
                 builder.and(path.eq(obj));
+            }
+        }
+        return this;
+    }
+
+
+    public QueryUtils orEq(final String obj, final StringPath... paths) {
+        if (obj != null) {
+            for (final StringPath path:paths) {
+                builder.or(path.eq(obj));
             }
         }
         return this;

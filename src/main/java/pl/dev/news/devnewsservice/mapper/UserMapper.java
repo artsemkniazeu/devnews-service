@@ -1,6 +1,7 @@
 package pl.dev.news.devnewsservice.mapper;
 
 
+import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -42,4 +43,13 @@ public interface UserMapper {
     @Mapping(source = "uploadEntity", target = "bg")
     @Mapping(source = "uploadEntity.url", target = "bgUrl")
     void updateBackground(@MappingTarget UserEntity entity, UploadEntity uploadEntity);
+
+    @AfterMapping
+    default void after(@MappingTarget final UserEntity entity, final RestUserModel model) {
+        if (model == null || entity == null) {
+            return;
+        }
+        entity.setFullName(model.getFirstName().concat(" ").concat(model.getLastName()));
+
+    }
 }

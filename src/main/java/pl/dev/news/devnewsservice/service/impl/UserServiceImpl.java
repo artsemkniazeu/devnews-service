@@ -98,13 +98,20 @@ public class UserServiceImpl implements UserService {
     ) {
         final Predicate predicate = new QueryUtils()
                 .andLikeAny(parameters.getName(), qUserEntity.firstName, qUserEntity.lastName)
-                .andLikeAny(parameters.getUsername(), qUserEntity.username)
-                .andLikeAny(parameters.getEmail(), qUserEntity.email)
+                .orLikeAny(parameters.getName(), qUserEntity.fullName)
+                .orLikeAny(parameters.getUsername(), qUserEntity.username)
+                .orEq(parameters.getEmail(), qUserEntity.email)
                 .build();
         return userRepository.findAll(
                 predicate,
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
+        //return userRepository.findAll(
+        //        parameters.getName(),
+        //        parameters.getUsername(),
+        //        parameters.getEmail(),
+        //        PageRequest.of(page - 1, size)
+        //).map(userMapper::toModel);
     }
 
     @Override

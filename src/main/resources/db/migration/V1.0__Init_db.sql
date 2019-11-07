@@ -42,6 +42,7 @@ create table if not exists users
     role            text            not null,
     first_name      citext          not null,
     last_name       citext          not null,
+    full_name       citext          not null,
     birthday        timestamp,
     city            text,
     country         text,
