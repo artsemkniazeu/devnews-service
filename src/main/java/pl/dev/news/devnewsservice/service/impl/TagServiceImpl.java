@@ -63,8 +63,8 @@ public class TagServiceImpl implements TagService {
     ) {
         final Predicate predicate = new QueryUtils()
                 .andLikeAny(parameters.getName(), qTagEntity.name)
-                .andSetEq(parameters.getFollowerId(), qTagEntity.followers.any().id)
-                .andSetEq(parameters.getPostId(), qTagEntity.posts.any().id)
+                .andEq(parameters.getFollowerId(), qTagEntity.followers.any().id)
+                .andEq(parameters.getPostId(), qTagEntity.posts.any().id)
                 .build();
         return tagRepository.findAll(
                 predicate,

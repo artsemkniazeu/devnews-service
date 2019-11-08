@@ -15,6 +15,7 @@ import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestPostQueryParameters;
 import pl.dev.news.model.rest.RestUserModel;
+import pl.dev.news.model.rest.RestUserQueryParameters;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -47,12 +48,13 @@ public class UserResourcesController implements UserResourcesApi {
     @Transactional
     public ResponseEntity<List<RestUserModel>> getUserFollowers(
             @PathVariable("userId") final UUID userId,
+            @Valid final RestUserQueryParameters parameters,
             @Min(1) @Valid
             @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestUserModel> users = userResourcesService.getFollowers(userId, page, size);
+        final Page<RestUserModel> users = userResourcesService.getFollowers(userId, parameters, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(basePath, users);
         return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
     }
@@ -61,12 +63,13 @@ public class UserResourcesController implements UserResourcesApi {
     @Transactional
     public ResponseEntity<List<RestUserModel>> getUserFollowing(
             @PathVariable("userId") final UUID userId,
+            @Valid final RestUserQueryParameters parameters,
             @Min(1) @Valid
             @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestUserModel> users = userResourcesService.getFollowing(userId, page, size);
+        final Page<RestUserModel> users = userResourcesService.getFollowing(userId, parameters, page, size);
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(basePath, users);
         return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
     }

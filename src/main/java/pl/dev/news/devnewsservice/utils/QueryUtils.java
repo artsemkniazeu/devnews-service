@@ -17,6 +17,10 @@ public class QueryUtils {
         return builder.getValue();
     }
 
+    public BooleanBuilder builder() {
+        return builder;
+    }
+
     public QueryUtils andLikeAny(final String str, final StringPath... paths) {
         if (str != null && str.length() > 0) {
             final BooleanBuilder booleanBuilder = new BooleanBuilder();
@@ -48,6 +52,14 @@ public class QueryUtils {
         return this;
     }
 
+    public QueryUtils andEq(final String obj, final StringPath... paths) {
+        if (obj != null) {
+            for (final StringPath path:paths) {
+                builder.and(path.eq(obj));
+            }
+        }
+        return this;
+    }
 
     public QueryUtils orEq(final String obj, final StringPath... paths) {
         if (obj != null) {
@@ -58,11 +70,16 @@ public class QueryUtils {
         return this;
     }
 
-    public QueryUtils andSetEq(final Object obj, final ComparablePath path) {
-        if (obj != null) {
-            builder.and(path.eq(obj));
-        }
+
+    public QueryUtils and(final BooleanBuilder builder) {
+        this.builder.and(builder);
         return this;
     }
+
+    public QueryUtils or(final BooleanBuilder builder) {
+        this.builder.or(builder);
+        return this;
+    }
+
 
 }

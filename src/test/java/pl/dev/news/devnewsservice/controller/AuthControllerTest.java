@@ -65,7 +65,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restSignInRequest)))
                 // then
-                .andExpect(status().isCreated())
+                .andExpect(status().isOk())
                 .andReturn();
         final RestTokenResponse model = objectMapper.readValue(
                 response.getResponse().getContentAsString(), RestTokenResponse.class

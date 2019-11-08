@@ -64,7 +64,7 @@ public class GroupServiceImpl implements GroupService {
                 .andLikeAny(parameters.getName(), qGroupEntity.name)
                 .andLikeAny(parameters.getValue(), qGroupEntity.value)
                 .andEq(parameters.getOwnerId(), qGroupEntity.ownerId)
-                .andSetEq(parameters.getUserId(), qGroupEntity.followers.any().id)
+                .andEq(parameters.getUserId(), qGroupEntity.followers.any().id)
                 .build();
         return groupRepository.findAll(
                 predicate,

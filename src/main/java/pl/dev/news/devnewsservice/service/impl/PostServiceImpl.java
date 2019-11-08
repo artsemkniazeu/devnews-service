@@ -80,8 +80,8 @@ public class PostServiceImpl implements PostService {
         final Predicate predicate = new QueryUtils()
                 .andLikeAny(parameters.getTitle(), qPostEntity.title)
                 .andLikeAny(parameters.getText(), qPostEntity.text)
-                .andSetEq(parameters.getTagId(), qPostEntity.tags.any().id)
-                .andSetEq(parameters.getCategoryId(), qPostEntity.categories.any().id)
+                .andEq(parameters.getTagId(), qPostEntity.tags.any().id)
+                .andEq(parameters.getCategoryId(), qPostEntity.categories.any().id)
                 .andEq(parameters.getGroupId(), qPostEntity.group.id)
                 .andEq(parameters.getPublisherId(), qPostEntity.publisherId)
                 .build();

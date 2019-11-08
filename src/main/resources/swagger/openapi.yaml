@@ -499,6 +499,12 @@ paths:
       security:
         - userAuth: []
       parameters:
+        - name: parameters
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -532,6 +538,12 @@ paths:
       security:
         - userAuth: []
       parameters:
+        - name: parameters
+          in: query
+          schema:
+            $ref: "#/components/schemas/UserQueryParameters"
+          style: form
+          explode: true
         - $ref: "#/components/parameters/PageQueryParameter"
         - $ref: "#/components/parameters/SizeQueryParameter"
       responses:
@@ -1354,6 +1366,9 @@ components:
         email:
           type: string
           format: email
+        id:
+          type: string
+          format: uuid
 
     CategoryQueryParameters:
       type: object

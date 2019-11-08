@@ -279,7 +279,7 @@ public class UserControllerTest extends AbstractIntegrationTest {
 
         Assert.assertTrue(
                 userResourcesService
-                        .getFollowers(follower.getId(), 1, 10)
+                        .getFollowers(follower.getId(), parameters, 1, 10)
                         .getContent()
                 .contains(userMapper.toModel(userEntity))
         );
@@ -292,7 +292,7 @@ public class UserControllerTest extends AbstractIntegrationTest {
 
         Assert.assertTrue(
                 userResourcesService
-                        .getFollowers(follower.getId(), 1, 10)
+                        .getFollowers(follower.getId(), parameters, 1, 10)
                         .getContent()
                 .isEmpty()
         );

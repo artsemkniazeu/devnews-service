@@ -1,5 +1,6 @@
 package pl.dev.news.devnewsservice.service.impl;
 
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestPostQueryParameters;
 import pl.dev.news.model.rest.RestUserModel;
+import pl.dev.news.model.rest.RestUserQueryParameters;
 
 import java.util.UUID;
 
@@ -45,7 +47,7 @@ public class UserResourcesServiceImpl implements UserResourcesService {
             final Integer size
     ) {
         final Predicate predicate = new QueryUtils()
-                .andSetEq(userId, qPostEntity.usersSaved.any().id)
+                .andEq(userId, qPostEntity.usersSaved.any().id)
                 .build();
         return postRepository.findAll(
                 predicate,
@@ -55,26 +57,49 @@ public class UserResourcesServiceImpl implements UserResourcesService {
 
     @Override
     @Transactional
-    public Page<RestUserModel> getFollowers(final UUID userId, final Integer page, final Integer size) {
+    public Page<RestUserModel> getFollowers(
+            final UUID userId,
+            final RestUserQueryParameters parameters,
+            final Integer page,
+            final Integer size
+    ) {
+        final QUserEntity following = QUserEntity.userEntity.followingUsers.any();
         final Predicate predicate = new QueryUtils()
-                .andSetEq(userId, qUserEntity.followingUsers.any().id)
+                .andEq(userId, following.id)
+                .andEq(parameters.getId(), qUserEntity.id)
+                .and(findByParams(parameters))
                 .build();
         return userRepository.findAll(
                 predicate,
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
-
     }
 
     @Override
     @Transactional
-    public Page<RestUserModel> getFollowing(final UUID userId, final Integer page, final Integer size) {
+    public Page<RestUserModel> getFollowing(
+            final UUID userId,
+            final RestUserQueryParameters parameters,
+            final Integer page,
+            final Integer size
+    ) {
+        final QUserEntity followers = QUserEntity.userEntity.followers.any();
         final Predicate predicate = new QueryUtils()
-                .andSetEq(userId, qUserEntity.followers.any().id)
+                .andEq(userId, followers.id)
+                .andEq(parameters.getId(), qUserEntity.id)
+                .and(findByParams(parameters))
                 .build();
         return userRepository.findAll(
                 predicate,
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
+    }
+
+    private BooleanBuilder findByParams(final RestUserQueryParameters parameters) {
+        return new QueryUtils()
+                .orEq(parameters.getEmail(), qUserEntity.email)
+                .orLikeAny(parameters.getName(), qUserEntity.fullName)
+                .orLikeAny(parameters.getUsername(), qUserEntity.username)
+                .builder();
     }
 }
