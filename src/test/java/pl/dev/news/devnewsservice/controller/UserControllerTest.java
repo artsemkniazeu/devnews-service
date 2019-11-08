@@ -14,6 +14,7 @@ import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestTokenResponse;
 import pl.dev.news.model.rest.RestUserModel;
+import pl.dev.news.model.rest.RestUserQueryParameters;
 
 import java.util.UUID;
 
@@ -271,6 +272,8 @@ public class UserControllerTest extends AbstractIntegrationTest {
         final UserEntity userEntity = createUser(USER);
         final UserEntity follower = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        final RestUserQueryParameters parameters = new RestUserQueryParameters();
+
         mockMvc.perform(
                 post(PathUtils.generate(followUserPath, follower.getId()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())

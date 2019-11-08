@@ -12,7 +12,7 @@ public interface UserResourcesService {
 
     Page<RestPostModel> getBookmarks(UUID userId, RestPostQueryParameters parameters, Integer page, Integer size);
 
-    Page<RestUserModel> getFollowers(UUID userId, final RestUserQueryParameters parameters, Integer page, Integer size);
+    Page<RestUserModel> getFollowers(UUID userId, RestUserQueryParameters parameters, Integer page, Integer size);
 
-    Page<RestUserModel> getFollowing(UUID userId, final RestUserQueryParameters parameters, Integer page, Integer size);
+    Page<RestUserModel> getFollowing(UUID userId, RestUserQueryParameters parameters, Integer page, Integer size);
 }

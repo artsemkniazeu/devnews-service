@@ -100,6 +100,6 @@ public class UserResourcesServiceImpl implements UserResourcesService {
                 .orEq(parameters.getEmail(), qUserEntity.email)
                 .orLikeAny(parameters.getName(), qUserEntity.fullName)
                 .orLikeAny(parameters.getUsername(), qUserEntity.username)
-                .builder();
+                .getBuilder();
     }
 }

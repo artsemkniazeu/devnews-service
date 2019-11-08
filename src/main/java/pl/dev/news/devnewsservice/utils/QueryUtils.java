@@ -17,7 +17,7 @@ public class QueryUtils {
         return builder.getValue();
     }
 
-    public BooleanBuilder builder() {
+    public BooleanBuilder getBuilder() {
         return builder;
     }
 
