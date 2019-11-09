@@ -14,6 +14,7 @@ import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.PostRepository;
 import pl.dev.news.devnewsservice.repository.UserRepository;
 import pl.dev.news.devnewsservice.service.UserResourcesService;
+import pl.dev.news.devnewsservice.utils.CommonUtils;
 import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestPostQueryParameters;
@@ -89,8 +90,17 @@ public class UserResourcesServiceImpl implements UserResourcesService {
                 .andEq(parameters.getId(), qUserEntity.id)
                 .and(findByParams(parameters))
                 .build();
-        return userRepository.findAll(
-                predicate,
+        //return userRepository.findAll(
+        //        predicate,
+        //        PageRequest.of(page - 1, size)
+        //).map(userMapper::toModel);
+
+        return userRepository.findAllFollowing(
+                userId,
+                CommonUtils.nullSafeToString(parameters.getId()),
+                parameters.getEmail(),
+                parameters.getName(),
+                parameters.getUsername(),
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
     }
