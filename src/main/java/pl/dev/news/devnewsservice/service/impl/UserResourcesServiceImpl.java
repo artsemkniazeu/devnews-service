@@ -1,6 +1,5 @@
 package pl.dev.news.devnewsservice.service.impl;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -64,14 +63,12 @@ public class UserResourcesServiceImpl implements UserResourcesService {
             final Integer page,
             final Integer size
     ) {
-        final QUserEntity following = QUserEntity.userEntity.followingUsers.any();
-        final Predicate predicate = new QueryUtils()
-                .andEq(userId, following.id)
-                .andEq(parameters.getId(), qUserEntity.id)
-                .and(findByParams(parameters))
-                .build();
-        return userRepository.findAll(
-                predicate,
+        return userRepository.findAllFollowers(
+                userId,
+                CommonUtils.nullSafeToString(parameters.getId()),
+                parameters.getEmail(),
+                parameters.getName(),
+                parameters.getUsername(),
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
     }
@@ -84,17 +81,6 @@ public class UserResourcesServiceImpl implements UserResourcesService {
             final Integer page,
             final Integer size
     ) {
-        final QUserEntity followers = QUserEntity.userEntity.followers.any();
-        final Predicate predicate = new QueryUtils()
-                .andEq(userId, followers.id)
-                .andEq(parameters.getId(), qUserEntity.id)
-                .and(findByParams(parameters))
-                .build();
-        //return userRepository.findAll(
-        //        predicate,
-        //        PageRequest.of(page - 1, size)
-        //).map(userMapper::toModel);
-
         return userRepository.findAllFollowing(
                 userId,
                 CommonUtils.nullSafeToString(parameters.getId()),
@@ -105,11 +91,4 @@ public class UserResourcesServiceImpl implements UserResourcesService {
         ).map(userMapper::toModel);
     }
 
-    private BooleanBuilder findByParams(final RestUserQueryParameters parameters) {
-        return new QueryUtils()
-                .orEq(parameters.getEmail(), qUserEntity.email)
-                .orLikeAny(parameters.getName(), qUserEntity.fullName)
-                .orLikeAny(parameters.getUsername(), qUserEntity.username)
-                .getBuilder();
-    }
 }

@@ -1,6 +1,5 @@
 package pl.dev.news.devnewsservice.service.impl;
 
-import com.querydsl.core.types.Predicate;
 import com.twilio.rest.verify.v2.service.Verification;
 import com.twilio.rest.verify.v2.service.VerificationCheck;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import pl.dev.news.devnewsservice.service.TwilioService;
 import pl.dev.news.devnewsservice.service.UploadService;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.ImageUtils;
-import pl.dev.news.devnewsservice.utils.QueryUtils;
 import pl.dev.news.devnewsservice.utils.SerializationUtils;
 import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestPhoneModel;
@@ -96,22 +94,12 @@ public class UserServiceImpl implements UserService {
             final Integer page,
             final Integer size
     ) {
-        final Predicate predicate = new QueryUtils()
-                .andLikeAny(parameters.getName(), qUserEntity.firstName, qUserEntity.lastName)
-                .orLikeAny(parameters.getName(), qUserEntity.fullName)
-                .orLikeAny(parameters.getUsername(), qUserEntity.username)
-                .orEq(parameters.getEmail(), qUserEntity.email)
-                .build();
         return userRepository.findAll(
-                predicate,
+                parameters.getEmail(),
+                parameters.getName(),
+                parameters.getUsername(),
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
-        //return userRepository.findAll(
-        //        parameters.getName(),
-        //        parameters.getUsername(),
-        //        parameters.getEmail(),
-        //        PageRequest.of(page - 1, size)
-        //).map(userMapper::toModel);
     }
 
     @Override
