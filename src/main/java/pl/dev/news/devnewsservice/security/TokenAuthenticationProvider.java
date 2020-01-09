@@ -6,8 +6,8 @@ import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 import pl.dev.news.devnewsservice.entity.UserEntity;
-import pl.dev.news.devnewsservice.exception.BadCredentialsException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
+import pl.dev.news.devnewsservice.exception.UnauthorizedException;
 import pl.dev.news.devnewsservice.repository.UserRepository;
 
 import java.util.UUID;
@@ -22,9 +22,10 @@ import static pl.dev.news.devnewsservice.constants.ExceptionConstants.userWithId
 public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     private final TokenProvider tokenProvider;
-    private final TokenValidator tokenValidator;
-    private final UserRepository userRepository;
 
+    private final TokenValidator tokenValidator;
+
+    private final UserRepository userRepository;
 
     @Override
     public Authentication authenticate(final Authentication authentication) {
@@ -35,10 +36,10 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
             final UserEntity user = userRepository.softFindById(userId)
                     .orElseThrow(() -> new NotFoundException(userWithIdNotFound, userId));
             if (!user.isEnabled()) {
-                throw new BadCredentialsException(userWithIdIsNotEnabled, userId);
+                throw new UnauthorizedException(userWithIdIsNotEnabled, userId);
             }
             if (user.isLocked()) {
-                throw new BadCredentialsException(userWithIdIsLocked, userId);
+                throw new UnauthorizedException(userWithIdIsLocked, userId);
             }
             tokenAuthentication.setUserDetails(user);
             tokenAuthentication.setAuthenticated(true);

@@ -9,7 +9,9 @@ import java.util.Collection;
 public class TokenAuthentication implements Authentication {
 
     private final String token;
+
     private UserDetails userDetails;
+
     private boolean authenticated;
 
     public TokenAuthentication(final String token) {

@@ -41,7 +41,6 @@ public class TokenValidatorImpl implements TokenValidator {
 
     @Override
     public boolean validateRefreshToken(final String refreshToken) {
-
         try {
             Jwts.parser().setSigningKey(key).parseClaimsJws(refreshToken);
             return true;

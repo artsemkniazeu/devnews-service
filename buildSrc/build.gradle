@@ -10,7 +10,7 @@ repositories {
 }
 
 ext {
-    openApiVersion = '3.3.4'
+    openApiVersion = '4.2.1'
 }
 
 dependencies {
