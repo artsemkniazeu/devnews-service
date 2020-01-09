@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.QUserEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
-import pl.dev.news.devnewsservice.exception.BadCredentialsException;
 import pl.dev.news.devnewsservice.exception.ConflictException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.exception.UnauthorizedException;
@@ -76,10 +75,10 @@ public class AuthServiceImpl implements AuthService {
             throw new UnauthorizedException(incorrectPassword);
         }
         if (!userEntity.isEnabled()) {
-            throw new BadCredentialsException(userWithIdIsNotEnabled, userEntity.getId());
+            throw new UnauthorizedException(userWithIdIsNotEnabled, userEntity.getId());
         }
         if (userEntity.isLocked()) {
-            throw new BadCredentialsException(userWithIdIsLocked, userEntity.getId());
+            throw new UnauthorizedException(userWithIdIsLocked, userEntity.getId());
         }
         return tokenProvider.createTokenModel(userEntity);
     }
