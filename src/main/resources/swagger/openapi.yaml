@@ -1598,8 +1598,10 @@ components:
           type: string
         about:
           type: string
-        nsfw:
-          type: boolean
+        imageUrl:
+          type: string
+        bgUrl:
+            type: string
         owner_id:
           type: string
           format: uuid

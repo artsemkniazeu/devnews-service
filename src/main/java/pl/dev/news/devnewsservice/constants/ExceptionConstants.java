@@ -14,6 +14,7 @@ public class ExceptionConstants {
     // ConflictException
     public static String userWithEmailDeleted = "Account with email {} was deleted!";
     public static String userWithEmailAlreadyExists = "User with email {} is already exists";
+    public static String groupWithValueAlreadyExists = "Group with value {} is already exists";
 
     // UnauthorizedException
     public static String incorrectPassword = "Incorrect password";

@@ -53,11 +53,11 @@ server:
   port: "${PORT:8080}"
 
 ---
-#logging:
-#  level:
-#    org.hibernate.ejb.HibernatePersistence: DEBUG
-#    org.hibernate: DEBUG
-#    org.postgresql.jdbc: DEBUG
+logging:
+  level:
+    org.hibernate.ejb.HibernatePersistence: DEBUG
+    org.hibernate: DEBUG
+    org.postgresql.jdbc: DEBUG
 ---
 
 spring:

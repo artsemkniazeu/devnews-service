@@ -32,17 +32,20 @@ import java.util.UUID;
 @Table(name = "groups")
 public class GroupEntity extends BaseEntity {
 
-    @Column(name = "name")
+    @Column(name = "name", columnDefinition = "citext")
     private String name;
 
-    @Column(name = "value")
+    @Column(name = "value", columnDefinition = "citext")
     private String value;
 
     @Column(name = "about")
     private String about;
 
-    @Column(name = "nsfw")
-    private Boolean nsfw;
+    @Column(name = "image_url")
+    private String imageUrl;
+
+    @Column(name = "bg_url")
+    private String bgUrl;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

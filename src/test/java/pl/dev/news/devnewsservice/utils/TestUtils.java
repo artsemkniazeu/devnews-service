@@ -146,7 +146,8 @@ public class TestUtils {
                 .name(name)
                 .value(value)
                 .about(faker.lorem().paragraph())
-                .nsfw(false)
+                .imageUrl(faker.internet().url())
+                .bgUrl(faker.internet().url())
                 .ownerId(ownerId);
     }
 

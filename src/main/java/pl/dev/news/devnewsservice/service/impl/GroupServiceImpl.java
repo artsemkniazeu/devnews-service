@@ -1,25 +1,27 @@
 package pl.dev.news.devnewsservice.service.impl;
 
-import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.GroupEntity;
 import pl.dev.news.devnewsservice.entity.QGroupEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
+import pl.dev.news.devnewsservice.exception.ConflictException;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.GroupMapper;
 import pl.dev.news.devnewsservice.repository.GroupRepository;
 import pl.dev.news.devnewsservice.security.SecurityResolver;
 import pl.dev.news.devnewsservice.service.GroupService;
-import pl.dev.news.devnewsservice.utils.QueryUtils;
+import pl.dev.news.devnewsservice.utils.CommonUtils;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestGroupQueryParameters;
 
 import java.util.UUID;
 
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithIdNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithValueAlreadyExists;
 
 @Service
 @RequiredArgsConstructor
@@ -31,8 +33,13 @@ public class GroupServiceImpl implements GroupService {
     private final QGroupEntity qGroupEntity = QGroupEntity.groupEntity;
 
     @Override
+    @Transactional
     public RestGroupModel create(final RestGroupModel model) {
+        if (groupRepository.exists(qGroupEntity.value.eq(model.getValue()))) {
+            throw new ConflictException(groupWithValueAlreadyExists, model.getValue());
+        }
         final UserEntity user = securityResolver.getUser();
+
         final GroupEntity entity = groupMapper.toEntity(model);
         entity.setOwner(user);
         final GroupEntity saved = groupRepository.saveAndFlush(entity);
@@ -40,6 +47,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public void delete(final UUID groupId) {
         if (!groupRepository.softExistsById(groupId)) {
             throw new NotFoundException(groupWithIdNotFound, groupId);
@@ -48,6 +56,7 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public RestGroupModel retrieve(final UUID groupId) {
         final GroupEntity entity = groupRepository.softFindById(groupId)
                 .orElseThrow(() -> new NotFoundException(groupWithIdNotFound, groupId));
@@ -55,24 +64,23 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    @Transactional
     public Page<RestGroupModel> retrieveAll(
             final RestGroupQueryParameters parameters,
             final Integer page,
             final Integer size
     ) {
-        final Predicate predicate = new QueryUtils()
-                .andLikeAny(parameters.getName(), qGroupEntity.name)
-                .andLikeAny(parameters.getValue(), qGroupEntity.value)
-                .andEq(parameters.getOwnerId(), qGroupEntity.ownerId)
-                .andEq(parameters.getUserId(), qGroupEntity.followers.any().id)
-                .build();
         return groupRepository.findAll(
-                predicate,
+                parameters.getUserId(),
+                parameters.getOwnerId(),
+                CommonUtils.nullSafeToString(parameters.getName()),
+                CommonUtils.nullSafeToString(parameters.getValue()),
                 PageRequest.of(page - 1, size)
         ).map(groupMapper::toModel);
     }
 
     @Override
+    @Transactional
     public RestGroupModel update(final UUID groupId, final RestGroupModel model) {
         final GroupEntity entity = groupRepository.softFindById(groupId)
                 .orElseThrow(() -> new NotFoundException(groupWithIdNotFound, groupId));

@@ -83,10 +83,11 @@ create table if not exists groups
     created_at      timestamp       not null,
     deleted_at      timestamp,
     updated_at      timestamp,
-    name            text            not null,
-    value           text            not null,
+    name            citext          not null,
+    value           citext          not null unique,
     about           text,
-    nsfw            bool            default false,
+    image_url       text,
+    bg_url          text,
     owner_id        uuid            not null references users (id)
 );
 

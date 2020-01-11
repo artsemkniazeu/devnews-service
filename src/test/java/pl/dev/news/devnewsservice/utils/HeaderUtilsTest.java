@@ -22,8 +22,8 @@ public class HeaderUtilsTest {
         final Page<RestUserModel> page = new PageImpl<>(userModels, PageRequest.of(1, 2), userModels.size());
         final HttpHeaders headers = HeaderUtils.generatePaginationHeaders("baseurl/", page);
         final List<String> link = headers.get(HttpHeaders.LINK);
-        final String expected = "<baseurl/?page=1&size=2>; rel=\"first\", <baseurl/?page=1&size=2>; rel=\"prev\", "
-                + "<baseurl/?page=1&size=2>; rel=\"next\", <baseurl/?page=5&size=2>; rel=\"last\"";
+        final String expected = "<baseurl/?page=1&size=2>; rel=\"first\", <baseurl/?page=1&size=2>; rel=\"prev\","
+                + " <baseurl/?page=3&size=2>; rel=\"next\", <baseurl/?page=5&size=2>; rel=\"last\"";
         Assert.assertEquals(expected, link.get(0));
     }
 }

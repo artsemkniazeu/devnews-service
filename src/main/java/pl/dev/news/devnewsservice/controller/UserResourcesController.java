@@ -6,7 +6,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import pl.dev.news.controller.api.UserResourcesApi;
@@ -30,7 +29,6 @@ public class UserResourcesController implements UserResourcesApi {
     private final UserResourcesService userResourcesService;
 
     @Override
-    @Transactional
     public ResponseEntity<List<RestPostModel>> getUserBookmarks(
             @PathVariable("userId") final UUID userId,
             @Valid final RestPostQueryParameters parameters,
@@ -45,7 +43,6 @@ public class UserResourcesController implements UserResourcesApi {
     }
 
     @Override
-    @Transactional
     public ResponseEntity<List<RestUserModel>> getUserFollowers(
             @PathVariable("userId") final UUID userId,
             @Valid final RestUserQueryParameters parameters,
@@ -60,7 +57,6 @@ public class UserResourcesController implements UserResourcesApi {
     }
 
     @Override
-    @Transactional
     public ResponseEntity<List<RestUserModel>> getUserFollowing(
             @PathVariable("userId") final UUID userId,
             @Valid final RestUserQueryParameters parameters,

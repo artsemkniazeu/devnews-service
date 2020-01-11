@@ -16,6 +16,7 @@ public class WebConfiguration {
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addExposedHeader("Authorization");
+        corsConfiguration.addExposedHeader("Link");
         corsConfiguration.addExposedHeader("X-Total-Count");
         corsConfiguration.setAllowCredentials(true);
         corsConfiguration.setMaxAge(1800L);

@@ -1,6 +1,5 @@
 package pl.dev.news.devnewsservice.controller;
 
-import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpHeaders;
@@ -50,9 +49,9 @@ public class GroupController implements GroupApi {
     @Override
     public ResponseEntity<List<RestGroupModel>> getGroups(
             @Valid final RestGroupQueryParameters parameters,
-            @Min(1) @ApiParam(value = "", defaultValue = "1")
-            @Valid @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
-            @Min(10) @Max(30) @ApiParam(value = "", defaultValue = "10") @Valid
+            @Min(1) @Valid
+            @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
+            @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
         final Page<RestGroupModel> groups = groupService.retrieveAll(parameters, page, size);

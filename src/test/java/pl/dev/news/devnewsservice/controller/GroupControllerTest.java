@@ -78,7 +78,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testGetPosts() throws Exception {
+    public void testGetGroups() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final GroupEntity entity = createGroup(user);
@@ -95,7 +95,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testGetPost() throws Exception {
+    public void testGetGroup() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final GroupEntity entity = createGroup(user);
@@ -108,7 +108,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testGetPostNotFound() throws Exception {
+    public void testGetGroupNotFound() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         mockMvc.perform(
@@ -119,7 +119,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testUpdatePost() throws Exception {
+    public void testUpdateGroup() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final RestGroupModel model = TestUtils.restGroupModel(user.getId());
@@ -136,7 +136,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
     }
 
     @Test
-    public void testUpdatePostNotFound() throws Exception {
+    public void testUpdateGroupNotFound() throws Exception {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final RestGroupModel model = TestUtils.restGroupModel(user.getId());

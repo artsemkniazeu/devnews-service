@@ -86,7 +86,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restSignInRequest)))
                 // then
-                .andExpect(status().isLocked());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test
@@ -100,7 +100,7 @@ public class AuthControllerTest extends AbstractIntegrationTest {
                 .contentType(APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(restSignInRequest)))
                 // then
-                .andExpect(status().isLocked());
+                .andExpect(status().isUnauthorized());
     }
 
     @Test

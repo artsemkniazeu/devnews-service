@@ -33,7 +33,7 @@ public final class HeaderUtils {
 
         // next link
         if (page.getNumber() + 1 < page.getTotalPages()) {
-            link.append(generatePaginationLink(methodPath, 1, page.getSize(), "next", true));
+            link.append(generatePaginationLink(methodPath, page.getNumber() + 2, page.getSize(), "next", true));
         }
 
         // last link

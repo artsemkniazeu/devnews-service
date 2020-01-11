@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+import pl.dev.news.devnewsservice.dto.UserQueryParametersDto;
 import pl.dev.news.devnewsservice.entity.QUserEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.repository.custom.CustomQueryDslRspository;
@@ -37,36 +38,37 @@ public interface UserRepository extends CustomQueryDslRspository<UserEntity, QUs
             @Param("username") String username,
             Pageable pageable
     );
-    
+
     @Query(value = "select u.* "
             + "from users u "
             + "    join user_follower uf "
             + "    on u.id = uf.user_id and uf.follower_id = :userId "
-            + "where (:id is null or :id = '' or u.id = uuid(:id)) "
-            + "    and (:email is null or :email  = '' or u.email = :email) "
-            + "    and (:email is not null or :email != '' or ( "
-            + "        (:name is null or :name = '' or u.full_name like concat('%', :name, '%')) "
-            + "        or (:username is null or :username = '' or u.username like concat('%', :username, '%')) "
+            + "where (:#{#dto.id} is null or :#{#dto.id} = '' or u.id = uuid(:#{#dto.id})) "
+            + "    and (:#{#dto.email} is null or :#{#dto.email}  = '' or u.email = :#{#dto.email}) "
+            + "    and (:#{#dto.email} is not null or :#{#dto.email} != '' or ( "
+            + "        (:#{#dto.name} is null or :#{#dto.name} = '' "
+            + "                 or u.full_name like concat('%', :#{#dto.name}, '%')) "
+            + "        or (:#{#dto.username} is null or :#{#dto.username} = '' "
+            + "                 or u.username like concat('%', :#{#dto.username}, '%')) "
             + "    )) "
             + "    and u.deleted_at is null",
             countQuery = "select count(u.id) "
                     + "from users u "
                     + "    join user_follower uf "
                     + "    on u.id = uf.user_id and uf.follower_id = :userId "
-                    + "where (:id is null or :id = '' or u.id = uuid(:id)) "
-                    + "    and (:email is null or :email  = '' or u.email = :email) "
-                    + "    and (:email is not null or :email != '' or ( "
-                    + "        (:name is null or :name = '' or u.full_name like concat('%', :name, '%')) "
-                    + "        or (:username is null or :username = '' or u.username like concat('%', :username, '%')) "
+                    + "where (:#{#dto.id} is null or :#{#dto.id} = '' or u.id = uuid(:#{#dto.id})) "
+                    + "    and (:#{#dto.email} is null or :#{#dto.email}  = '' or u.email = :#{#dto.email}) "
+                    + "    and (:#{#dto.email} is not null or :#{#dto.email} != '' or ( "
+                    + "        (:#{#dto.name} is null or :#{#dto.name} = '' "
+                    + "                 or u.full_name like concat('%', :#{#dto.name}, '%')) "
+                    + "        or (:#{#dto.username} is null or :#{#dto.username} = '' "
+                    + "                 or u.username like concat('%', :#{#dto.username}, '%')) "
                     + "    )) "
                     + "    and u.deleted_at is null",
             nativeQuery = true)
     Page<UserEntity> findAllFollowing(
             @Param("userId") UUID userId,
-            @Param("id") String id,
-            @Param("email") String email,
-            @Param("name") String name,
-            @Param("username") String username,
+            @Param("dto") UserQueryParametersDto dto,
             Pageable pageable
     );
 
@@ -75,31 +77,32 @@ public interface UserRepository extends CustomQueryDslRspository<UserEntity, QUs
             + "from users u "
             + "    join user_follower uf "
             + "    on u.id = uf.follower_id and uf.user_id = :userId "
-            + "where (:id is null or :id = '' or uf.follower_id = uuid(:id)) "
-            + "    and (:email is null or :email  = '' or u.email = :email) "
-            + "    and (:email is not null or :email != '' or ( "
-            + "        (:name is null or :name = '' or u.full_name like concat('%', :name, '%')) "
-            + "        or (:username is null or :username = '' or u.username like concat('%', :username, '%')) "
+            + "where (:#{#dto.id} is null or :#{#dto.id} = '' or uf.follower_id = uuid(:#{#dto.id})) "
+            + "    and (:#{#dto.email} is null or :#{#dto.email}  = '' or u.email = :#{#dto.email}) "
+            + "    and (:#{#dto.email} is not null or :#{#dto.email} != '' or ( "
+            + "        (:#{#dto.name} is null or :#{#dto.name} = '' "
+            + "                 or u.full_name like concat('%', :#{#dto.name}, '%')) "
+            + "        or (:#{#dto.username} is null or :#{#dto.username} = '' "
+            + "                 or u.username like concat('%', :#{#dto.username}, '%')) "
             + "    )) "
             + "    and u.deleted_at is null",
             countQuery = "select count(u.id) "
                     + "from users u "
                     + "    join user_follower uf "
                     + "    on u.id = uf.follower_id and uf.user_id = :userId "
-                    + "where (:id is null or :id = '' or uf.follower_id = uuid(:id)) "
-                    + "    and (:email is null or :email  = '' or u.email = :email) "
-                    + "    and (:email is not null or :email != '' or ( "
-                    + "        (:name is null or :name = '' or u.full_name like concat('%', :name, '%')) "
-                    + "        or (:username is null or :username = '' or u.username like concat('%', :username, '%')) "
+                    + "where (:#{#dto.id} is null or :#{#dto.id} = '' or uf.follower_id = uuid(:#{#dto.id})) "
+                    + "    and (:#{#dto.email} is null or :#{#dto.email}  = '' or u.email = :#{#dto.email}) "
+                    + "    and (:#{#dto.email} is not null or :#{#dto.email} != '' or ( "
+                    + "        (:#{#dto.name} is null or :#{#dto.name} = '' "
+                    + "                 or u.full_name like concat('%', :#{#dto.name}, '%')) "
+                    + "        or (:#{#dto.username} is null or :#{#dto.username} = '' "
+                    + "                 or u.username like concat('%', :#{#dto.username}, '%')) "
                     + "    )) "
                     + "    and u.deleted_at is null",
             nativeQuery = true)
     Page<UserEntity> findAllFollowers(
             @Param("userId") UUID userId,
-            @Param("id") String id,
-            @Param("email") String email,
-            @Param("name") String name,
-            @Param("username") String username,
+            @Param("dto") UserQueryParametersDto dto,
             Pageable pageable
     );
 
