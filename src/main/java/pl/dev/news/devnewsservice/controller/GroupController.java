@@ -14,6 +14,7 @@ import pl.dev.news.devnewsservice.service.GroupService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestGroupQueryParameters;
+import pl.dev.news.model.rest.RestIdModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -28,45 +29,64 @@ public class GroupController implements GroupApi {
     private final GroupService groupService;
 
     @Override
-    public ResponseEntity<RestGroupModel> createGroup(@Valid @RequestBody final RestGroupModel restGroupModel) {
+    public ResponseEntity<RestGroupModel> create(@Valid @RequestBody final RestGroupModel restGroupModel) {
         final RestGroupModel model = groupService.create(restGroupModel);
-        final HttpHeaders headers = HeaderUtils.generateLocationHeader(getGroupPath, model.getId());
+        final HttpHeaders headers = HeaderUtils.generateLocationHeader(retrievePath, model.getId());
         return new ResponseEntity<>(model, headers, HttpStatus.CREATED);
     }
 
     @Override
-    public ResponseEntity<Void> deleteGroup(@PathVariable("groupId") final UUID groupId) {
+    public ResponseEntity<RestGroupModel> update(
+            @PathVariable("groupId") final UUID groupId,
+            @Valid @RequestBody final RestGroupModel restGroupModel
+    ) {
+        final RestGroupModel model = groupService.update(groupId, restGroupModel);
+        return new ResponseEntity<>(model, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<Void> delete(@PathVariable("groupId") final UUID groupId) {
         groupService.delete(groupId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @Override
-    public ResponseEntity<RestGroupModel> getGroup(@PathVariable("groupId") final UUID groupId) {
+    public ResponseEntity<RestGroupModel> retrieve(@PathVariable("groupId") final UUID groupId) {
         final RestGroupModel model = groupService.retrieve(groupId);
         return new ResponseEntity<>(model, HttpStatus.OK);
     }
 
     @Override
-    public ResponseEntity<List<RestGroupModel>> getGroups(
+    public ResponseEntity<List<RestGroupModel>> find(
             @Valid final RestGroupQueryParameters parameters,
             @Min(1) @Valid
             @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
             @Min(10) @Max(30) @Valid
             @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
     ) {
-        final Page<RestGroupModel> groups = groupService.retrieveAll(parameters, page, size);
-        final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(getGroupsPath, groups);
+        final Page<RestGroupModel> groups = groupService.find(parameters, page, size);
+        final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(findPath, groups);
         return new ResponseEntity<>(groups.getContent(), headers, HttpStatus.OK);
-
     }
 
     @Override
-    public ResponseEntity<RestGroupModel> updateGroup(
-            @PathVariable("groupId") final UUID groupId,
-            @Valid @RequestBody final RestGroupModel restGroupModel
+    public ResponseEntity<Void> unfollowMultiple(
+            @Valid @RequestBody final List<RestIdModel> restIds
     ) {
-        final RestGroupModel model = groupService.update(groupId, restGroupModel);
-        return new ResponseEntity<>(model, HttpStatus.OK);
+        groupService.unfollowMultiple(restIds);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public ResponseEntity<Void> follow(@PathVariable("groupId") final UUID groupId) {
+        groupService.follow(groupId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @Override
+    public ResponseEntity<Void> unfollow(@PathVariable("groupId") final UUID groupId) {
+        groupService.unfollow(groupId);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
 }

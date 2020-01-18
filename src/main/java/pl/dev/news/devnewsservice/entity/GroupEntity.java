@@ -15,6 +15,7 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -64,4 +65,16 @@ public class GroupEntity extends BaseEntity {
     @OneToMany(mappedBy = "group")
     private Set<PostEntity> posts;
 
+    public void addFollower(final UserEntity user) {
+        if (this.followers == null) {
+            this.followers = new HashSet<>();
+        }
+        this.followers.add(user);
+    }
+
+    public void removeFollower(final UserEntity user) {
+        if (this.followers != null) {
+            this.followers.remove(user);
+        }
+    }
 }

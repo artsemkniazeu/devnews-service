@@ -1059,7 +1059,7 @@ paths:
     get:
       tags:
         - Group
-      operationId: getGroups
+      operationId: find
       security:
         - userAuth: []
       parameters:
@@ -1088,7 +1088,7 @@ paths:
     post:
       tags:
         - Group
-      operationId: createGroup
+      operationId: create
       security: []
       requestBody:
         $ref: "#/components/requestBodies/GroupRequest"
@@ -1104,6 +1104,26 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
+  "/groups/unfollow":
+    post:
+      tags:
+        - Group
+      operationId: unfollowMultiple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: "#/components/schemas/IdModel"
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
   "/groups/{groupId}":
     parameters:
       - name: groupId
@@ -1115,7 +1135,7 @@ paths:
     get:
       tags:
         - Group
-      operationId: getGroup
+      operationId: retrieve
       security:
         - userAuth: []
       responses:
@@ -1135,7 +1155,7 @@ paths:
     put:
       tags:
         - Group
-      operationId: updateGroup
+      operationId: update
       security:
         - userAuth: []
       requestBody:
@@ -1155,7 +1175,7 @@ paths:
     delete:
       tags:
         - Group
-      operationId: deleteGroup
+      operationId: delete
       security:
         - userAuth: []
       responses:
@@ -1164,42 +1184,50 @@ paths:
         "401":
           $ref: "#/components/responses/Unauthorized"
 
-  # /users/{userId}/image:
-  #   parameters:
-  #     - name: userId
-  #       in: path
-  #       required: true
-  #       schema:
-  #         type: string
-  #         format: uuid
-  #   post:
-  #     tags:
-  #       - User
-  #     operationId: uploadImage
-  #     security:
-  #       - userAuth: []
-  #     requestBody:
-  #       content:
-  #         multipart/form-data:
-  #           schema:
-  #             type: object
-  #             properties:
-  #               file:
-  #                 type: string
-  #                 format: binary
-  #     responses:
-  #       "201":
-  #         description: Created
-  #         content:
-  #           application/json:
-  #             schema:
-  #               $ref: "#/components/schemas/UploadModel"
-  #       "400":
-  #         $ref: "#/components/responses/BadRequest"
-  #       "401":
-  #         $ref: "#/components/responses/Unauthorized"
-  #       "422":
-  #         $ref: "#/components/responses/UnprocessableEntity"
+
+  "/groups/{groupId}/follow":
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags:
+        - Group
+      operationId: follow
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  "/groups/{groupId}/unfollow":
+    parameters:
+      - name: groupId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    delete:
+      tags:
+        - Group
+      operationId: unfollow
+      security:
+        - userAuth: []
+      responses:
+        "204":
+          description: No Content
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+
+
+
 components:
 
   # ========================================
@@ -1400,6 +1428,9 @@ components:
           type: string
         value:
           type: string
+        groupId:
+          type: string
+          format: uuid
         ownerId:
           type: string
           format: uuid
@@ -1452,6 +1483,13 @@ components:
     # ========================================
     # ===== Model Schemes
     # ========================================
+
+    IdModel:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
 
     UserRole:
       type: string
@@ -1602,7 +1640,7 @@ components:
           type: string
         bgUrl:
             type: string
-        owner_id:
+        ownerId:
           type: string
           format: uuid
 

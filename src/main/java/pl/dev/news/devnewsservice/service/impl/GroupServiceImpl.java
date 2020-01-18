@@ -17,8 +17,11 @@ import pl.dev.news.devnewsservice.service.GroupService;
 import pl.dev.news.devnewsservice.utils.CommonUtils;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestGroupQueryParameters;
+import pl.dev.news.model.rest.RestIdModel;
 
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithValueAlreadyExists;
@@ -65,12 +68,13 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     @Transactional
-    public Page<RestGroupModel> retrieveAll(
+    public Page<RestGroupModel> find(
             final RestGroupQueryParameters parameters,
             final Integer page,
             final Integer size
     ) {
-        return groupRepository.findAll(
+        return groupRepository.find(
+                parameters.getGroupId(),
                 parameters.getUserId(),
                 parameters.getOwnerId(),
                 CommonUtils.nullSafeToString(parameters.getName()),
@@ -88,4 +92,33 @@ public class GroupServiceImpl implements GroupService {
         final GroupEntity saved = groupRepository.saveAndFlush(entity);
         return groupMapper.toModel(saved);
     }
+
+    @Override
+    @Transactional
+    public void unfollowMultiple(final List<RestIdModel> restIds) {
+        final UserEntity user = securityResolver.getUser();
+        final List<UUID> ids = restIds.stream()
+                .map(RestIdModel::getId)
+                .collect(Collectors.toList());
+        groupRepository.unFollowAll(ids, user.getId());
+    }
+
+    @Override
+    public void follow(final UUID groupId) {
+        final UserEntity follower = securityResolver.getUser();
+        final GroupEntity groupEntity = groupRepository.softFindById(groupId)
+                .orElseThrow(() -> new NotFoundException(groupWithIdNotFound, groupId));
+        groupEntity.addFollower(follower);
+        groupRepository.saveAndFlush(groupEntity);
+    }
+
+    @Override
+    public void unfollow(final UUID groupId) {
+        final UserEntity follower = securityResolver.getUser();
+        final GroupEntity groupEntity = groupRepository.softFindById(groupId)
+                .orElseThrow(() -> new NotFoundException(groupWithIdNotFound, groupId));
+        groupEntity.removeFollower(follower);
+        groupRepository.saveAndFlush(groupEntity);
+    }
+
 }
