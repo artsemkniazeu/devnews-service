@@ -8,6 +8,8 @@ import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.mapper.context.PostMapperContext;
 import pl.dev.news.model.rest.RestPostModel;
 
+import java.time.Instant;
+
 public class DefaultPostMapperContext implements PostMapperContext {
 
     @Override
@@ -22,6 +24,7 @@ public class DefaultPostMapperContext implements PostMapperContext {
             return;
         }
         entity.setPublisher(user);
+        entity.setPublishDate(Instant.now());
         if (group != null) {
             entity.setGroup(group);
         }

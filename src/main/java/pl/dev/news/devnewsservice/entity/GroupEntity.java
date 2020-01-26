@@ -9,11 +9,13 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.util.HashSet;
 import java.util.Set;
@@ -45,8 +47,16 @@ public class GroupEntity extends BaseEntity {
     @Column(name = "image_url")
     private String imageUrl;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "image_upload_id")
+    private UploadEntity image;
+
     @Column(name = "bg_url")
     private String bgUrl;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "bg_upload_id")
+    private UploadEntity bg;
 
     @ManyToOne
     @JoinColumn(name = "owner_id")

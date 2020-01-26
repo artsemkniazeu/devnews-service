@@ -88,7 +88,9 @@ create table if not exists groups
     about           text,
     image_url       text,
     bg_url          text,
-    owner_id        uuid            not null references users (id)
+    owner_id        uuid            not null references users (id),
+    image_upload_id uuid, -- reference
+    bg_upload_id    uuid  -- reference
 );
 
 create index if not exists groups_owner_id on groups (owner_id);
@@ -194,3 +196,9 @@ add constraint users_uploads_image_upload_id foreign key (image_upload_id) refer
 
 alter table users
 add constraint users_uploads_bg_upload_id foreign key (bg_upload_id) references uploads (id);
+
+alter table groups
+add constraint groups_uploads_image_upload_id foreign key (image_upload_id) references uploads (id);
+
+alter table groups
+add constraint groups_uploads_bg_upload_id foreign key (bg_upload_id) references uploads (id);

@@ -8,13 +8,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import pl.dev.news.controller.api.GroupApi;
 import pl.dev.news.devnewsservice.service.GroupService;
 import pl.dev.news.devnewsservice.utils.HeaderUtils;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestGroupQueryParameters;
 import pl.dev.news.model.rest.RestIdModel;
+import pl.dev.news.model.rest.RestUploadModel;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Max;
@@ -89,4 +92,21 @@ public class GroupController implements GroupApi {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @Override
+    public ResponseEntity<RestUploadModel> uploadGroupBackground(
+            @PathVariable("groupId") final UUID groupId,
+            @Valid @RequestPart("file")  final MultipartFile file
+    ) {
+        final RestUploadModel restUploadModel = groupService.uploadBackground(groupId, file);
+        return new ResponseEntity<>(restUploadModel, HttpStatus.CREATED);
+    }
+
+    @Override
+    public ResponseEntity<RestUploadModel> uploadGroupImage(
+            @PathVariable("groupId") final UUID groupId,
+            @Valid @RequestPart("file")  final MultipartFile file
+    ) {
+        final RestUploadModel restUploadModel = groupService.uploadImage(groupId, file);
+        return new ResponseEntity<>(restUploadModel, HttpStatus.CREATED);
+    }
 }
