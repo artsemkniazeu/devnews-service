@@ -38,6 +38,7 @@ public interface PostMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "publishDate", ignore = true)
     @Mapping(target = "categories", ignore = true)
     @Mapping(target = "uploads", ignore = true)
     void update(@MappingTarget PostEntity entity, RestPostModel model, @Context PostMapperContext context);
