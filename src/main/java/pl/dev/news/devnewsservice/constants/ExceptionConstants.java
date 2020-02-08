@@ -8,8 +8,8 @@ public class ExceptionConstants {
     public static String tagWithIdNotFound = "Tag with id {} could not be found";
     public static String postWithIdNotFound = "Post with id {} could not be found";
     public static String groupWithIdNotFound = "Group with id {} could not be found";
-
     public static String categoryWithIdNotFound = "Category with id {} not be found";
+    public static String commentWithIdNotFound = "Comment with id {} not be found";
 
     // ConflictException
     public static String userWithEmailDeleted = "Account with email {} was deleted!";

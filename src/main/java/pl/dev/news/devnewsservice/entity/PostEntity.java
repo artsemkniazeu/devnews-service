@@ -104,6 +104,12 @@ public class PostEntity extends AuditableEntity {
     })
     private Set<UploadEntity> uploads;
 
+    @OneToMany(mappedBy = "post", cascade = {
+            CascadeType.DETACH,
+            CascadeType.REFRESH
+    })
+    private Set<CommentEntity> comments;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id")
     private GroupEntity group;
@@ -117,9 +123,5 @@ public class PostEntity extends AuditableEntity {
 
     public void addCategory(final CategoryEntity category) {
         this.categories.add(category);
-    }
-
-    public void addUpload(final UploadEntity upload) {
-        this.uploads.add(upload);
     }
 }

@@ -57,23 +57,6 @@ create table if not exists users
 );
 
 
---- Comments
-
-create table if not exists comments
-(
-    id              uuid            not null primary key,
-    created_at      timestamp       not null,
-    deleted_at      timestamp,
-    updated_at      timestamp,
-    likes           bigint          not null,
-    text            text            not null,
-    parent_id       uuid            not null references comments (id),
-    user_id         uuid            not null references users (id)
-);
-
-create index if not exists comments_parent_id on comments (parent_id);
-
-create index if not exists comments_user_id on comments (user_id);
 
 -- Groups
 
@@ -115,6 +98,26 @@ create table if not exists posts
 create index if not exists posts_publisher_id on posts (publisher_id);
 
 create index if not exists posts_group_id on posts (group_id);
+
+
+--- Comments
+
+create table if not exists comments
+(
+    id              uuid            not null primary key,
+    created_at      timestamp       not null,
+    deleted_at      timestamp,
+    updated_at      timestamp,
+    likes           bigint          not null default 0,
+    text            text            not null,
+    parent_id       uuid            references comments (id),
+    user_id         uuid            not null references users (id),
+    post_id         uuid            not null references posts (id)
+);
+
+create index if not exists comments_parent_id on comments (parent_id);
+
+create index if not exists comments_user_id on comments (user_id);
 
 
 --- Uploads

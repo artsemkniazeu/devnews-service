@@ -1378,7 +1378,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/TagModel"
+            $ref: "#/components/schemas/CommentModel"
       required: true
 
     PostRequest:
@@ -1681,12 +1681,15 @@ components:
         id:
           type: string
           format: uuid
+        postId:
+          type: string
+          format: uuid
         text:
           type: string
         likes:
           type: integer
           format: int64
-        parent_id:
+        parentId:
           type: string
           format: uuid
         children:
