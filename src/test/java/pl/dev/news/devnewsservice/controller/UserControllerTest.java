@@ -1,11 +1,8 @@
 package pl.dev.news.devnewsservice.controller;
 
 
-import com.google.cloud.storage.Blob;
-import com.google.cloud.storage.BlobId;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.mock.web.MockMultipartFile;
 import pl.dev.news.devnewsservice.AbstractIntegrationTest;
 import pl.dev.news.devnewsservice.entity.UserEntity;
@@ -19,8 +16,6 @@ import pl.dev.news.model.rest.RestUserQueryParameters;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -370,12 +365,5 @@ public class UserControllerTest extends AbstractIntegrationTest {
                 .andExpect(status().isConflict());
     }
 
-    private void mockBucketUpload(final String url) {
-        final Blob blob = Mockito.mock(Blob.class);
-        final BlobId blobId = BlobId.of("", "", 1L);
-        when(blob.getMediaLink()).thenReturn(url);
-        when(blob.getBlobId()).thenReturn(blobId);
-        when(fileService.bucketUpload(any(), any()))
-                .thenReturn(blob);
-    }
+
 }

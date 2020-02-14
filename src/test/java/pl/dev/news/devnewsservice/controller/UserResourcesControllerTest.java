@@ -2,6 +2,7 @@ package pl.dev.news.devnewsservice.controller;
 
 import org.junit.Test;
 import pl.dev.news.devnewsservice.AbstractIntegrationTest;
+import pl.dev.news.devnewsservice.entity.GroupEntity;
 import pl.dev.news.devnewsservice.entity.PostEntity;
 import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.utils.PathUtils;
@@ -20,6 +21,7 @@ import static pl.dev.news.controller.api.UserApi.followUserPath;
 import static pl.dev.news.controller.api.UserResourcesApi.getUserBookmarksPath;
 import static pl.dev.news.controller.api.UserResourcesApi.getUserFollowersPath;
 import static pl.dev.news.controller.api.UserResourcesApi.getUserFollowingPath;
+import static pl.dev.news.controller.api.UserResourcesApi.getUsersFeedPath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
 public class UserResourcesControllerTest extends AbstractIntegrationTest {
@@ -40,6 +42,27 @@ public class UserResourcesControllerTest extends AbstractIntegrationTest {
 
         mockMvc.perform(
                 get(PathUtils.generate(getUserBookmarksPath, userEntity.getId()))
+                        .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
+                        .contentType(APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsBytes(parameters)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$",  hasSize(1)))
+                .andExpect(jsonPath("$[?(@.id == '" + postEntity.getId() + "')]").exists());
+    }
+
+    @Test
+    public void testGetUserFeed() throws Exception {
+        final UserEntity userEntity = createUser(USER);
+        final UserEntity creator = createUser(USER);
+        final GroupEntity group = createGroup(creator);
+        final PostEntity postEntity = createPostEmpty(creator, group);
+        final RestPostQueryParameters parameters = new RestPostQueryParameters();
+        final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(userEntity);
+        followGroup(userEntity, group);
+
+
+        mockMvc.perform(
+                get(PathUtils.generate(getUsersFeedPath, userEntity.getId()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .contentType(APPLICATION_JSON)
                         .content(objectMapper.writeValueAsBytes(parameters)))

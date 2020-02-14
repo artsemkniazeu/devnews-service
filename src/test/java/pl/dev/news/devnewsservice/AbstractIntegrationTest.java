@@ -2,9 +2,12 @@ package pl.dev.news.devnewsservice;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.cloud.storage.Blob;
+import com.google.cloud.storage.BlobId;
 import com.google.cloud.storage.Storage;
 import org.junit.After;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -52,6 +55,8 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.categoryWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.postWithIdNotFound;
@@ -135,6 +140,15 @@ public abstract class AbstractIntegrationTest {
         jdbcTemplate.execute("truncate table group_user restart identity cascade");
         jdbcTemplate.execute("truncate table groups restart identity cascade");
         jdbcTemplate.execute("truncate table users restart identity cascade");
+    }
+
+    protected void mockBucketUpload(final String url) {
+        final Blob blob = Mockito.mock(Blob.class);
+        final BlobId blobId = BlobId.of("", "", 1L);
+        when(blob.getMediaLink()).thenReturn(url);
+        when(blob.getBlobId()).thenReturn(blobId);
+        when(fileService.bucketUpload(any(), any()))
+                .thenReturn(blob);
     }
 
     // User
@@ -266,16 +280,22 @@ public abstract class AbstractIntegrationTest {
     }
 
     protected PostEntity createPost(final UserEntity user) {
-        final GroupEntity group = new GroupEntity(); // TODO create group
+        final GroupEntity group = createGroup(user);
         final RestPostModel model = TestUtils.restPostModel(createTags(), createCategory().getChildren(), group);
         return createPost(user, model, null);
     }
 
     protected PostEntity createPostEmpty(final UserEntity user) {
-        final GroupEntity group = new GroupEntity(); // TODO create group
+        final GroupEntity group = createGroup(user);
         final RestPostModel model = TestUtils
                 .restPostModel(createTags(0), new HashSet<>(), group);
-        return createPost(user, model, null);
+        return createPost(user, model, group);
+    }
+
+    protected PostEntity createPostEmpty(final UserEntity user, final GroupEntity group) {
+        final RestPostModel model = TestUtils
+                .restPostModel(createTags(0), new HashSet<>(), group);
+        return createPost(user, model, group);
     }
 
     protected PostEntity getPost(final UUID postId) {
@@ -301,4 +321,8 @@ public abstract class AbstractIntegrationTest {
                 .orElseThrow(() -> new NotFoundException(groupWithIdNotFound, groupId));
     }
 
+    protected GroupEntity followGroup(final UserEntity user, final GroupEntity groupEntity) {
+        groupEntity.addFollower(user);
+        return groupRepository.saveAndFlush(groupEntity);
+    }
 }
