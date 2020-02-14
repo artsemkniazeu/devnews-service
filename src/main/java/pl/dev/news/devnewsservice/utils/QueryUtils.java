@@ -75,6 +75,7 @@ public class QueryUtils {
         this.builder.and(expression);
         return this;
     }
+
     public QueryUtils or(final BooleanExpression expression) {
         this.builder.or(expression);
         return this;
