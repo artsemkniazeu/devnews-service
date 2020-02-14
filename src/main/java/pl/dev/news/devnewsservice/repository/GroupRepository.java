@@ -55,5 +55,5 @@ public interface GroupRepository extends CustomQueryDslRspository<GroupEntity, Q
             + "    and gu.group_id in (:ids) "
             + "    and gu.user_id = uuid(cast(:userId as text))",
             nativeQuery = true)
-    void unFollowAll(@Param("ids") List<UUID> ids, @Param("userId") final UUID id);
+    void unFollowAll(@Param("ids") List<UUID> ids, @Param("userId") UUID id);
 }

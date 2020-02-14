@@ -4,6 +4,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.GroupEntity;
@@ -87,7 +88,7 @@ public class PostServiceImpl implements PostService {
                 .build();
         return postRepository.findAll(
                 predicate,
-                PageRequest.of(page - 1, size)
+                PageRequest.of(page - 1, size, Sort.Direction.DESC, "createdAt")
         ).map(postMapper::toModel);
     }
 

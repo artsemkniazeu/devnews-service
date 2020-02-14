@@ -6,6 +6,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.BatchSize;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,10 +25,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @EqualsAndHashCode(callSuper = false, exclude = {
-        "user", "parent", "children"
+        "user", "parent", "children", "post"
 })
 @ToString(exclude = {
-        "user", "parent", "children"
+        "user", "parent", "children", "post"
 })
 @AllArgsConstructor
 @NoArgsConstructor
@@ -55,10 +58,18 @@ public class CommentEntity extends AuditableEntity {
     @JoinColumn(name = "parent_id", nullable = false)
     private CommentEntity parent;
 
+    @Column(name = "parent_id", insertable = false, updatable = false)
+    private UUID parentId;
+
+    @BatchSize(size = 10)
+    @Fetch(FetchMode.JOIN)
     @OneToMany(mappedBy = "parent")
     private Set<CommentEntity> children;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private PostEntity post;
+
+    @Column(name = "post_id", insertable = false, updatable = false)
+    private UUID postId;
 }

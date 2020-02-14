@@ -21,11 +21,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static pl.dev.news.controller.api.GroupApi.createGroupPath;
-import static pl.dev.news.controller.api.GroupApi.deleteGroupPath;
-import static pl.dev.news.controller.api.GroupApi.getGroupPath;
-import static pl.dev.news.controller.api.GroupApi.getGroupsPath;
-import static pl.dev.news.controller.api.GroupApi.updateGroupPath;
+import static pl.dev.news.controller.api.GroupApi.createPath;
+import static pl.dev.news.controller.api.GroupApi.deletePath;
+import static pl.dev.news.controller.api.GroupApi.findPath;
+import static pl.dev.news.controller.api.GroupApi.retrievePath;
+import static pl.dev.news.controller.api.GroupApi.updatePath;
 import static pl.dev.news.devnewsservice.entity.UserRoleEntity.USER;
 
 public class GroupControllerTest extends AbstractIntegrationTest {
@@ -38,7 +38,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final RestGroupModel model = TestUtils.restGroupModel(user.getId());
         // when
         mockMvc.perform(
-                post(createGroupPath)
+                post(createPath)
                         .contentType(APPLICATION_JSON)
                         .header(AUTHORIZATION, tokenModel.getAccess().getToken())
                         .content(objectMapper.writeValueAsBytes(model)))
@@ -55,7 +55,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final GroupEntity entity = createGroup(user);
         // when
         mockMvc.perform(
-                delete(deleteGroupPath, entity.getId())
+                delete(deletePath, entity.getId())
                         .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
                 // then
                 .andExpect(status().isNoContent());
@@ -71,7 +71,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final RestTokenResponse tokenModel = tokenProvider.createTokenModel(user);
         // when
         mockMvc.perform(
-                delete(deleteGroupPath, UUID.randomUUID())
+                delete(deletePath, UUID.randomUUID())
                         .header(AUTHORIZATION, tokenModel.getAccess().getToken()))
                 // then
                 .andExpect(status().isNotFound());
@@ -83,7 +83,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final GroupEntity entity = createGroup(user);
         mockMvc.perform(
-                get(PathUtils.generate(getGroupsPath))
+                get(PathUtils.generate(findPath))
                         .param("name", entity.getName())
                         .param("value", entity.getValue())
                         .param("ownerId", entity.getOwnerId().toString())
@@ -100,7 +100,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final GroupEntity entity = createGroup(user);
         mockMvc.perform(
-                get(PathUtils.generate(getGroupPath, entity.getId()))
+                get(PathUtils.generate(findPath, entity.getId()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -112,7 +112,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final UserEntity user = createUser(USER);
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         mockMvc.perform(
-                get(PathUtils.generate(getGroupPath, UUID.randomUUID()))
+                get(PathUtils.generate(retrievePath, UUID.randomUUID()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .contentType(APPLICATION_JSON))
                 .andExpect(status().isNotFound());
@@ -126,7 +126,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final GroupEntity entity = createGroup(user, model);
         model.setName("changed");
         mockMvc.perform(
-                put(PathUtils.generate(updateGroupPath, entity.getId()))
+                put(PathUtils.generate(updatePath, entity.getId()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .content(objectMapper.writeValueAsBytes(model))
                         .contentType(APPLICATION_JSON))
@@ -141,7 +141,7 @@ public class GroupControllerTest extends AbstractIntegrationTest {
         final RestTokenResponse tokenResponse = tokenProvider.createTokenModel(user);
         final RestGroupModel model = TestUtils.restGroupModel(user.getId());
         mockMvc.perform(
-                put(PathUtils.generate(updateGroupPath, UUID.randomUUID()))
+                put(PathUtils.generate(updatePath, UUID.randomUUID()))
                         .header(AUTHORIZATION, tokenResponse.getAccess().getToken())
                         .content(objectMapper.writeValueAsBytes(model))
                         .contentType(APPLICATION_JSON))

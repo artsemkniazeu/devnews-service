@@ -15,4 +15,6 @@ public interface UserResourcesService {
     Page<RestUserModel> getFollowers(UUID userId, RestUserQueryParameters parameters, Integer page, Integer size);
 
     Page<RestUserModel> getFollowing(UUID userId, RestUserQueryParameters parameters, Integer page, Integer size);
+
+    Page<RestPostModel> getUsersFeed(UUID userId, RestPostQueryParameters parameters, Integer page, Integer size);
 }

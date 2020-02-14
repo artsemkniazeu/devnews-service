@@ -4,6 +4,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.dto.UserQueryParametersDto;
@@ -46,10 +47,29 @@ public class UserResourcesServiceImpl implements UserResourcesService {
     ) {
         final Predicate predicate = new QueryUtils()
                 .andEq(userId, qPostEntity.usersSaved.any().id)
+                .andEq(parameters.getPostId(), qPostEntity.id)
                 .build();
         return postRepository.findAll(
                 predicate,
-                PageRequest.of(page - 1, size)
+                PageRequest.of(page - 1, size, Sort.Direction.DESC, "createdAt")
+        ).map(postMapper::toModel);
+    }
+
+    @Override
+    @Transactional
+    public Page<RestPostModel> getUsersFeed(
+            final UUID userId,
+            final RestPostQueryParameters parameters,
+            final Integer page,
+            final Integer size
+    ) {
+        final Predicate predicate = new QueryUtils()
+                .and(qPostEntity.group.followers.any().id.eq(userId))
+                .or(qPostEntity.group.owner.id.eq(userId))
+                .build();
+        return postRepository.findAll(
+                predicate,
+                PageRequest.of(page - 1, size, Sort.Direction.DESC, "createdAt")
         ).map(postMapper::toModel);
     }
 

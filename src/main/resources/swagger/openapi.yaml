@@ -484,6 +484,45 @@ paths:
         "404":
           $ref: "#/components/responses/NotFound"
 
+  "/users/{userId}/resources/feed":
+    parameters:
+      - name: userId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    get:
+      tags:
+        - UserResources
+      operationId: getUsersFeed
+      security:
+        - userAuth: []
+      parameters:
+        - name: parameters
+          in: query
+          schema:
+            $ref: "#/components/schemas/PostQueryParameters"
+          style: form
+          explode: true
+        - $ref: "#/components/parameters/PageQueryParameter"
+        - $ref: "#/components/parameters/SizeQueryParameter"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PostModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
   "/users/{userId}/resources/followers":
     parameters:
       - name: userId
@@ -868,6 +907,25 @@ paths:
       tags:
         - Comment
       operationId: updateComment
+      security:
+        - userAuth: []
+      requestBody:
+        $ref: "#/components/requestBodies/CommentRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CommentModel"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    patch:
+      tags:
+        - Comment
+      operationId: likeComment
       security:
         - userAuth: []
       requestBody:
@@ -1484,6 +1542,9 @@ components:
     CommentQueryParameters:
       type: object
       properties:
+        postId:
+          type: string
+          format: uuid
         parentId:
           type: string
           format: uuid
@@ -1513,6 +1574,9 @@ components:
     PostQueryParameters:
       type: object
       properties:
+        postId:
+          type: string
+          format: uuid
         title:
           type: string
         text:
@@ -1746,6 +1810,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/CategoryModel'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentModel'
         groupId:
           type: string
           format: uuid

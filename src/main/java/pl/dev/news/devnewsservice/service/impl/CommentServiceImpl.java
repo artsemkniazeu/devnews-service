@@ -4,6 +4,7 @@ import com.querydsl.core.types.Predicate;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.dev.news.devnewsservice.entity.CommentEntity;
@@ -46,9 +47,15 @@ public class CommentServiceImpl implements CommentService {
         final UserEntity userEntity = securityResolver.getUser();
         final PostEntity postEntity = postRepository.softFindById(model.getPostId())
                 .orElseThrow(() -> new NotFoundException(postWithIdNotFound, model.getPostId()));
+
         final CommentEntity entity = commentMapper.toEntity(model);
         entity.setPost(postEntity);
         entity.setUser(userEntity);
+        if (model.getParentId() != null) {
+            final CommentEntity parentCommentEntity = commentRepository.softFindById(model.getParentId())
+                    .orElseThrow(() -> new NotFoundException(commentWithIdNotFound, model.getParentId()));
+            entity.setParent(parentCommentEntity);
+        }
         final CommentEntity saved = commentRepository.saveAndFlush(entity);
         return commentMapper.toModel(saved);
     }
@@ -70,12 +77,14 @@ public class CommentServiceImpl implements CommentService {
     ) {
         final Predicate predicate = new QueryUtils()
                 .andLikeAny(parameters.getText(), qCommentEntity.text)
+                .andEq(parameters.getPostId(), qCommentEntity.post.id)
                 .andEq(parameters.getParentId(), qCommentEntity.parent.id)
                 .andEq(parameters.getUserId(), qCommentEntity.userId)
+                .and(qCommentEntity.parent.isNull())
                 .build();
         return commentRepository.findAll(
-                predicate,
-                PageRequest.of(page - 1, size))
+                commentRepository.soft(predicate),
+                PageRequest.of(page - 1, size, Sort.Direction.ASC, "createdAt"))
                 .map(commentMapper::toModel);
     }
 

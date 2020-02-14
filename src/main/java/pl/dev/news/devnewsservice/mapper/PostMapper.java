@@ -17,6 +17,7 @@ import pl.dev.news.model.rest.RestPostModel;
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, uses = {
         UserMapper.class,
         CategoryMapper.class,
+        CommentMapper.class,
         TagMapper.class,
         UploadMapper.class
 })
@@ -27,6 +28,7 @@ public interface PostMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "tags", ignore = true)
     @Mapping(target = "categories", ignore = true)
+    @Mapping(target = "comments", ignore = true)
     @Mapping(target = "uploads", ignore = true)
     @Mapping(target = "imageUrl", source = "model.imageUrl")
     @Mapping(target = "createdAt", ignore = true)

@@ -2,6 +2,7 @@ package pl.dev.news.devnewsservice.utils;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.ComparablePath;
 import com.querydsl.core.types.dsl.StringPath;
 
@@ -70,6 +71,14 @@ public class QueryUtils {
         return this;
     }
 
+    public QueryUtils and(final BooleanExpression expression) {
+        this.builder.and(expression);
+        return this;
+    }
+    public QueryUtils or(final BooleanExpression expression) {
+        this.builder.or(expression);
+        return this;
+    }
 
     public QueryUtils and(final BooleanBuilder builder) {
         this.builder.and(builder);

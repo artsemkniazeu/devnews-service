@@ -20,6 +20,12 @@ public interface CommentMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "children", ignore = true)
+    @Mapping(target = "user", ignore = true)
+    @Mapping(target = "userId", ignore = true)
+    @Mapping(target = "post", ignore = true)
+    @Mapping(target = "postId", ignore = true)
+    @Mapping(target = "parent", ignore = true)
+    @Mapping(target = "parentId", ignore = true)
     void update(@MappingTarget CommentEntity entity, RestCommentModel model);
 
     @AfterMapping

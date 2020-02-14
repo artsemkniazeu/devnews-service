@@ -43,6 +43,20 @@ public class UserResourcesController implements UserResourcesApi {
     }
 
     @Override
+    public ResponseEntity<List<RestPostModel>> getUsersFeed(
+            @PathVariable("userId") final UUID userId,
+            @Valid final RestPostQueryParameters parameters,
+            @Min(1) @Valid
+            @RequestParam(value = "page", required = false, defaultValue = "1") final Integer page,
+            @Min(10) @Max(30) @Valid
+            @RequestParam(value = "size", required = false, defaultValue = "10") final Integer size
+    ) {
+        final Page<RestPostModel> users = userResourcesService.getUsersFeed(userId, parameters, page, size);
+        final HttpHeaders headers = HeaderUtils.generatePaginationHeaders(basePath, users);
+        return new ResponseEntity<>(users.getContent(), headers, HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<List<RestUserModel>> getUserFollowers(
             @PathVariable("userId") final UUID userId,
             @Valid final RestUserQueryParameters parameters,
