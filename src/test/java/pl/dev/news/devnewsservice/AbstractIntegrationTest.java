@@ -19,6 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import pl.dev.news.devnewsservice.entity.CategoryEntity;
+import pl.dev.news.devnewsservice.entity.CommentEntity;
 import pl.dev.news.devnewsservice.entity.GroupEntity;
 import pl.dev.news.devnewsservice.entity.PostEntity;
 import pl.dev.news.devnewsservice.entity.TagEntity;
@@ -26,11 +27,13 @@ import pl.dev.news.devnewsservice.entity.UserEntity;
 import pl.dev.news.devnewsservice.entity.UserRoleEntity;
 import pl.dev.news.devnewsservice.exception.NotFoundException;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
+import pl.dev.news.devnewsservice.mapper.CommentMapper;
 import pl.dev.news.devnewsservice.mapper.GroupMapper;
 import pl.dev.news.devnewsservice.mapper.PostMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.devnewsservice.mapper.UserMapper;
 import pl.dev.news.devnewsservice.repository.CategoryRepository;
+import pl.dev.news.devnewsservice.repository.CommentRepository;
 import pl.dev.news.devnewsservice.repository.GroupRepository;
 import pl.dev.news.devnewsservice.repository.PostRepository;
 import pl.dev.news.devnewsservice.repository.TagRepository;
@@ -43,6 +46,7 @@ import pl.dev.news.devnewsservice.service.UserResourcesService;
 import pl.dev.news.devnewsservice.service.UserService;
 import pl.dev.news.devnewsservice.utils.TestUtils;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestCommentModel;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestPostModel;
 import pl.dev.news.model.rest.RestSignUpRequest;
@@ -58,6 +62,7 @@ import java.util.stream.IntStream;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.categoryWithIdNotFound;
+import static pl.dev.news.devnewsservice.constants.ExceptionConstants.commentWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.groupWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.postWithIdNotFound;
 import static pl.dev.news.devnewsservice.constants.ExceptionConstants.tagWithIdNotFound;
@@ -76,6 +81,8 @@ public abstract class AbstractIntegrationTest {
     protected final UserMapper userMapper = UserMapper.INSTANCE;
 
     protected final PostMapper postMapper = PostMapper.INSTANCE;
+
+    protected final CommentMapper commentMapper = CommentMapper.INSTANCE;
 
     @Autowired
     protected JdbcTemplate jdbcTemplate;
@@ -109,6 +116,9 @@ public abstract class AbstractIntegrationTest {
 
     @Autowired
     protected GroupRepository groupRepository;
+
+    @Autowired
+    protected CommentRepository commentRepository;
 
     @Autowired
     protected UserService userService;
@@ -324,5 +334,46 @@ public abstract class AbstractIntegrationTest {
     protected GroupEntity followGroup(final UserEntity user, final GroupEntity groupEntity) {
         groupEntity.addFollower(user);
         return groupRepository.saveAndFlush(groupEntity);
+    }
+
+
+    // Comment
+
+    protected CommentEntity createComment(
+            final UserEntity user,
+            final PostEntity post,
+            final RestCommentModel model
+    ) {
+        final CommentEntity entity = commentMapper.toEntity(model);
+        entity.setUser(user);
+        entity.setPost(post);
+        return commentRepository.saveAndFlush(entity);
+    }
+
+    protected CommentEntity createComment(
+            final UserEntity user,
+            final PostEntity post
+    ) {
+        final RestCommentModel model = TestUtils.restCommentModel(post.getId());
+        final CommentEntity entity = commentMapper.toEntity(model);
+        entity.setUser(user);
+        entity.setPost(post);
+        return commentRepository.saveAndFlush(entity);
+    }
+
+    protected CommentEntity createComment(
+            final UserEntity user
+    ) {
+        final PostEntity post = createPost(user);
+        final RestCommentModel model = TestUtils.restCommentModel(post.getId());
+        final CommentEntity entity = commentMapper.toEntity(model);
+        entity.setUser(user);
+        entity.setPost(post);
+        return commentRepository.saveAndFlush(entity);
+    }
+
+    protected CommentEntity getComment(final UUID commentId) {
+        return commentRepository.findById(commentId)
+                .orElseThrow(() -> new NotFoundException(commentWithIdNotFound, commentId));
     }
 }

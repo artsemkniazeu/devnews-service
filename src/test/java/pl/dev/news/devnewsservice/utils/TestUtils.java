@@ -11,6 +11,7 @@ import pl.dev.news.devnewsservice.entity.TagEntity;
 import pl.dev.news.devnewsservice.mapper.CategoryMapper;
 import pl.dev.news.devnewsservice.mapper.TagMapper;
 import pl.dev.news.model.rest.RestCategoryModel;
+import pl.dev.news.model.rest.RestCommentModel;
 import pl.dev.news.model.rest.RestEmailModel;
 import pl.dev.news.model.rest.RestGroupModel;
 import pl.dev.news.model.rest.RestPhoneModel;
@@ -149,6 +150,13 @@ public class TestUtils {
                 .imageUrl(faker.internet().url())
                 .bgUrl(faker.internet().url())
                 .ownerId(ownerId);
+    }
+
+    public static RestCommentModel restCommentModel(final UUID postId) {
+        final String text = faker.lorem().paragraph();
+        return new RestCommentModel()
+                .postId(postId)
+                .text(text);
     }
 
     public RestPhoneModel restPhoneModel() {
