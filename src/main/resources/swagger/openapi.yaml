@@ -1799,7 +1799,7 @@ components:
           type: string
         publishDate:
           type: string
-        publisher_id:
+        publisherId:
           type: string
           format: uuid
         tags:

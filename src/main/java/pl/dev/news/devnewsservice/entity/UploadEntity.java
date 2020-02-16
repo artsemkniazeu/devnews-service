@@ -10,8 +10,6 @@ import lombok.ToString;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -29,12 +27,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "uploads")
-public class UploadEntity extends AuditableEntity {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class UploadEntity extends BaseEntity {
 
     @Column(name = "url")
     private String url;

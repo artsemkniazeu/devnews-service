@@ -87,7 +87,7 @@ public class PostServiceImpl implements PostService {
                 .andEq(parameters.getPublisherId(), qPostEntity.publisherId)
                 .build();
         return postRepository.findAll(
-                predicate,
+                postRepository.soft(predicate),
                 PageRequest.of(page - 1, size, Sort.Direction.DESC, "createdAt")
         ).map(postMapper::toModel);
     }

@@ -14,8 +14,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -38,12 +36,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "posts")
-public class PostEntity extends AuditableEntity {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class PostEntity extends BaseEntity {
 
     @Column(name = "title", columnDefinition = "citext")
     private String title;

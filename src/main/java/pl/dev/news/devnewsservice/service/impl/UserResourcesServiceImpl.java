@@ -50,7 +50,7 @@ public class UserResourcesServiceImpl implements UserResourcesService {
                 .andEq(parameters.getPostId(), qPostEntity.id)
                 .build();
         return postRepository.findAll(
-                predicate,
+                postRepository.soft(predicate),
                 PageRequest.of(page - 1, size, Sort.Direction.DESC, "createdAt")
         ).map(postMapper::toModel);
     }
@@ -68,7 +68,7 @@ public class UserResourcesServiceImpl implements UserResourcesService {
                 .or(qPostEntity.group.owner.id.eq(userId))
                 .build();
         return postRepository.findAll(
-                predicate,
+                postRepository.soft(predicate),
                 PageRequest.of(page - 1, size, Sort.Direction.DESC, "createdAt")
         ).map(postMapper::toModel);
     }

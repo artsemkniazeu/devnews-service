@@ -11,8 +11,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
@@ -33,12 +31,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "categories")
-public class CategoryEntity extends AuditableEntity {
+public class CategoryEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
 
     @Column(name = "name", columnDefinition = "citext")
     private String name;

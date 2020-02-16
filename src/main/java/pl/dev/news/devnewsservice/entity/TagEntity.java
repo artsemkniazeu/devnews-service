@@ -9,12 +9,9 @@ import lombok.ToString;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.Table;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -28,12 +25,8 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "tags")
-public class TagEntity extends AuditableEntity {
+public class TagEntity extends BaseEntity {
 
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
 
     @Column(name = "name", columnDefinition = "citext")
     private String name;

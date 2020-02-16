@@ -355,21 +355,14 @@ public abstract class AbstractIntegrationTest {
             final PostEntity post
     ) {
         final RestCommentModel model = TestUtils.restCommentModel(post.getId());
-        final CommentEntity entity = commentMapper.toEntity(model);
-        entity.setUser(user);
-        entity.setPost(post);
-        return commentRepository.saveAndFlush(entity);
+        return createComment(user, post, model);
     }
 
     protected CommentEntity createComment(
             final UserEntity user
     ) {
         final PostEntity post = createPost(user);
-        final RestCommentModel model = TestUtils.restCommentModel(post.getId());
-        final CommentEntity entity = commentMapper.toEntity(model);
-        entity.setUser(user);
-        entity.setPost(post);
-        return commentRepository.saveAndFlush(entity);
+        return createComment(user, post);
     }
 
     protected CommentEntity getComment(final UUID commentId) {

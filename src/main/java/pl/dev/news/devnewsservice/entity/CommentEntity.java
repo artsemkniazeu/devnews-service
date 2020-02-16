@@ -13,8 +13,6 @@ import org.hibernate.annotations.FetchMode;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -34,12 +32,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @Entity
 @Table(name = "comments")
-public class CommentEntity extends AuditableEntity {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "id", updatable = false, nullable = false)
-    private UUID id;
+public class CommentEntity extends BaseEntity {
 
     @Column(name = "text", nullable = false)
     private String text;
