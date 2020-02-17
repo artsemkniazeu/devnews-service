@@ -48,6 +48,17 @@ spring:
   mustache:
     cache: true
     suffix: ""
+  mail:
+    host: "smtp.gmail.com"
+    port: 587
+    username: "devnewsdev@gmail.com"
+    password: "l4JMDbv$4DyCYWclQs%Z&5x*rby&lJUn$nHDe@LqgwGDM0w2"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 server:
   port: "${PORT:8080}"
