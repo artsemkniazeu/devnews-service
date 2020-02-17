@@ -17,19 +17,19 @@ public interface UserRepository extends CustomQueryDslRspository<UserEntity, QUs
 
     @Query(value = "select u.* "
             + "from users u "
-            + "where (:email is null or :email  = '' or u.email = :email) "
-            + "    and (:email is not null or :email != '' or ( "
-            + "        (:name is null or :name = '' or u.full_name like concat('%', :name, '%')) "
-            + "        or (:username is null or :username = '' or u.username like concat('%', :username, '%')) "
+            + "where (:email  = '' or u.email = :email) "
+            + "    and (:email != '' or ( "
+            + "        (:name = '' or u.full_name like concat('%', :name, '%')) "
+            + "        or (:username = '' or u.username like concat('%', :username, '%')) "
             + "    )) "
             + "    and u.deleted_at is null",
-            countQuery = "select count(u.id) "
-                    + "from users u "
-                    + "where (:email is null or :email  = '' or u.email = :email) "
-                    + "    and (:email is not null or :email != '' or ( "
-                    + "        (:name is null or :name = '' or u.full_name like concat('%', :name, '%')) "
-                    + "        or (:username is null or :username = '' or u.username like concat('%', :username, '%')) "
-                    + "    )) "
+            countQuery = "select u.*  "
+                    + "from users u  "
+                    + "where (:email  = '' or u.email = :email)  "
+                    + "    and (:email != '' or (  "
+                    + "        (:name = '' or u.full_name like concat('%', :name, '%'))  "
+                    + "        or (:username = '' or u.username like concat('%', :username, '%'))  "
+                    + "    ))  "
                     + "    and u.deleted_at is null",
             nativeQuery = true)
     Page<UserEntity> findAll(

@@ -25,6 +25,7 @@ import pl.dev.news.devnewsservice.service.TransactionTemplate;
 import pl.dev.news.devnewsservice.service.TwilioService;
 import pl.dev.news.devnewsservice.service.UploadService;
 import pl.dev.news.devnewsservice.service.UserService;
+import pl.dev.news.devnewsservice.utils.CommonUtils;
 import pl.dev.news.devnewsservice.utils.ImageUtils;
 import pl.dev.news.devnewsservice.utils.SerializationUtils;
 import pl.dev.news.model.rest.RestEmailModel;
@@ -95,9 +96,9 @@ public class UserServiceImpl implements UserService {
             final Integer size
     ) {
         return userRepository.findAll(
-                parameters.getEmail(),
-                parameters.getName(),
-                parameters.getUsername(),
+                CommonUtils.nullSafeToString(parameters.getEmail()),
+                CommonUtils.nullSafeToString(parameters.getName()),
+                CommonUtils.nullSafeToString(parameters.getUsername()),
                 PageRequest.of(page - 1, size)
         ).map(userMapper::toModel);
     }
